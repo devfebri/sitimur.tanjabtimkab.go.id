@@ -18,8 +18,8 @@ class UserController extends Controller
                     $button = '<div class="tabledit-toolbar btn-toolbar" style="text-align: center;">';
                     $button .= '<div class="btn-group btn-group-sm" style="float: none;">';
                     $button .= '<button class="tabledit-edit-button btn btn-sm btn-warning edit-post" data-id=' . $f->id . ' id="alertify-success" style="float: none; margin: 5px;"><span class="ti-pencil"></span></button>';
-                    $button .= '<a href="#" target="_blank" style="margin: 5px;" class="tabledit-edit-button btn btn-sm btn-primary"><span class="ti-shift-right"></span></a>';
-                    // $button.='<button class="tabledit-delete-button btn btn-sm btn-danger delete" data-id='.$f->id.' style="float: none; margin: 5px;"><span class="ti-trash"></span></button>';
+                    // $button .= '<a href="#" target="_blank" style="margin: 5px;" class="tabledit-edit-button btn btn-sm btn-primary"><span class="ti-shift-right"></span></a>';
+                    $button.='<button class="tabledit-delete-button btn btn-sm btn-danger delete" data-id='.$f->id.' style="float: none; margin: 5px;"><span class="ti-trash"></span></button>';
                     $button .= '</div>';
                     $button .= '</div>';
 
@@ -45,44 +45,32 @@ class UserController extends Controller
     {
         $id = $request->id;
         if ($id) {
+            // dd($request->all());
+          
             $user = User::find($id);
             
-            $cutisisa = CutiSisa::where('user_id', $id)->update(['sisa_cuti' => $request->sisa_cuti]);
-            $pegawai = Pegawai::find($user->pegawai_id)->update(['gapok' => $request->gapok]);
             $user->update([
+                'name' => $request->name,
                 'role' => $request->role,
-                'pegawai_pin' => $request->pegawai_pin,
-                'unit_new_id' => $request->unit_id,
-                'status' => $request->statuss,
-                'hak_cuti_lainnya' => $request->hak_cuti_lainnya
+                'akses' => $request->statuss,
+                'password' => bcrypt($request->password),
+                'role' => $request->role,
             ]);
         } else {
             // dd($request->all());
             $validated = $request->validate([
                 'username' => 'required|unique:users,username',
             ]);
-            $pegawai = new Pegawai;
-            $pegawai->nama = $request->name;
-            $pegawai->nik = $request->username;
-            $pegawai->save();
+            
 
             $user = new User;
-            $user->pegawai_id = $pegawai->id;
             $user->username = $request->username;
             $user->name = $request->name;
             $user->role = $request->role;
-            $user->password = bcrypt($request->username);
-            $user->cek_pass = $request->username;
-            $user->unit_new_id = $request->unit_id;
-            $user->pegawai_pin = $request->pegawai_pin;
+            $user->password = bcrypt($request->password);
+            $user->akses    = $request->statuss;
             $user->save();
 
-            $cuti_sisa = new CutiSisa();
-            $cuti_sisa->user_id = $user->id;
-            $cuti_sisa->pegawai_id = $pegawai->id;
-            $cuti_sisa->sisa_cuti = $request->sisa_cuti;
-            $cuti_sisa->tahun = 2023;
-            $cuti_sisa->save();
         }
         return response()->json($user);
     }
@@ -90,9 +78,6 @@ class UserController extends Controller
     public function delete($id)
     {
         $user = User::find($id);
-        $cuti = Cuti::where('user_id', $id)->delete();
-        $sisacuti = CutiSisa::where('user_id', $id)->delete();
-        $sisacuti = Pegawai::find($user->pegawai_id)->delete();
 
         $user->delete();
         return response()->json($user);
@@ -102,5 +87,12 @@ class UserController extends Controller
     {
         $data =  User::find($id);
         return response()->json($data);
+    }
+    public function checkUsername(Request $request)
+    {
+        $exists = User::where('username', $request->username)
+            ->where('id', '!=', $request->id)
+            ->exists();
+        return response()->json(!$exists); // true jika unik, false jika sudah ada
     }
 }

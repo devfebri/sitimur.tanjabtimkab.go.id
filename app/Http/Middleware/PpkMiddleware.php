@@ -3,11 +3,11 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class VerifikatorMiddleware
+class PpkMiddleware
 {
     /**
      * Handle an incoming request.
@@ -17,7 +17,7 @@ class VerifikatorMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
-            if (Auth::user()->role == 'verfikator') {
+            if (Auth::user()->role == 'ppk') {
                 return $next($request);
             } else {
                 return redirect(url('/'));

@@ -20,11 +20,11 @@ class AdminMiddleware
             if (Auth::user()->role == 'admin') {
                 return $next($request);
             } else {
-                return redirect(url('login'));
+                return redirect(url('/'));
             }
         } else {
             Auth::logout();
-            return redirect(url('login'));
+            return redirect(url('/'));
         }
     }
 }

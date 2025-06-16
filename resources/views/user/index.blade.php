@@ -42,7 +42,7 @@
                 <div class="card m-b-30">
                     <div class="card-body">
 
-                        <h4 class="mt-0 header-title">Data Pegawai
+                        <h4 class="mt-0 header-title">Data User
                             @if(auth()->user()->role=='admin')
                             <button type="button" class="btn btn-primary mb-2  float-right btn-sm" id="tombol-tambah">
                                 Tambah Data
@@ -106,13 +106,15 @@
                 <input type="hidden" name="id" id="id">
                 <div class="card-body">
                     <div class="form-group row">
-                        <label for="username" class="col-sm-4 col-form-label">Username</label>
+                        <label for="username" class="col-sm-4 col-form-label">Username <small class="text-center" style="color:red;">*</small></label>
+
                         <div class="col-sm-8">
                             <input class="form-control" type="text" name="username" id="username"   required>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="name" class="col-sm-4 col-form-label">Nama Lengkap</label>
+                        <label for="name" class="col-sm-4 col-form-label">Nama Lengkap <small class="text-center" style="color:red;">*</small></label>
+
                         <div class="col-sm-8">
                             <input class="form-control" type="text" name="name" id="name" required>
                         </div>
@@ -121,12 +123,12 @@
 
 
                     <div class="form-group row">
-                        <label class="col-sm-4 col-form-label">Hak Akses</label>
+                        <label class="col-sm-4 col-form-label">Hak Akses <small class="text-center" style="color:red;">*</small></label>
                         <div class="col-sm-8">
                             <select class="form-control" name="role" id="role" required>
                                 <option value="">-pilih-</option>
                                 <option value="admin">admin</option>
-                                <option value="pegawai">PPK</option>
+                                <option value="ppk">PPK</option>
                                 <option value="verifikator">Verfikator</option>
                                 <option value="kepalaukpbj">Kepala UKPBJ</option>
                                 <option value="pokjapemilihan">Pokja Pemilihan</option>
@@ -134,29 +136,36 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="name" class="col-sm-4 col-form-label">Password</label>
+                        <label for="name" class="col-sm-4 col-form-label">Password <small class="text-center" style="color:red;display:none;" id="pwwjb">*</small></label>
+
                         <div class="col-sm-8">
-                            <input class="form-control" type="password" name="name" id="name" value="password" required>
-                            <small class="text-danger"><i>default = "password"</i></small>
+                            <input class="form-control" type="password" name="password" id="password"  >
+                            {{-- <small class="text-danger"><i>default = "password"</i></small> --}}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="name" class="col-sm-4 col-form-label">Password Confirmation <small class="text-center" style="color:red;display:none;" id="pwcfwjb">*</small></label>
+
+
+                        <div class="col-sm-8">
+                            <input class="form-control" type="password" name="password_confirmation" id="password_confirmation"  >
+                            {{-- <small class="text-danger"><i>default = "password"</i></small> --}}
 
 
                         </div>
                     </div>
+
 
 
                     <div class="form-group row" style="display: none;" id="formstatus">
-
-                        <label class="col-sm-2 col-form-label">Status Akun</label>
-                        <div class="col-sm-10">
+                        <label class="col-sm-4 col-form-label">Status Akun <small class="text-center" style="color:red;" >*</small></label>
+                        <div class="col-sm-8">
                             <select class="form-control" name="statuss" id="statuss" style="width: 100%; height:36px;" required>
-
-                                <option value="1">active</option>
-                                <option value="0">not active</option>
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
                             </select>
                         </div>
                     </div>
-
-
                 </div>
 
                 <div class="modal-footer">
@@ -180,9 +189,6 @@
 
 <script>
     $(document).ready(function() {
-
-
-
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -193,7 +199,7 @@
             processing: true,
             serverSide: true,
             ajax: "{{ route(auth()->user()->role.'_user') }}",
-            scrollX: true, // Tambahkan baris ini
+            scrollX: true,
             columns: [
                 {
                     data: null,
@@ -216,100 +222,117 @@
                 { data: 'action', name: 'action' },
                 @endif
             ]
-
         });
-
 
         $('#unit_id').select2();
         $('#pegawai_pin').select2();
 
-
-
-
-        // tombol tambah data
+        // Tombol tambah data
         $('#tombol-tambah').click(function() {
-            $('#id').val(''); //valuenya menjadi kosong
-            $('#form-tambah-edit').trigger("reset"); //mereset semua input dll didalamnya
-            $('#modal-judul').html("Tambah User"); //valuenya tambah pegawai baru
-            $('#tambah-edit-modal').modal('show');
-            // console.log('sukses');
-        });
-
-
-        // tombol tambah data
-        $('#tombol-tambah').click(function() {
-            $('#id').val(''); //valuenya menjadi kosong
-            $('#form-tambah-edit').trigger("reset"); //mereset semua input dll didalamnya
-            $('#modal-judul').html("Tambah Pegawai"); //valuenya tambah pegawai baru
+            $('#id').val('');
+            $('#form-tambah-edit').trigger("reset");
+            $('#modal-judul').html("Tambah Pegawai");
             $('#tambah-edit-modal').modal({
-                backdrop: 'static'
-                , keyboard: false
+                backdrop: 'static',
+                keyboard: false
             });
-
+            $('#pwwjb').show();
+            $('#pwcfwjb').show();
+            $('#password_confirmation').attr('required', true);
+            $('#password').attr('required', true);
+            $('#username').attr('disabled', false);
         });
 
+        // Validasi form
         if ($("#form-tambah-edit").length > 0) {
             $("#form-tambah-edit").validate({
-                submitHandler: function(form) {
+                rules: {
+                    username: {
+                        required: true,
+                        remote: {
+                            url: "{{ route('usercheckUsername') }}",
 
-                    var actionType = $('#tombol-simpan').val();
-                    var simpan = $('#tombol-simpan').html('Sending..');
-                    $.ajax({
-                        data: $('#form-tambah-edit')
-                            .serialize(), //function yang dipakai agar value pada form-control seperti input, textarea, select dll dapat digunakan pada URL query string ketika melakukan ajax request
-                        url: "{{ route(auth()->user()->role.'_usercreate') }}", //url simpan data
-
-                        type: "POST", //karena simpan kita pakai method POST
-                        dataType: 'json'
-                        , success: function(data) { //jika berhasil
-
-                            $('#form-tambah-edit').trigger("reset"); //form
-
-                            $('#tambah-edit-modal').modal('hide'); //modal hide
-                            $('#tombol-simpan').html('Simpan'); //tombol simpan
-                            var oTable = $('#datatable1')
-                                .dataTable(); //inialisasi datatable
-                            oTable.fnDraw(false);
+                            type: "post",
+                            data: {
+                                username: function() { return $("#username").val(); },
+                                id: function() { return $("#id").val(); },
+                                _token: "{{ csrf_token() }}"
+                            }
                         }
-                        , error: function(data) { //jika error tampilkan error pada console
-
+                    },
+                    name: { required: true },
+                    role: { required: true },
+                    password: {
+                        required: function() {
+                            return $('#id').val() === '';
+                        },
+                        minlength: 6
+                    },
+                    password_confirmation: {
+                        equalTo: "#password"
+                    }
+                },
+                messages: {
+                    username: {
+                        required: "Username wajib diisi",
+                        remote: "Username sudah digunakan"
+                    },
+                    name: "Nama wajib diisi",
+                    role: "Role wajib dipilih",
+                    password: {
+                        required: "Password wajib diisi",
+                        minlength: "Password minimal 6 karakter"
+                    },
+                    password_confirmation: {
+                        equalTo: "Konfirmasi password tidak sama"
+                    }
+                },
+                submitHandler: function(form) {
+                    var actionType = $('#tombol-simpan').val();
+                    $('#tombol-simpan').html('Sending..');
+                    $.ajax({
+                        data: $('#form-tambah-edit').serialize(),
+                        url: "{{ route(auth()->user()->role.'_usercreate') }}",
+                        type: "POST",
+                        dataType: 'json',
+                        success: function(data) {
+                            $('#form-tambah-edit').trigger("reset");
+                            $('#tambah-edit-modal').modal('hide');
+                            $('#tombol-simpan').html('Simpan');
+                            table.ajax.reload(null, false);
+                        },
+                        error: function(data) {
                             $('#tombol-simpan').html('Simpan');
                         }
                     });
                 }
-            })
+            });
         }
 
-        $('body').on('click', '.delete', function(id) {
-            var dataid = $(this).attr('data-id');
+        // Hapus data
+        $('body').on('click', '.delete', function() {
             var dataid = $(this).attr('data-id');
             var url = "{{ route(auth()->user()->role.'_userdelete', ':dataid') }}";
-
-            urls = url.replace(':dataid', dataid);
+            url = url.replace(':dataid', dataid);
 
             alertify.confirm('Seluruh data yang berkaitan di user ini akan ikut terhapus, apa anda yakin ?', function() {
                 $.ajax({
-
-                    url: urls, //eksekusi ajax ke url ini
-
-                    type: 'delete'
-                    , success: function(data) { //jika sukses
+                    url: url,
+                    type: 'delete',
+                    success: function(data) {
                         setTimeout(function() {
-
-                            var oTable = $('#datatable1').dataTable();
-                            oTable.fnDraw(false); //reset datatable
+                            table.ajax.reload(null, false);
                             $('#tombol-hapus').text('Yakin');
                         });
-
+                        alertify.success('Data berhasil dihapus');
                     }
-                })
-                alertify.success('Data berhasil dihapus')
-
+                });
             }, function() {
-                alertify.error('Cancel')
+                alertify.error('Cancel');
             });
         });
 
+        // Edit data
         $('body').on('click', '.edit-post', function() {
             var data_id = $(this).data('id');
             $.get('user/' + data_id + '/edit', function(data) {
@@ -318,23 +341,23 @@
                 $('#tambah-edit-modal').modal('show');
                 $('#id').val(data.id);
                 $('#username').val(data.username).attr('disabled', true);
-                $('#name').val(data.name).attr('disabled', true);
+                $('#name').val(data.name);
                 $('#role').val(data.role).change();
-                $('#sisa_cuti').val(data.sisa_cuti);
+                $('#hak').val(data.sisa_cuti);
                 $('#gapok').val(data.gapok);
                 $('#pegawai_pin').val(data.pegawai_pin).change();
                 $('#formstatus').show();
                 $('#unit_id').val(data.unit_new_id).change();
-                $('#statuss').val(data.status).change();
+                $('#statuss').val(data.akses).change();
                 $('#hak_cuti_lainnya').val(data.hak_cuti_lainnya).change();
-
-            })
+                $('#pwwjb').hide();
+                $('#pwcfwjb').hide();
+                $('#password_confirmation').attr('required', false);
+                $('#password').attr('required', false);
+            });
         });
 
-
-
     });
-
 </script>
 @endsection
 

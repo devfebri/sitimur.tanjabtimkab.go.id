@@ -2,7 +2,10 @@
 <div class="topbar-left">
     <div class="text-center">
         {{-- <a href="index.html" class="logo"><i class="mdi mdi-assistant"></i> Annex</a> --}}
-        <a href="{{ route(auth()->user()->role.'_dashboard') }}" class="logo"><img src="{{ asset('image/logo-png.png') }}" height="80" alt="logo"></a>
+        <a href="{{ route(auth()->user()->role.'_dashboard') }}" class="logo">
+            <img src="{{ asset('img/ukpbj.jpeg') }}" width="100" height="40" alt="logo">
+            <img src="{{ asset('img/tanjabtim.jpg') }}" width="50" height="40" alt="logo">
+        </a>
         <h5></h5>
     </div>
 </div>
@@ -11,13 +14,40 @@
 
     <div id="sidebar-menu">
         <ul>
-           
+           @if( auth()->user()->role == 'ppk')
+            {{-- <li class="menu-title">Admin</li> --}}
+            <li>
+                <a href="{{ route('ppk_dashboard') }}" class="waves-effect">
+                    <i class="mdi mdi-view-dashboard"></i>
+                    <span> Dashboard </span>
+                </a>
+            </li>
+
+            @elseif(auth()->user()->role == 'admin')
+            
             <li>
                 <a href="{{ route(auth()->user()->role.'_user') }}" class="waves-effect">
                     <i class="mdi mdi-worker"></i>
                     <span> User </span>
                 </a>
             </li>
+            <li>
+                <a href="{{ route(auth()->user()->role.'_persyaratan') }}" class="waves-effect">
+                    <i class="mdi mdi-worker"></i>
+                    <span> Kelola Persyaratan </span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="waves-effect">
+                    <i class="mdi mdi-worker"></i>
+                    <span> Data pengajuan </span>
+                </a>
+            </li>
+
+
+
+           @endif
+            
 
 
         </ul>

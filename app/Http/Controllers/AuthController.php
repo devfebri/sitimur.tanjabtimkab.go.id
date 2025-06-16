@@ -16,6 +16,9 @@ class AuthController extends Controller
 
     public function proses_login(Request $request)
     {
+        if (!$request->has('_token') || $request->session()->token() !== $request->_token) {
+            return redirect('/')->with('gagal', 'Session expired, silakan refresh halaman.');
+        }
         // dd($request->all());
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             if(auth()->user()->akses!=1){

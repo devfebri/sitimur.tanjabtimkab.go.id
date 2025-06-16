@@ -36,7 +36,11 @@
 
 
                 <h3 class="text-center mt-0 m-b-15">
-                    <a href="#" class="logo logo-admin"><img src="{{ asset('image/logo1.png') }}" class="rounded-circle" height="100" alt="logo"></a>
+                    <a href="#" class="logo logo-admin">
+                        <img src="{{ asset('img/tanjabtim.png') }}" height="100" alt="logo">
+                        <img src="{{ asset('img/ukpbj.jpeg') }}" height="60" alt="logo">
+
+                    </a>
                 </h3>
                 <h3 style="font-family:Cursive;font-size:14pt;color:#fff;margin-bottom:-25px;" class="text-center">Pengajuan Tender</h3>
                 <div class="p-3">

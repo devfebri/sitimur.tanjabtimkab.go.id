@@ -20,11 +20,11 @@ class KepalaukpbjMiddleware
             if (Auth::user()->role == 'kepalaukpbj') {
                 return $next($request);
             } else {
-                return redirect(url('login'));
+                return redirect(url('/'));
             }
         } else {
             Auth::logout();
-            return redirect(url('login'));
+            return redirect(url('/'));
         }
     }
 }

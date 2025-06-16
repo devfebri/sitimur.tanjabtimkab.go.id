@@ -131,12 +131,68 @@
     <script src="{{ asset('template/assets/js/popper.min.js') }}"></script>
     <script src="{{ asset('template/assets/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('template/assets/plugins/alertify/js/alertify.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script>
-        @if(Session::has('berhasil'))
-            alertify.success("{{ Session::get('berhasil') }}");
-        @elseif(Session::has('gagal'))
-            alertify.error("{{ Session::get('gagal') }}");
-        @endif
-    </script>
+$(document).ready(function() {
+    $("form[action='{{ route('proses_register') }}']").validate({
+        rules: {
+            name: { required: true },
+            email: { required: true, email: true },
+            username: {
+                required: true,
+                remote: {
+                    url: "{{ route('usercheckUsername') }}",
+                    type: "post",
+                    data: {
+                        username: function() { return $("#username").val(); },
+                        _token: "{{ csrf_token() }}"
+                    }
+                }
+            },
+            password: { required: true, minlength: 6 },
+            password_confirmation: { required: true, equalTo: "#password" },
+            nip: { required: true },
+            nik: { required: true },
+            jabatan: { required: true },
+            pangkat: { required: true },
+            nohp: { required: true },
+            jk: { required: true }
+        },
+        messages: {
+            name: "Nama wajib diisi",
+            email: {
+                required: "Email wajib diisi",
+                email: "Format email tidak valid"
+            },
+            username: {
+                required: "Username wajib diisi",
+                remote: "Username sudah digunakan"
+            },
+            password: {
+                required: "Password wajib diisi",
+                minlength: "Password minimal 6 karakter"
+            },
+            password_confirmation: {
+                required: "Konfirmasi password wajib diisi",
+                equalTo: "Konfirmasi password tidak sama"
+            },
+            nip: "NIP wajib diisi",
+            nik: "NIK wajib diisi",
+            jabatan: "Jabatan wajib diisi",
+            pangkat: "Pangkat wajib diisi",
+            nohp: "No HP wajib diisi",
+            jk: "Jenis kelamin wajib dipilih"
+        },
+        errorElement: 'small',
+        errorClass: 'text-danger',
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        }
+    });
+});
+</script>
 </body>
 </html>

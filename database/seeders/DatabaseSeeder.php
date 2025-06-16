@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
 
         $data = new User();
         $data->name = 'Kepala UKPBJ';
-        $data->email = 'kepalaukpbj@gmail.com';
+        $data->email = 'kepalaukpbj@gmail.com'; 
         $data->username = 'kepalaukpbj';
         $data->role = 'kepalaukpbj';
         $data->password = bcrypt('password');
@@ -48,5 +48,41 @@ class DatabaseSeeder extends Seeder
         $data->password = bcrypt('password');
         $data->akses = 1;
         $data->save();
+
+        $data = new User();
+        $data->name = 'ppk';
+        $data->email = 'ppk@gmail.com';
+        $data->username = 'ppk';
+        $data->role = 'ppk';
+        $data->password = bcrypt('password');
+        $data->akses = 1;
+        $data->save();
+
+        $mp= new \App\Models\MetodePengadaan();
+        $mp->nama_metode_pengadaan = 'Seleksi';
+        $mp->slug = 'seleksi';
+        $mp->status = 1;
+        $mp->save();
+
+        $mp = new \App\Models\MetodePengadaan();
+        $mp->nama_metode_pengadaan = 'Tender';
+        $mp->slug = 'tender';
+        $mp->status = 1;
+        $mp->save();
+
+        $mpb = new \App\Models\MetodePengadaanBerkas();
+        $mpb->metode_pengadaan_id = 1; // Seleksi
+        $mpb->nama_berkas = 'Surat Permohonan';
+        $mpb->slug = 'surat_permohonan';
+        $mpb->multiple = 0; // Tidak bisa upload lebih dari satu
+        $mpb->status = 1;
+        $mpb->save();
+        $mpb = new \App\Models\MetodePengadaanBerkas();
+        $mpb->metode_pengadaan_id = 1; // Seleksi
+        $mpb->nama_berkas = 'KAK';
+        $mpb->slug = 'kak';
+        $mpb->multiple = 1; // Bisa upload lebih dari satu
+        $mpb->status = 1;
+        $mpb->save();
     }
 }
