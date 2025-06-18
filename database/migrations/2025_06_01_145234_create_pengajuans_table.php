@@ -24,13 +24,13 @@ return new class extends Migration
             $table->string('jenis_pengadaan');
             $table->string('metode_pengadaan');
             $table->integer('verifikator_id');
-            $table->boolean('verifikator_status')->default('false');
+            $table->boolean('verifikator_status')->default(false);
             $table->datetime('verifikator_updated');
             $table->integer('kepalaukpbj_id');
-            $table->boolean('kepalaukpbj_status')->default('false');
+            $table->boolean('kepalaukpbj_status')->default(false);
             $table->datetime('kepalaukpbj_updated');
             $table->integer('pokjapemilihan_id');
-            $table->boolean('pokjapemilihan_status')->default('false');
+            $table->boolean('pokjapemilihan_status')->default(false);
             $table->datetime('pokjapemilihan_updated');
 
             $table->timestamps();

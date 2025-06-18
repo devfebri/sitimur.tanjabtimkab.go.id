@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama_metode_pengadaan')->unique();
             $table->text('slug')->unique();
-            $table->boolean('status')->default(true); // true for active, false for inactive
+            $table->boolean('status')->default(true)->comment('1=aktif, 0=nonaktif'); // true for active, false for inactive
             $table->timestamps();
         });
     }

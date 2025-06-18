@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('pesan')->nullable();
             $table->string('slug');
             $table->text('file_path');
-            $table->enum('verfikasi', ['proses', 'diterima', 'ditolak'])->default('proses');
+            $table->enum('verfikasi', ['proses', 'diterima', 'ditolak'])->default('proses')->comment('proses, diterima, ditolak');
             $table->timestamps();
         });
     }
