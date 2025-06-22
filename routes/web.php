@@ -10,11 +10,11 @@ use App\Http\Middleware\PpkMiddleware;
 use App\Http\Middleware\VerifikatorMiddleware;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/', function () {
+    return view('maintenance');
+});
 
-Route::get('/', [AuthController::class, 'index'])->name('login');
+Route::get('/login', [AuthController::class, 'index'])->name('login');
 Route::post('/proses_login', [AuthController::class, 'proses_login'])->name('proses_login');
 Route::post('/proses_register', [AuthController::class, 'proses_register'])->name('proses_register');
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
