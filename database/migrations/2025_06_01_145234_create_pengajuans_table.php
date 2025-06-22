@@ -23,15 +23,15 @@ return new class extends Migration
             $table->string('pagu_hps');
             $table->string('jenis_pengadaan');
             $table->string('metode_pengadaan');
-            $table->integer('verifikator_id');
+            $table->integer('verifikator_id')->nullable();
             $table->boolean('verifikator_status')->default(false);
-            $table->datetime('verifikator_updated');
-            $table->integer('kepalaukpbj_id');
+            $table->datetime('verifikator_updated')->nullable();
+            $table->integer('kepalaukpbj_id')->nullable();
             $table->boolean('kepalaukpbj_status')->default(false);
-            $table->datetime('kepalaukpbj_updated');
-            $table->integer('pokjapemilihan_id');
+            $table->datetime('kepalaukpbj_updated')->nullable();
+            $table->integer('pokjapemilihan_id')->nullable();
             $table->boolean('pokjapemilihan_status')->default(false);
-            $table->datetime('pokjapemilihan_updated');
+            $table->datetime('pokjapemilihan_updated')->nullable();
 
             $table->timestamps();
         });

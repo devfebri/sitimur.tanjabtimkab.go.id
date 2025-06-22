@@ -33,9 +33,7 @@
                         <div class="col-lg-4 col-sm-12" style="background-color: rgb(89, 255, 89);" >
                             <div class="card-body" >
                                 <b>Verifikator</b>  <br>
-                               
                                     <span class="badge badge-pill badge-primary"><b><i>Diajukan</i></b></span>
-                                    
                             </div>
                         </div>
                         <div class="col-lg-4  col-sm-12" style="background-color: rgb(89, 255, 89);" >
@@ -334,13 +332,15 @@
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'nama_file', name: 'nama_file' },
             { data: 'status', name: 'status', render: function(data) {
-                return data == '0'
-                    ? '<span class="badge badge-pill badge-primary"><b><i>Diproses</i></b></span>'
-                    : data == '1'
+                return data == 'belum diperiksa'
+                    ? '<span class="badge badge-pill badge-primary"><b><i>Belum diperiksa</i></b></span>'
+                    : data == 'diproses'
+                    ? '<span class="badge badge-pill badge-warning"><b><i>Diproses</i></b></span>'
+                    : data == 'disetujui'
                     ? '<span class="badge badge-pill badge-success"><b><i>Disetujui</i></b></span>'
-                    : data == '2'
-                    ? '<span class="badge badge-pill badge-warning"><b><i>Tidak Disetujui</i></b></span>'
-                    : '<span class="badge badge-pill badge-danger"><b><i>Error</i></b></span>';
+                    : data == 'tidak disetujui'
+                    ? '<span class="badge badge-pill badge-danger"><b><i>Tidak Disetujui</i></b></span>'
+                    : '<span class="badge badge-pill badge-secondary"><b><i>Status Tidak Dikenal</i></b></span>';
             }},
             { data: 'pesan', name: 'pesan', orderable: false, searchable: false,render:function(data){
                 return data==null ? '<b><i>Null</i></b>' : data;

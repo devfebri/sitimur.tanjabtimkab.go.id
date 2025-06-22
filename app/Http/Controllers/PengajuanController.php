@@ -51,12 +51,12 @@ class PengajuanController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $data = Pengajuan::findOrFail($row->pengajuan_id);
-                    $button= '<button class="btn btn-warning btn-sm edit-post" data-id="' . $row->id . '">Edit</button>';
-                    
-                    $button .= '<a href="' . asset('pengajuan/' . $data->created_at->format('d-m-Y') . '/' . $data->user->name . '/' . $data->id . '/' . $row->slug . '/' . $row->file_path) . '" target="_blank" class="btn btn-sm btn-info"><span class="ti-import"></span></a>
-                    ';
-                
-
+                    if($row->status=='ditolak'){
+                        $button= '<button class="btn btn-warning btn-sm edit-post" data-id="' . $row->id . '">Edit</button>';
+                        $button .= '<a href="' . asset('pengajuan/' . $data->created_at->format('d-m-Y') . '/' . $data->user->name . '/' . $data->id . '/' . $row->slug . '/' . $row->file_path) . '" target="_blank" class="btn btn-sm btn-info"><span class="ti-import"></span></a>';
+                    }else{
+                        $button = '<a href="' . asset('pengajuan/' . $data->created_at->format('d-m-Y') . '/' . $data->user->name . '/' . $data->id . '/' . $row->slug . '/' . $row->file_path) . '" target="_blank" class="btn btn-sm btn-info"><span class="ti-import"></span></a>';
+                    }
                     return $button;
                 })
                 ->rawColumns(['action'])
@@ -112,7 +112,6 @@ class PengajuanController extends Controller
                         \DB::table('pengajuan_files')->insert([
                             'pengajuan_id' => $data->id,
                             'nama_file' => $berkas->nama_berkas,
-                            'mutliple' => $berkas->multiple,
                             'slug' => $berkas->slug,
                             'file_path' => $filename,
                             'created_at' => now(),
@@ -128,7 +127,6 @@ class PengajuanController extends Controller
                     \DB::table('pengajuan_files')->insert([
                         'pengajuan_id' => $data->id,
                         'nama_file' => $berkas->nama_berkas,
-                        'mutliple' => $berkas->multiple,
                         'slug' => $berkas->slug,
                         'file_path' => $filename,
                         'created_at' => now(),

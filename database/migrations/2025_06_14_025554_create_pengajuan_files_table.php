@@ -15,12 +15,10 @@ return new class extends Migration
             $table->id();
             $table->integer('pengajuan_id')->constrained('pengajuans')->onDelete('cascade');
             $table->string('nama_file');
-            $table->boolean('multiple');
-            $table->boolean('status')->default(false);
             $table->text('pesan')->nullable();
             $table->string('slug');
             $table->text('file_path');
-            $table->enum('verfikasi', ['proses', 'diterima', 'ditolak'])->default('proses')->comment('proses, diterima, ditolak');
+            $table->enum('status', ['belum diperiksa','proses', 'diterima', 'ditolak'])->default('belum diperiksa')->comment('belum diperiksa','proses, diterima, ditolak');
             $table->timestamps();
         });
     }
