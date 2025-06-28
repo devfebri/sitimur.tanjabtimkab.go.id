@@ -5,40 +5,88 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use datatables;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $data = User::where('role', '!=', 'admin')->orderBy('name', 'asc')->get();
-       
-        if ($request->ajax()) {
-            return datatables()->of($data)
-                ->addColumn('action', function ($f) {
-                    $button = '<div class="tabledit-toolbar btn-toolbar" style="text-align: center;">';
-                    $button .= '<div class="btn-group btn-group-sm" style="float: none;">';
-                    $button .= '<button class="tabledit-edit-button btn btn-sm btn-warning edit-post" data-id=' . $f->id . ' id="alertify-success" style="float: none; margin: 5px;"><span class="ti-pencil"></span></button>';
-                    // $button .= '<a href="#" target="_blank" style="margin: 5px;" class="tabledit-edit-button btn btn-sm btn-primary"><span class="ti-shift-right"></span></a>';
-                    $button.='<button class="tabledit-delete-button btn btn-sm btn-danger delete" data-id='.$f->id.' style="float: none; margin: 5px;"><span class="ti-trash"></span></button>';
-                    $button .= '</div>';
-                    $button .= '</div>';
+        return view('user.index');
+    }
 
-                    return $button;
-                })->addColumn('status', function ($f) {
+    public function getUserData(Request $request)
+    {
+        $columns = [
+            0 => 'id',
+            1 => 'username',
+            2 => 'name',
+            3 => 'role',
+            4 => 'nohp',
+            5 => 'jabatan',
+            6 => 'pangkat',
+            7 => 'jk',
+            8 => 'nip',
+            9 => 'nik',
+            10 => 'akses'
+        ];
 
-                    if ($f->akses == 1) {
+        $query = DB::table('users')
+            ->select('id', 'username', 'name', 'role', 'nohp', 'jabatan', 'pangkat', 'jk', 'nip', 'nik', 'akses');
 
-                        $status = '<span class="badge badge-pill badge-primary"><b><i>active</i></b></span>';
-                    } elseif ($f->akses == 0) {
-                        $status = '<span class="badge badge-pill badge-danger"><b><i>not active</i></b></span>';
-                    }
-                    return $status;
-                })
-                ->rawColumns(['action',  'status'])
-                ->addIndexColumn()
-                ->make(true);
+        // Search
+        $search = $request->input('search.value');
+        if ($search && strlen($search) >= 3) {
+            $query->where(function ($q) use ($search) {
+                $q->where('username', 'like', "%{$search}%")
+                    ->orWhere('nip', 'like', "%{$search}%");
+            });
         }
-        return view('user.index', compact('data'));
+
+        // Total records sebelum filter
+        $recordsTotal = DB::table('users')->count();
+
+        // Total records setelah filter (tanpa offset/limit)
+        $filteredQuery = clone $query;
+        $recordsFiltered = $filteredQuery->count();
+
+        // Ordering
+        if ($request->input('order')) {
+            $orderColumnIndex = $request->input('order.0.column');
+            $orderColumn = $columns[$orderColumnIndex] ?? 'id';
+            $orderDir = $request->input('order.0.dir') ?? 'asc';
+            $query->orderBy($orderColumn, $orderDir);
+        }
+
+        // Paging
+        $start = $request->input('start', 0);
+        $length = $request->input('length', 10);
+        $data = $query->offset($start)->limit($length)->get();
+
+        // Format data untuk DataTables
+        $result = [];
+        $no = $start + 1;
+        foreach ($data as $row) {
+            $result[] = [
+                'no' => $no++,
+                'username' => $row->username,
+                'name' => $row->name,
+                'role' => $row->role,
+                'nohp' => $row->nohp,
+                'jabatan' => $row->jabatan,
+                'pangkat' => $row->pangkat,
+                'jk' => $row->jk,
+                'nip' => $row->nip,
+                'nik' => $row->nik,
+                'status' => $row->akses == 1 ? 'Active' : 'Inactive',
+            ];
+        }
+
+        return response()->json([
+            'draw' => intval($request->input('draw')),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $result
+        ]);
     }
 
     public function create(Request $request)

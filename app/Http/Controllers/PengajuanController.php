@@ -14,21 +14,31 @@ class PengajuanController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Pengajuan::all();
+        
+        // Di awal controller/method
+        // $start = microtime(true);
+
+        $data = Pengajuan::query();
         $metodepengadaan = MetodePengadaan::where('status', 1)->get();
         
         if ($request->ajax()) {
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    return '
-                        <button class="btn btn-primary btn-sm open-post" data-id="' . $row->id . '">Open</button>
-                        <button class="btn btn-danger btn-sm delete-post" data-id="' . $row->id . '">Hapus</button>
-                    ';
+                    
+                    $button = '<button class="btn btn-primary btn-sm open-post" data-id="' . $row->id . '">Open</button>';
+                    $button .=  '<button class="btn btn-danger btn-sm delete-post" data-id="' . $row->id . '">Hapus</button>';
+                    return $button;
                 })
                 ->rawColumns(['action'])
                 ->make(true);
         }
+
+        // Di akhir controller/method
+        // $end = microtime(true);
+        // $duration = $end - $start;
+        // \Log::info('Waktu eksekusi: ' . $duration . ' detik');
+
         return view('dashboard.index',compact('data', 'metodepengadaan'));
     }
     public function open($id)

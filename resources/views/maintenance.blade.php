@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maintenance | Website Kami</title>
 <!--
                                      ...JdHH""""""""""MHHgJ...
                                 .-W9"!                      ?""Mg..
@@ -56,10 +53,15 @@
         Kamu sedang mengintip karya dari Padepokan IT.
         Setiap baris kode ini membawa berkah teknologi.
 
-        Punya project impian? Hubungi kami: @padepokan.it
+        Punya project impian? Hubungi kami: https://devfebri.github.io/
 
         #PadepokanIT #KodeSakti #NoCopas #RespectTheCraft
-        -->
+-->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance | Website Kami</title>
+
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
@@ -137,7 +139,7 @@
 
     </style>
 </head>
-<body>
+<body oncontextmenu="return false">
     <div class="container">
         <div class="spinner"></div>
         <h1>Website Sedang Maintenance</h1>

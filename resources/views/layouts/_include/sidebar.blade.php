@@ -3,8 +3,7 @@
     <div class="text-center">
         {{-- <a href="index.html" class="logo"><i class="mdi mdi-assistant"></i> Annex</a> --}}
         <a href="{{ route(auth()->user()->role.'_dashboard') }}" class="logo">
-            <img src="{{ asset('img/ukpbj.jpeg') }}" width="100" height="40" alt="logo">
-            <img src="{{ asset('img/tanjabtim.jpg') }}" width="50" height="40" alt="logo">
+            <img src="{{ asset('img/logo.webp') }}" width="200" height="40" alt="logo">
         </a>
         <h5></h5>
     </div>
@@ -41,6 +40,14 @@
                 <a href="#" class="waves-effect">
                     <i class="mdi mdi-worker"></i>
                     <span> Data pengajuan </span>
+                </a>
+            </li>
+            @elseif(auth()->user()->role == 'verifikator')
+
+            <li>
+                <a href="{{ route('verifikator_dashboard') }}" class="waves-effect">
+                    <i class="mdi mdi-view-dashboard"></i>
+                    <span> Dashboard </span>
                 </a>
             </li>
 

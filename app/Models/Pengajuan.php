@@ -28,6 +28,18 @@ class Pengajuan extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    public function verifikator()
+    {
+        return $this->belongsTo(User::class, 'verifikator_id');
+    }
+    public function kepalaukpbj()
+    {
+        return $this->belongsTo(User::class, 'kepalaukpbj_id');
+    }
+    public function pokjapemilihan()
+    {
+        return $this->belongsTo(User::class, 'pokjapemilihan_id');
+    }
 
     public function metodePengadaan()
     {

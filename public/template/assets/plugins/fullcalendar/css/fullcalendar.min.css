@@ -53,7 +53,7 @@ body .fc {
 .fc-unthemed td,
 .fc-unthemed th,
 .fc-unthemed thead {
-    border-color: green;
+    border-color: #007BFF;
 }
 .fc-unthemed .fc-popover {
     background-color: #fff;
@@ -362,8 +362,8 @@ hr.fc-divider {
     font-size: 0.85em;
     line-height: 1.3;
     border-radius: 3px;
-    border: 1px solid green;
-    background-color: green;
+    border: 1px solid #007BFF;
+    background-color:  #007BFF;
     font-weight: 400;
 }
 .fc-event,

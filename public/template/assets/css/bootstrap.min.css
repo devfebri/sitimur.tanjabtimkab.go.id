@@ -152,7 +152,7 @@ sup {
     top: -0.5em;
 }
 a {
-    color: green;
+    color: #007BFF;
     text-decoration: none;
     background-color: transparent;
 }
@@ -5334,7 +5334,7 @@ a.close.disabled {
     pointer-events: auto;
     background-color: #fff;
     background-clip: padding-box;
-    border: 1px solid green;
+    border: 1px solid #007BFF;
     border-radius: 0.3rem;
     outline: 0;
 }

@@ -17,7 +17,7 @@ class VerifikatorMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
-            if (Auth::user()->role == 'verfikator') {
+            if (Auth::user()->role == 'verifikator') {
                 return $next($request);
             } else {
                 return redirect(url('/'));

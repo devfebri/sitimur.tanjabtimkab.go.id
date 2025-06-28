@@ -82,5 +82,7 @@ class DatabaseSeeder extends Seeder
         $mpb->slug = 'kak';
         $mpb->status = 1;
         $mpb->save();
+
+        \App\Models\User::factory(1000)->create();
     }
 }

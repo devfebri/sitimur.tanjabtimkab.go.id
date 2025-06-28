@@ -213,7 +213,7 @@ code {
     margin-left: -23px;
     border-width: 2px 1px;
     border-style: solid;
-    border-color: green white;
+    border-color: #007BFF white;
     border-radius: 50%;
     -o-border-radius: 50%;
     -ms-border-radius: 50%;
@@ -287,34 +287,25 @@ code {
 
 @keyframes pulse {
     0% {
-        background-color: rgba(255, 0, 0, 1);
-    }
-    13% {
-        background-color: rgba(0, 255, 0, 1);
+        background-color: rgb(0, 4, 255);
     }
     15% {
-        background-color: rgba(255, 255, 0, 1);
-    }
-    28% {
-        background-color: rgba(255, 0, 0, 1);
+        background-color: rgb(255, 255, 255);
     }
     30% {
-        background-color: rgba(0, 255, 0, 1);
-    }
-    43% {
-        background-color: rgba(255, 255, 0, 1);
+        background-color: rgb(0, 4, 255);
     }
     45% {
-        background-color: rgba(255, 0, 0, 1);
+        background-color: rgb(255, 255, 255);
     }
-    70% {
-        background-color: rgba(0, 255, 0, 1);
+    60% {
+        background-color: rgb(0, 4, 255);
     }
-    74% {
-        background-color: rgba(255, 255, 0, 1);
+    75% {
+        background-color: rgb(255, 255, 255);
     }
     100% {
-        background-color: rgba(255, 0, 0, 1);
+        background-color: rgb(0, 4, 255);
     }
 }
 
@@ -434,7 +425,7 @@ code {
 }
 
 .bg-primary {
-    background-color: green !important;
+    background-color:  #007BFF !important;
 }
 
 .bg-success {
@@ -503,7 +494,7 @@ code {
 }
 
 .badge-primary {
-    background-color: green;
+    background-color:  #007BFF;
 }
 
 .badge-success {
@@ -529,11 +520,11 @@ code {
 /* Navs & Tabs */
 .nav-pills .nav-item.show .nav-link,
 .nav-pills .nav-link.active {
-    background-color: green;
+    background-color:  #007BFF;
 }
 
 .nav-pills > .active > a > .badge {
-    color: green;
+    color: #007BFF;
 }
 
 /* List Group */
@@ -552,7 +543,7 @@ code {
 }
 
 .list-group-item.active:hover .list-group-item-text {
-    color: green;
+    color: #007BFF;
 }
 
 .list-group-item.active:focus {
@@ -563,11 +554,11 @@ code {
 }
 
 .list-group-item.active:focus .list-group-item-text {
-    color: green;
+    color: #007BFF;
 }
 
 .list-group-item.active .list-group-item-text {
-    color: green;
+    color: #007BFF;
 }
 
 .list-group-item {
@@ -591,7 +582,7 @@ code {
 }
 
 .list-group-item.active > .badge {
-    color: green;
+    color: #007BFF;
 }
 
 .popover-header {
@@ -1025,7 +1016,7 @@ code {
 }
 
 .icon-demo-content .col-sm-6:hover i {
-    color: green;
+    color: #007BFF;
 }
 
 /*===grid===*/
@@ -1088,8 +1079,8 @@ code {
 }
 
 .btn-primary {
-    background-color: green;
-    border: 1px solid green;
+    background-color:  #007BFF;
+    border: 1px solid #007BFF;
 }
 
 .btn-primary:hover,
@@ -1108,8 +1099,8 @@ code {
 .btn-primary.active,
 .btn-primary:active,
 .show > .btn-primary.dropdown-toggle {
-    background-color: #01e401;
-    border: 1px solid #01e401;
+    background-color: #007BFF;
+    border: 1px solid #007BFF;
 }
 
 .btn-success {
@@ -1249,13 +1240,13 @@ code {
 }
 
 .btn-link:hover {
-    color: green;
+    color: #007BFF;
 }
 
 /* button Outline */
 .btn-outline-primary {
-    color: green;
-    border-color: green;
+    color: #007BFF;
+    border-color: #007BFF;
 }
 
 .btn-outline-success {
@@ -1361,8 +1352,8 @@ code {
 }
 
 .card-primary {
-    background-color: green;
-    border-color: green;
+    background-color:  #007BFF;
+    border-color: #007BFF;
 }
 
 .card-success {
@@ -1393,12 +1384,12 @@ code {
   Pagination
 ===================*/
 .page-link {
-    color: green;
+    color: #007BFF;
 }
 
 .page-item.active .page-link {
-    background-color: green;
-    border-color: green;
+    background-color:  #007BFF;
+    border-color: #007BFF;
 }
 
 .page-link:focus,
@@ -1411,7 +1402,7 @@ code {
   Progressbar
 ===================*/
 .progress-bar {
-    background-color: green;
+    background-color:  #007BFF;
 }
 
 /* Progressbar Vertical */
@@ -1522,8 +1513,8 @@ code {
 }
 
 .swal2-icon.swal2-question {
-    color: green;
-    border-color: green;
+    color: #007BFF;
+    border-color: #007BFF;
 }
 
 .swal2-icon.swal2-success {
@@ -1572,7 +1563,7 @@ code {
 }
 
 .custom-dd .dd-list .dd-item .dd-handle:hover {
-    color: green;
+    color: #007BFF;
 }
 
 .custom-dd .dd-list .dd-item button {
@@ -1596,7 +1587,7 @@ code {
 }
 
 .custom-dd-empty .dd-list .dd3-handle:hover {
-    color: green;
+    color: #007BFF;
 }
 
 .custom-dd-empty .dd-list .dd3-content {
@@ -1608,7 +1599,7 @@ code {
 }
 
 .custom-dd-empty .dd-list .dd3-content:hover {
-    color: green;
+    color: #007BFF;
 }
 
 .custom-dd-empty .dd-list button {
@@ -1939,12 +1930,12 @@ th {
 
 /* == Responsive Table ==*/
 table.focus-on tbody tr.focused th {
-    background-color: green;
+    background-color:  #007BFF;
     color: #ffffff;
 }
 
 table.focus-on tbody tr.focused td {
-    background-color: green;
+    background-color:  #007BFF;
     color: #ffffff;
 }
 
@@ -1959,8 +1950,8 @@ table.focus-on tbody tr.focused td {
 }
 
 .table-rep-plugin .btn-default.btn-primary {
-    background-color: green;
-    border-color: green;
+    background-color:  #007BFF;
+    border-color: #007BFF;
 }
 
 .table-rep-plugin .table-responsive {
@@ -2048,8 +2039,8 @@ table.focus-on tbody tr.focused td {
 }
 
 .table-rep-plugin .checkbox-row input[type="checkbox"]:checked + label::before {
-    background-color: green;
-    border-color: green;
+    background-color:  #007BFF;
+    border-color: #007BFF;
 }
 
 .table-rep-plugin .checkbox-row input[type="checkbox"]:checked + label::after {
@@ -2068,7 +2059,7 @@ table.focus-on tbody tr.focused td {
 .irs-from:after,
 .irs-to:after,
 .irs-single:after {
-    border-top-color: green;
+    border-top-color: #007BFF;
 }
 
 /* ==============
@@ -2106,13 +2097,13 @@ label {
 }
 
 .form-control:focus {
-    border-color: green;
+    border-color: #007BFF;
     -webkit-box-shadow: none;
     box-shadow: none;
 }
 
 .custom-control-input:checked ~ .custom-control-indicator {
-    background-color: green;
+    background-color:  #007BFF;
 }
 
 .custom-control-input:focus ~ .custom-control-indicator {
@@ -2211,7 +2202,7 @@ label {
 .datepicker table tr td.selected.disabled,
 .datepicker table tr td.selected.disabled:hover,
 .datepicker table tr td.selected:hover {
-    background-color: green !important;
+    background-color:  #007BFF !important;
     background-image: none;
     -webkit-box-shadow: none;
     box-shadow: none;
@@ -2352,7 +2343,7 @@ pre[class*="language-"] {
 .mce-menu-item:hover,
 .mce-menu-item.mce-selected,
 .mce-menu-item:focus {
-    background-color: green !important;
+    background-color:  #007BFF !important;
 }
 
 .mce-menu {
@@ -2532,7 +2523,7 @@ pre[class*="language-"] {
     margin: 5px 0;
     padding: 5px 5px;
     text-align: center;
-    background-color: green;
+    background-color:  #007BFF;
     color: #ffffff !important;
 }
 
@@ -2596,7 +2587,7 @@ pre[class*="language-"] {
 
 .round {
     line-height: 60px;
-    color: green;
+    color: #007BFF;
     width: 60px;
     height: 60px;
     font-size: 26px;
@@ -2746,7 +2737,7 @@ pre[class*="language-"] {
     line-height: 30px;
     font-size: 20px;
     color: #ffffff;
-    background-color: green;
+    background-color:  #007BFF;
     border: 5px solid #ffffff;
 }
 
@@ -3021,7 +3012,7 @@ File: Menu
 }
 
 .navbar-custom {
-    background-color: rgb(18, 18, 129);
+    background-color:  #007BFF;
     border: none;
     margin: -20px -25px 0 -25px;
     -webkit-box-shadow: 1px 0px 20px rgba(0, 0, 0, 0.2);
@@ -3230,7 +3221,7 @@ body.fixed-left .side-menu.left {
 }
 
 .button-menu-mobile {
-    background-color: green;
+    background-color:  #007BFF;
     font-size: 28px;
     color: #ffffff;
     width: 42px;
@@ -3345,7 +3336,7 @@ body.fixed-left .side-menu.left {
 }
 
 #sidebar-menu ul ul li.active a {
-    color: green;
+    color: #007BFF;
 }
 
 #sidebar-menu ul ul a {
@@ -3376,12 +3367,12 @@ body.fixed-left .side-menu.left {
 }
 
 #sidebar-menu > ul > li > a:hover {
-    color: green;
+    color: #007BFF;
     text-decoration: none;
 }
 
 #sidebar-menu > ul > li > a:hover i {
-    color: green;
+    color: #007BFF;
 }
 
 #sidebar-menu > ul > li > a span i {
@@ -3415,12 +3406,12 @@ body.fixed-left .side-menu.left {
 }
 
 #sidebar-menu > ul > li > a.active {
-    color: green;
+    color: #007BFF;
     background-color: rgba(91, 107, 232, 0.15);
 }
 
 #sidebar-menu > ul > li > a.active i {
-    color: green;
+    color: #007BFF;
 }
 
 #sidebar-menu > ul > li.nav-active > ul {

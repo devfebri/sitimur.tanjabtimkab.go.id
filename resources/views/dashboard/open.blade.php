@@ -30,51 +30,64 @@
             <div class="col-12">
                 <div class="card m-b-20">
                     <div class="row text-center" style="font-size: 12px;">
-                        <div class="col-lg-4 col-sm-12" style="background-color: rgb(89, 255, 89);" >
+                        <div class="col-lg-4 col-sm-12" @if($data->verifikator_status==1) style="background-color: rgb(89, 255, 89);" @elseif($data->verifikator_status==2) style="background-color: rgb(255, 59, 59);" @endif>
+
+
                             <div class="card-body" >
                                 <b>Verifikator</b>  <br>
+                                @if($data->verifikator_status==0)
                                     <span class="badge badge-pill badge-primary"><b><i>Diajukan</i></b></span>
+                                @elseif($data->verifikator_status==1)
+                                    {{ $data->verifikator->name }} <br>
+                                    <span class="badge badge-pill badge-success"><b><i>Disetujui</i></b></span>
+                                @elseif($data->verifikator_status==2)
+                                    {{ $data->verifikator->name }} <br>
+                                    <span class="badge badge-pill badge-danger"><b><i>Tidak Disetujui</i></b></span>
+                                @endif
                             </div>
                         </div>
-                        <div class="col-lg-4  col-sm-12" style="background-color: rgb(89, 255, 89);" >
-
-
+                        <div class="col-lg-4  col-sm-12" @if($data->kepalaukpbj_status==1) style="background-color: rgb(89, 255, 89);" @elseif($data->kepalaukpbj_status==2) style="background-color: rgb(255, 59, 59);" @endif>
                             <div class="card-body" >
                                 <b>Kepala UKPBJ</b> <br>
+                                @if($data->kepalaukpbj_status==0)
                                 <span class="badge badge-pill badge-primary"><b><i>Diajukan</i></b></span>
-                                
-
-
+                                @elseif($data->kepalaukpbj_status==1)
+                                {{ $data->kepalaukpbj->name }} <br>
+                                <span class="badge badge-pill badge-success"><b><i>Disetujui</i></b></span>
+                                @elseif($data->kepalaukpbj_status==2)
+                                {{ $data->kepalaukpbj->name }} <br>
+                                <span class="badge badge-pill badge-danger"><b><i>Tidak Disetujui</i></b></span>
+                                @endif
                             </div>
                         </div>
-                        <div class="col-lg-4 col-sm-12"  style="background-color: rgb(89, 255, 89);" >
-
+                        <div class="col-lg-4 col-sm-12" @if($data->pokjapemilihan_status==1) style="background-color: rgb(89, 255, 89);" @elseif($data->pokjapemilihan_status==2) style="background-color: rgb(255, 59, 59);" @endif>
                             <div class="card-body" >
                                   <b>Pokja Pemilihan</b> <br>
+                                  @if($data->pokjapemilihan_status==0)
                                   <span class="badge badge-pill badge-primary"><b><i>Diajukan</i></b></span>
+                                  @elseif($data->pokjapemilihan_status==1)
+                                  {{ $data->pokjapemilihan->name }} <br>
+                                  <span class="badge badge-pill badge-success"><b><i>Disetujui</i></b></span>
+                                  @elseif($data->pokjapemilihan_status==2)
+                                  {{ $data->pokjapemilihan->name }} <br>
+                                  @endif
                             </div>
                         </div>
-                        
                     </div>
-
                 </div>
             </div>
         </div>
-
-
         <div class="row">
             <div class="col-lg-7 col-sm-12">
                 <div class="card m-b-20">
                     <div class="card-body">
                         <h4 class="mt-0 header-title">Detail Pengajuan </h4>
-
                         <table class="table table-bordered table-striped">
                             <tr>
                                 <td width="35%">Kode RUP</td>
                                 <td width="3%">:</td>
                                 <td>{{ $data->kode_rup }}</td>
                             </tr>
-
                             <tr>
                                 <td width="35%">Nama Paket</td>
                                 <td width="3%">:</td>
@@ -111,25 +124,16 @@
                                 <td>{{ $data->metodePengadaan->nama_metode_pengadaan }}</td>
 
                             </tr>
-                           
-
-                            
-
                             <tr>
                                 <td width="20%">Status</td>
                                 <td width="3%">:</td>
                                 <td>
-                                   
                                     <span class="badge badge-pill badge-primary"><b><i>Diajukan</i></b></span>
-                                    
                                 </td>
                             </tr>
-
                         </table>
-
                     </div>
                 </div>
-
             </div> <!-- end col -->
             <div class="col-lg-5 col-sm-12">
                 <div class="card m-b-20">

@@ -69,9 +69,7 @@
                                             <th>NIP</th>
                                             <th>NIK</th>
                                             <th>Status</th>
-                                            @if(auth()->user()->role=='admin')
-                                            <th>Action</th>
-                                            @endif
+                                           
                                         </tr>
                                     </thead>
 
@@ -194,20 +192,15 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+       
 
-        var table = $('#datatable1').DataTable({
+        $('#datatable1').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route(auth()->user()->role.'_user') }}",
+            ajax: "{{ route(auth()->user()->role.'_userdata') }}",
             scrollX: true,
             columns: [
-                {
-                    data: null,
-                    sortable: false,
-                    render: function(data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1
-                    },
-                },
+                { data: 'no', name: 'no' },
                 { data: 'username', name: 'username' },
                 { data: 'name', name: 'name' },
                 { data: 'role', name: 'role' },
@@ -218,11 +211,21 @@
                 { data: 'nip', name: 'nip' },
                 { data: 'nik', name: 'nik' },
                 { data: 'status', name: 'status' },
-                @if(auth()->user()->role == 'admin')
-                { data: 'action', name: 'action' },
-                @endif
-            ]
+               
+            ],
+            search: {
+                search: "",
+                smart: false
+            }
+        }).on('search.dt', function() {
+            var value = $('.dataTables_filter input').val();
+            if (value.length < 3 && value.length > 0) {
+                $('#datatable1').DataTable().search('').draw();
+            }
         });
+         // Set placeholder pada input search DataTables
+         $('.dataTables_filter input[type="search"]').attr('placeholder', 'Cari Username/NIP ...');
+
 
         $('#unit_id').select2();
         $('#pegawai_pin').select2();

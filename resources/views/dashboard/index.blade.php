@@ -196,7 +196,8 @@
         var table = $('#datatable1').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('ppk_dashboard') }}",
+            ajax: "{{ route(auth()->user()->role.'_dashboard') }}",
+
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'kode_rup', name: 'kode_rup' },
@@ -207,9 +208,9 @@
                 { data: 'pagu_anggaran', name: 'pagu_anggaran' },
                 { data: 'pagu_hps', name: 'pagu_hps' },
                 { data: 'jenis_pengadaan', name: 'jenis_pengadaan' },
-                @if(auth()->user()->role=='ppk')
+              
                 { data: 'action', name: 'action', orderable: false, searchable: false },
-                @endif
+             
             ]
         });
 
