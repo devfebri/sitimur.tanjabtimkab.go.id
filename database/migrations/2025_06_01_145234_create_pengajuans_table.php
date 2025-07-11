@@ -32,7 +32,8 @@ return new class extends Migration
             $table->integer('pokjapemilihan_id')->nullable();
             $table->boolean('pokjapemilihan_status')->default(false);
             $table->datetime('pokjapemilihan_updated')->nullable();
-
+            $table->boolean('status')->default(false);
+            $table->datetime('status_updated')->nullable();
             $table->timestamps();
         });
     }

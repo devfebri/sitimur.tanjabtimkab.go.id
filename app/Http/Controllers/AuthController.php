@@ -28,7 +28,6 @@ class AuthController extends Controller
                 if(auth()->user()->role == 'admin') {
                     return redirect(route('admin_user'))->with('pesan', 'Selamat datang kembali "' .auth()->user()->name . '"');
                 } else{
-
                     return redirect(route(auth()->user()->role . '_dashboard'))->with('pesan', 'Selamat datang kembali "' .auth()->user()->name . '"');
                 }
             }

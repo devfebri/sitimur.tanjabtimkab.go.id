@@ -16,7 +16,8 @@ return new class extends Migration
             $table->integer('metode_pengadaan_id');
             $table->string('nama_berkas');
             $table->text('slug')->unique();
-            $table->boolean('status')->default(true)->comment('1=aktif, 0=nonaktif');
+            $table->boolean('multiple')->default(true)->comment('1=aktif, 0=nonaktif');
+            $table->boolean('status')->default(false)->comment('1=aktif, 0=nonaktif');
             $table->timestamps();
         });
     }

@@ -8,6 +8,7 @@ class Pengajuan extends Model
 {
     protected $table = 'pengajuans';
     protected $fillable = [
+        'user_id',
         'kode_rup',
         'nama_paket',
         'perangkat_daerah',
@@ -17,9 +18,19 @@ class Pengajuan extends Model
         'pagu_hps',
         'jenis_pengadaan',
         'metode_pengadaan',
+        'verifikator_id',
+        'verifikator_status',
+        'verifikator_updated',
+        'kepalaukpbj_id',
+        'kepalaukpbj_status',
+        'kepalaukpbj_updated',
+        'pokjapemilihan_id',
+        'pokjapemilihan_status',
+        'pokjapemilihan_updated',
         'status',
+        'status_updated',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     

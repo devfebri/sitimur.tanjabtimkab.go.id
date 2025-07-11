@@ -61,7 +61,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
-    <title>Pengajuan Tender</title>
+    <title>SITIMUR</title>
     <meta content="Admin Dashboard" name="description" />
     <meta content="Mannatthemes" name="author" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -97,7 +97,7 @@
                     <img src="{{ asset('img/tanjabtim.png') }}" height="100" alt="logo" class="febri" data-tilt>
                     <img src="{{ asset('img/ukpbj.jpeg') }}" height="60" alt="logo" class="febri" data-tilt>
                 </h3>
-                <h3 style="font-family:Cursive;font-size:14pt;color:#fff;margin-bottom:-25px;" class="text-center">Pengajuan Tender</h3>
+                <h3 style="font-family:Cursive;font-size:14pt;color:#fff;margin-bottom:-25px;" class="text-center">Sistem Informasi Tender</h3>
                 <div class="p-3">
                     @php
                     if(isset($_COOKIE['username']) && isset($_COOKIE['password'])){

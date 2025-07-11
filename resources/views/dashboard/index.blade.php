@@ -66,6 +66,7 @@
                                             <th>Pagu Anggaran</th>
                                             <th>Pagu HPS</th>
                                             <th>Jenis Pengadaan</th>
+                                            <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -105,8 +106,8 @@
                         <div class="col-sm-8">
                             <select name="metode_pengadaan" id="metode_pengadaan" class="form-control">
                                 <option value="">-Pilih-</option>
-                                @foreach ($metodepengadaan as $mp)
-                                <option value="{{ $mp->id }}">{{ $mp->nama_metode_pengadaan }}</option>
+                                @foreach ($metodepengadaan as $id=>$mp)
+                                <option value="{{ $id }}">{{ $mp }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -160,7 +161,6 @@
                             </select>
                         </div>
                     </div>
-                    
                     <div id="dokumen_berkas" >
                         {{-- isi berkas --}}
                     </div>
@@ -196,10 +196,9 @@
         var table = $('#datatable1').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route(auth()->user()->role.'_dashboard') }}",
-
+            ajax: "{{ route(auth()->user()->role.'_pengajuandata') }}",
             columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'no', name: 'no', orderable: false, searchable: false },
                 { data: 'kode_rup', name: 'kode_rup' },
                 { data: 'nama_paket', name: 'nama_paket' },
                 { data: 'perangkat_daerah', name: 'perangkat_daerah' },
@@ -208,11 +207,18 @@
                 { data: 'pagu_anggaran', name: 'pagu_anggaran' },
                 { data: 'pagu_hps', name: 'pagu_hps' },
                 { data: 'jenis_pengadaan', name: 'jenis_pengadaan' },
-              
-                { data: 'action', name: 'action', orderable: false, searchable: false },
-             
+                { data: 'status', name: 'status' },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
             ]
+        }).on('search.dt', function() {
+            var value = $('.dataTables_filter input').val();
+            if (value.length < 3 && value.length > 0) {
+                $('#datatable1').DataTable().search('').draw();
+            }
         });
+
+        // Placeholder search minimal 3 huruf
+        $('.dataTables_filter input[type="search"]').attr('placeholder', 'Cari minimal 3 huruf...');
 
         // Tombol tambah data
         $('#tombol-tambah').click(function() {
@@ -225,11 +231,7 @@
                 , keyboard: false
             });
         });
-
         
-
-       
-
         $('body').on('click', '.open-post', function() {
             var data_id = $(this).data('id');
             var url = "{{ route(auth()->user()->role.'_pengajuanopen',':data_id') }}";
@@ -237,6 +239,7 @@
             window.location.href = url;
         });
 
+        @if(auth()->user()->role == 'ppk')
         // Hapus data
         $('body').on('click', '.delete-post', function() {
             var data_id = $(this).data('id');
@@ -258,7 +261,7 @@
                 });
             }
         });
-
+       
 
         // Tampilkan dokumen sesuai metode dan disable input file yang tidak aktif
         $('#metode_pengadaan').change(function() {
@@ -293,6 +296,7 @@
                 $('#dokumen_berkas').hide().empty();
             }
         }).trigger('change'); // trigger agar kondisi awal sesuai
+        
 
         // Validasi dan submit form via AJAX
         $("#form-tambah-edit").validate({
@@ -377,6 +381,8 @@
                 return false;
             }
         });
+        @endif
+
     });
 
 </script>

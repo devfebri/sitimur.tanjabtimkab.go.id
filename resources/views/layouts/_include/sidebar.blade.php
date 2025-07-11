@@ -50,6 +50,22 @@
                     <span> Dashboard </span>
                 </a>
             </li>
+            @elseif(auth()->user()->role == 'kepalaukpbj')
+
+            <li>
+                <a href="{{ route('kepalaukpbj_dashboard') }}" class="waves-effect">
+                    <i class="mdi mdi-view-dashboard"></i>
+                    <span> Dashboard </span>
+                </a>
+            </li>
+            @elseif(auth()->user()->role == 'pokjapemilihan')
+
+            <li>
+                <a href="{{ route('pokjapemilihan_dashboard') }}" class="waves-effect">
+                    <i class="mdi mdi-view-dashboard"></i>
+                    <span> Dashboard </span>
+                </a>
+            </li>
 
 
 

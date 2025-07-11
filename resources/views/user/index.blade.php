@@ -33,10 +33,6 @@
                 </div>
             </div>
         </div>
-
-
-
-
         <div class="row">
             <div class="col-12">
                 <div class="card m-b-30">
@@ -185,6 +181,9 @@
 <script src="{{ asset('js/jquery-validation/jquery.validate.min.js') }}"></script>
 <script src="{{ asset('template/assets/plugins/select2/select2.min.js') }}" type="text/javascript"></script>
 
+
+
+
 <script>
     $(document).ready(function() {
         $.ajaxSetup({
@@ -193,7 +192,6 @@
             }
         });
        
-
         $('#datatable1').DataTable({
             processing: true,
             serverSide: true,
@@ -211,7 +209,6 @@
                 { data: 'nip', name: 'nip' },
                 { data: 'nik', name: 'nik' },
                 { data: 'status', name: 'status' },
-               
             ],
             search: {
                 search: "",
@@ -223,10 +220,9 @@
                 $('#datatable1').DataTable().search('').draw();
             }
         });
-         // Set placeholder pada input search DataTables
-         $('.dataTables_filter input[type="search"]').attr('placeholder', 'Cari Username/NIP ...');
 
-
+        // Set placeholder pada input search DataTables
+        $('.dataTables_filter input[type="search"]').attr('placeholder', 'Cari Username/NIP ...');
         $('#unit_id').select2();
         $('#pegawai_pin').select2();
 
@@ -254,7 +250,6 @@
                         required: true,
                         remote: {
                             url: "{{ route('usercheckUsername') }}",
-
                             type: "post",
                             data: {
                                 username: function() { return $("#username").val(); },

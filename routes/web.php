@@ -6,6 +6,8 @@ use App\Http\Controllers\PengajuanController;
 use App\Http\Controllers\PersyaratanController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\KepalaukpbjMiddleware;
+use App\Http\Middleware\PokjaPemilihanMiddleware;
 use App\Http\Middleware\PpkMiddleware;
 use App\Http\Middleware\VerifikatorMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -41,6 +43,7 @@ Route::prefix('admin')->middleware(AdminMiddleware::class)->name('admin_')->grou
 });
 Route::prefix('verifikator')->middleware(VerifikatorMiddleware::class)->name('verifikator_')->group(function () {
     Route::get('/dashboard', [PengajuanController::class, 'index'])->name('dashboard');
+    Route::get('/pengajuan/data', [PengajuanController::class, 'getData'])->name('pengajuandata');
     Route::get('/pengajuan/{id}/edit', [PengajuanController::class, 'edit'])->name('pengajuanedit');
     Route::post('/pengajuan/create', [PengajuanController::class, 'kirim_pengajuan'])->name('kirim_pengajuan');
     Route::post('/pengajuan/{id}/update', [PengajuanController::class, 'update_pengajuan'])->name('update_pengajuan');
@@ -48,16 +51,25 @@ Route::prefix('verifikator')->middleware(VerifikatorMiddleware::class)->name('ve
     Route::get('/pengajuan/{id}/open', [PengajuanController::class, 'open'])->name('pengajuanopen');
     Route::get('/metode_pengadaan_berkas/{id}', [PengajuanController::class, 'metodePengadaanBerkas'])->name('metode_pengadaan_berkas');
     Route::get('pengajuan/{id}/files', [PengajuanController::class, 'getFiles'])->name('pengajuan_files');
-
+    Route::post('pengajuan/{id}/files/approval',[PengajuanController::class,'filesApproval'])->name('pengajuan_files_approval');
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 });
-
+Route::prefix('kepalaukpbj')->middleware(KepalaukpbjMiddleware::class)->name('kepalaukpbj_')->group(function () {
+    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::get('/dashboard', [PengajuanController::class, 'index'])->name('dashboard');
+    Route::get('/pengajuan/data', [PengajuanController::class, 'getData'])->name('pengajuandata');
+    Route::get('/pengajuan/{id}/open', [PengajuanController::class, 'open'])->name('pengajuanopen');
+    Route::get('pengajuan/{id}/files', [PengajuanController::class, 'getFiles'])->name('pengajuan_files');
+    Route::post('/pengajuan/{id}/disposisi', [PengajuanController::class, 'disposisiPokja'])->name('pengajuan_disposisi');
+    Route::post('/pengajuan/{id}/tolak', [PengajuanController::class, 'tolakPengajuan'])->name('pengajuan_tolak');
+});
 Route::prefix('ppk')->middleware(PpkMiddleware::class)->name('ppk_')->group(function () {
     // Route::get('/dashboard', [PengajuanController::class, 'index'])->name('dashboard');
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     // Route::post('/kirim_pengajuan', [DashboardController::class, 'kirim_pengajuan'])->name('kirim_pengajuan');
 
     Route::get('/dashboard', [PengajuanController::class, 'index'])->name('dashboard');
+    Route::get('/pengajuan/data', [PengajuanController::class,'getData'])->name('pengajuandata');
     Route::get('/pengajuan/{id}/edit', [PengajuanController::class, 'edit'])->name('pengajuanedit');
     Route::post('/pengajuan/create', [PengajuanController::class, 'kirim_pengajuan'])->name('kirim_pengajuan');
     Route::post('/pengajuan/{id}/update', [PengajuanController::class, 'update_pengajuan'])->name('update_pengajuan');
@@ -68,4 +80,18 @@ Route::prefix('ppk')->middleware(PpkMiddleware::class)->name('ppk_')->group(func
  
     Route::get('pengajuan/{id}/open/edit', [PengajuanController::class, 'editFile'])->name('pengajuan_open_edit');
     Route::post('pengajuan/{id}/open/update', [PengajuanController::class, 'updateFile'])->name('pengajuan_open_update');
+});
+
+Route::prefix('pokjapemilihan')->middleware(PokjaPemilihanMiddleware::class)->name('pokjapemilihan_')->group(function () {
+    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::get('/dashboard', [PengajuanController::class, 'index'])->name('dashboard');
+    Route::get('/pengajuan/data', [PengajuanController::class, 'getData'])->name('pengajuandata');
+    Route::get('/pengajuan/{id}/edit', [PengajuanController::class, 'edit'])->name('pengajuanedit');
+    Route::post('/pengajuan/create', [PengajuanController::class, 'kirim_pengajuan'])->name('kirim_pengajuan');
+    Route::post('/pengajuan/{id}/update', [PengajuanController::class, 'update_pengajuan'])->name('update_pengajuan');
+    Route::delete('/pengajuan/{id}', [PengajuanController::class, 'destroy'])->name('pengajuandelete');
+    Route::get('/pengajuan/{id}/open', [PengajuanController::class, 'open'])->name('pengajuanopen');
+    Route::get('/metode_pengadaan_berkas/{id}', [PengajuanController::class, 'metodePengadaanBerkas'])->name('metode_pengadaan_berkas');
+    Route::get('pengajuan/{id}/files', [PengajuanController::class, 'getFiles'])->name('pengajuan_files');
+    Route::post('pengajuan/{id}/files/approval', [PengajuanController::class, 'filesApproval'])->name('pengajuan_files_approval');
 });

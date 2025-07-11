@@ -126,8 +126,8 @@ class UserController extends Controller
     public function delete($id)
     {
         $user = User::find($id);
-
-        $user->delete();
+        $user->status= 0; // Set status to inactive instead of deleting
+        $user->save();
         return response()->json($user);
     }
 
