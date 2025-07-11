@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PengajuanController;
 use App\Http\Controllers\PersyaratanController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\KepalaukpbjMiddleware;
 use App\Http\Middleware\PokjaPemilihanMiddleware;
@@ -25,7 +26,8 @@ Route::post('check-username', [UserController::class, 'checkUsername'])->name('u
 
 Route::prefix('admin')->middleware(AdminMiddleware::class)->name('admin_')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profileupdate');
     Route::get('/user', [UserController::class, 'index'])->name('user');
     Route::get('/users/data', [UserController::class,'getUserData'])->name('userdata');
     Route::get('/user/{id}/edit', [UserController::class, 'edit'])->name('useredit');
@@ -53,9 +55,11 @@ Route::prefix('verifikator')->middleware(VerifikatorMiddleware::class)->name('ve
     Route::get('pengajuan/{id}/files', [PengajuanController::class, 'getFiles'])->name('pengajuan_files');
     Route::post('pengajuan/{id}/files/approval',[PengajuanController::class,'filesApproval'])->name('pengajuan_files_approval');
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::post('/profile/update',[ProfileController::class,'update'])->name('profileupdate');
 });
 Route::prefix('kepalaukpbj')->middleware(KepalaukpbjMiddleware::class)->name('kepalaukpbj_')->group(function () {
-    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profileupdate');
     Route::get('/dashboard', [PengajuanController::class, 'index'])->name('dashboard');
     Route::get('/pengajuan/data', [PengajuanController::class, 'getData'])->name('pengajuandata');
     Route::get('/pengajuan/{id}/open', [PengajuanController::class, 'open'])->name('pengajuanopen');
@@ -65,7 +69,8 @@ Route::prefix('kepalaukpbj')->middleware(KepalaukpbjMiddleware::class)->name('ke
 });
 Route::prefix('ppk')->middleware(PpkMiddleware::class)->name('ppk_')->group(function () {
     // Route::get('/dashboard', [PengajuanController::class, 'index'])->name('dashboard');
-    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profileupdate');
     // Route::post('/kirim_pengajuan', [DashboardController::class, 'kirim_pengajuan'])->name('kirim_pengajuan');
 
     Route::get('/dashboard', [PengajuanController::class, 'index'])->name('dashboard');
@@ -83,7 +88,8 @@ Route::prefix('ppk')->middleware(PpkMiddleware::class)->name('ppk_')->group(func
 });
 
 Route::prefix('pokjapemilihan')->middleware(PokjaPemilihanMiddleware::class)->name('pokjapemilihan_')->group(function () {
-    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profileupdate');
     Route::get('/dashboard', [PengajuanController::class, 'index'])->name('dashboard');
     Route::get('/pengajuan/data', [PengajuanController::class, 'getData'])->name('pengajuandata');
     Route::get('/pengajuan/{id}/edit', [PengajuanController::class, 'edit'])->name('pengajuanedit');
