@@ -34,7 +34,7 @@ class PengajuanController extends Controller
 
         if(auth()->user()->role=='ppk'){
             $query = \DB::table('pengajuans')
-                ->select('id', 'kode_rup', 'nama_paket', 'perangkat_daerah', 'rekening_kegiatan', 'sumber_dana', 'pagu_anggaran', 'pagu_hps', 'jenis_pengadaan','status', 'verifikator_status')
+                ->select('id', 'kode_rup', 'nama_paket', 'perangkat_daerah', 'rekening_kegiatan', 'sumber_dana', 'pagu_anggaran', 'pagu_hps', 'jenis_pengadaan','status', 'verifikator_status', 'kepalaukpbj_status', 'pokjapemilihan_status')
                 ->where('user_id', auth()->user()->id);
         } elseif (auth()->user()->role == 'verifikator'){
             $query = \DB::table('pengajuans')
@@ -47,6 +47,9 @@ class PengajuanController extends Controller
             $query = \DB::table('pengajuans')
                 ->select('id', 'kode_rup', 'nama_paket', 'perangkat_daerah', 'rekening_kegiatan', 'sumber_dana', 'pagu_anggaran', 'pagu_hps', 'jenis_pengadaan', 'kepalaukpbj_status','pokjapemilihan_status')
                 ->where('verifikator_status', 1)->where('kepalaukpbj_status', 1);
+        } else{
+            $query = \DB::table('pengajuans')
+                ->select('id', 'kode_rup', 'nama_paket', 'perangkat_daerah', 'rekening_kegiatan', 'sumber_dana', 'pagu_anggaran', 'pagu_hps', 'jenis_pengadaan','status');
         }
         
         
@@ -91,8 +94,12 @@ class PengajuanController extends Controller
         $no = $start + 1;
         foreach ($data as $row) {
             if (auth()->user()->role == 'ppk') {
-                $button = '<button class="btn btn-primary btn-sm open-post" data-id="' . $row->id . '">Open</button>
-                            <button class="btn btn-danger btn-sm delete-post" data-id="' . $row->id . '">Hapus</button>';
+
+                $button = '<button class="btn btn-primary btn-sm open-post" data-id="' . $row->id . '">Open</button>';
+                if($row->verifikator_status==0 && $row->kepalaukpbj_status==0 && $row-> pokjapemilihan_status==0){
+                    $button .= '<button class="btn btn-danger btn-sm delete-post" data-id="' . $row->id . '">Hapus</button>';
+                }
+                            
                 if ($row->status == 0) {
                     $status = '<span class="badge badge-pill badge-primary">Proses</span>';
                 } elseif ($row->status == 1) {
@@ -133,6 +140,17 @@ class PengajuanController extends Controller
                 } elseif ($row->pokjapemilihan_status == 2) {
                     $status = '<span class="badge badge-pill badge-danger">Tidak Disetujui</span>';
                 } elseif ($row->pokjapemilihan_status == 3) {
+                    $status = '<span class="badge badge-pill badge-warning">Dikembalikan</span>';
+                }
+            } else{
+                $button = '<button class="btn btn-primary btn-sm open-post" data-id="' . $row->id . '">Open</button>';
+                if ($row->status == 0) {
+                    $status = '<span class="badge badge-pill badge-primary">Proses</span>';
+                } elseif ($row->status == 1) {
+                    $status = '<span class="badge badge-pill badge-success">Disetujui</span>';
+                } elseif ($row->status == 2) {
+                    $status = '<span class="badge badge-pill badge-danger">Tidak Disetujui</span>';
+                } elseif ($row->status == 3) {
                     $status = '<span class="badge badge-pill badge-warning">Dikembalikan</span>';
                 }
             }

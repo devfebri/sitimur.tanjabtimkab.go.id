@@ -37,7 +37,7 @@
                 </a>
             </li>
             <li>
-                <a href="#" class="waves-effect">
+                <a href="{{ route(auth()->user()->role.'_dashboard') }}" class="waves-effect">
                     <i class="mdi mdi-worker"></i>
                     <span> Data pengajuan </span>
                 </a>

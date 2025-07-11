@@ -25,7 +25,11 @@ Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('check-username', [UserController::class, 'checkUsername'])->name('usercheckUsername');
 
 Route::prefix('admin')->middleware(AdminMiddleware::class)->name('admin_')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [PengajuanController::class, 'index'])->name('dashboard');
+    Route::get('/pengajuan/data', [PengajuanController::class, 'getData'])->name('pengajuandata');
+    Route::get('/pengajuan/{id}/open', [PengajuanController::class, 'open'])->name('pengajuanopen');
+    Route::get('pengajuan/{id}/files', [PengajuanController::class, 'getFiles'])->name('pengajuan_files');
+
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profileupdate');
     Route::get('/user', [UserController::class, 'index'])->name('user');
