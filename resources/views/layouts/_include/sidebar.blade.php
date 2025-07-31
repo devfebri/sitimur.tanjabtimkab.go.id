@@ -16,11 +16,19 @@
            @if( auth()->user()->role == 'ppk')
             {{-- <li class="menu-title">Admin</li> --}}
             <li>
-                <a href="{{ route('ppk_dashboard') }}" class="waves-effect">
+                <a href="{{ route('ppk_pengajuan_create') }}" class="waves-effect">
+
                     <i class="mdi mdi-view-dashboard"></i>
-                    <span> Dashboard </span>
+                    <span> Pengajuan </span>
                 </a>
             </li>
+             <li>
+                 <a href="{{ route('ppk_dashboard') }}" class="waves-effect">
+                     <i class="mdi mdi-view-dashboard"></i>
+                     <span> Riwayat Pengajuan </span>
+                 </a>
+             </li>
+
 
             @elseif(auth()->user()->role == 'admin')
             

@@ -43,11 +43,12 @@
                     <div class="card-body">
 
                         <h4 class="mt-0 header-title">Pengajuan Tender
-                            @if(auth()->user()->role=='ppk')
-                            <button type="button" class="btn btn-primary mb-2  float-right btn-sm" id="tombol-tambah">
-                                Tambah Data
-                            </button>
-                            @endif
+                            {{-- @if(auth()->user()->role=='ppk')
+                         
+                            <a href="{{ route('ppk_pengajuan_create') }}" class="btn btn-primary mb-2  float-right btn-sm" >
+                                Buat Pengajuan
+                            </a>
+                            @endif --}}
                             {{-- <a href="/ppk/importuser" class="btn btn-primary mb-2 mr-2 float-right btn-sm" >
                                 Import User
                             </a> --}}
@@ -61,12 +62,16 @@
                                             <th>Kode RUP</th>
                                             <th>Nama Paket</th>
                                             <th>Perangkat Daerah</th>
-                                            <th>Rekening Kegiatan</th>
+                                            {{-- <th>Rekening Kegiatan</th>
                                             <th>Sumber Dana</th>
                                             <th>Pagu Anggaran</th>
-                                            <th>Pagu HPS</th>
+                                            <th>Pagu HPS</th> --}}
                                             <th>Jenis Pengadaan</th>
+                                            @if(auth()->user()->role == 'ppk')
+                                            <th>Posisi Paket</th>
+                                            @else
                                             <th>Status</th>
+                                            @endif
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -106,7 +111,7 @@
                         <div class="col-sm-8">
                             <select name="metode_pengadaan" id="metode_pengadaan" class="form-control">
                                 <option value="">-Pilih-</option>
-                                @foreach ($metodepengadaan as $id=>$mp)
+                                @foreach ($metodepengadaan as $id=>$mp) 
                                 <option value="{{ $id }}">{{ $mp }}</option>
                                 @endforeach
                             </select>
@@ -156,7 +161,7 @@
                                 <option value="">-Pilih-</option>
                                 <option value="Pengadaan Barang">Pengadaan Barang</option>
                                 <option value="Pekerjaan Konstruksi">Pekerjaan Konstruksi</option>
-                                <option value="Jasa Konsultasi">Jasa Konsultasi</option>
+                                <option value="Jasa Konsultansi">Jasa Konsultansi</option>
                                 <option value="Jasa Lainnya">Jasa Lainnya</option>
                             </select>
                         </div>
@@ -202,10 +207,10 @@
                 { data: 'kode_rup', name: 'kode_rup' },
                 { data: 'nama_paket', name: 'nama_paket' },
                 { data: 'perangkat_daerah', name: 'perangkat_daerah' },
-                { data: 'rekening_kegiatan', name: 'rekening_kegiatan' },
-                { data: 'sumber_dana', name: 'sumber_dana' },
-                { data: 'pagu_anggaran', name: 'pagu_anggaran' },
-                { data: 'pagu_hps', name: 'pagu_hps' },
+                // { data: 'rekening_kegiatan', name: 'rekening_kegiatan' },
+                // { data: 'sumber_dana', name: 'sumber_dana' },
+                // { data: 'pagu_anggaran', name: 'pagu_anggaran' },
+                // { data: 'pagu_hps', name: 'pagu_hps' },
                 { data: 'jenis_pengadaan', name: 'jenis_pengadaan' },
                 { data: 'status', name: 'status' },
                 { data: 'action', name: 'action', orderable: false, searchable: false }
@@ -232,12 +237,29 @@
             });
         });
         
-        $('body').on('click', '.open-post', function() {
+       
+        $('body').on('click', '.open-post', function(e) {
             var data_id = $(this).data('id');
-            var url = "{{ route(auth()->user()->role.'_pengajuanopen',':data_id') }}";
-            url = url.replace(':data_id', data_id);
-            window.location.href = url;
+            var data_status = $(this).data('status');
+            var userRole = "{{ auth()->user()->role }}";
+
+            if (userRole === 'pokjapemilihan' && data_status === 'mulai') {
+                e.preventDefault();
+                alertify.confirm('Apakah Anda ingin membuka pengajuan ini? Status akan berubah menjadi "Diproses".', function() {
+                    // AJAX update status ke 1
+                    var url = "{{ route(auth()->user()->role.'_pengajuanopen', ':data_id') }}";
+                    url = url.replace(':data_id', data_id);
+                    window.location.href = url;
+                }, function() {
+                    alertify.error('Batal membuka pengajuan.');
+                });
+            } else {
+                var url = "{{ route(auth()->user()->role.'_pengajuanopen', ':data_id') }}";
+                url = url.replace(':data_id', data_id);
+                window.location.href = url;
+            }
         });
+
 
         @if(auth()->user()->role == 'ppk')
         // Hapus data

@@ -27,7 +27,9 @@ class AuthController extends Controller
             }else{
                 if(auth()->user()->role == 'admin') {
                     return redirect(route('admin_user'))->with('pesan', 'Selamat datang kembali "' .auth()->user()->name . '"');
-                } else{
+                }else if(auth()->user()->role == 'ppk') {
+                    return redirect(route('ppk_pengajuan_create'))->with('pesan', 'Selamat datang kembali "' .auth()->user()->name . '"');
+                }else{
                     return redirect(route(auth()->user()->role . '_dashboard'))->with('pesan', 'Selamat datang kembali "' .auth()->user()->name . '"');
                 }
             }

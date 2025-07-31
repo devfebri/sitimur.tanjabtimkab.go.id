@@ -17,11 +17,22 @@ return new class extends Migration
             // $table->integer('metode_pengadaan_berkas_id')->constrained('metode_pengadaan_berkass')->onDelete('cascade');
             $table->string('nama_file');
             $table->integer('revisi_ke')->default(0)->comment('Revisi ke berapa, 0 berarti file asli');
-            $table->boolean('status_verifikator')->default(false)->comment(' 0=belum diperiksa, 1=diterima, 2=ditolak 3=dikembalikan');
+            $table->boolean('status_verifikator')->default(false)->comment(' 0=belum direviu, 1=sesuai, 2=tidak sesuai 3=perlu perbaikan');
             $table->text('pesan_verifikator')->nullable();
-            $table->boolean('status_pokjapemilihan')->default(false)->comment(' 0=belum diperiksa, 1=diterima, 2=ditolak 3=dikembalikan');
-            $table->text('pesan_pokjapemilihan')->nullable();
-            $table->boolean('status')->default(false)->comment(' 0=belum fix, 1=fix');
+            
+            $table->boolean('pokja1_status')->default(false)->comment(' 0=belum direviu, 1=sesuai, 2=tidak sesuai 3=perlu perbaikan');
+            $table->text('pokja1_pesan')->nullable();
+            $table->datetime('pokja1_updated')->nullable();
+
+            $table->boolean('pokja2_status')->default(false)->comment(' 0=belum direviu, 1=sesuai, 2=tidak sesuai 3=perlu perbaikan');
+            $table->text('pokja2_pesan')->nullable();
+            $table->datetime('pokja2_updated')->nullable();
+
+            $table->boolean('pokja3_status')->default(false)->comment(' 0=belum direviu, 1=sesuai, 2=tidak sesuai 3=perlu perbaikan');
+            $table->text('pokja3_pesan')->nullable();
+            $table->datetime('pokja3_updated')->nullable();
+
+            $table->boolean('status')->default(false)->comment(' 0=belum sesuai, 1=sesuai');
             $table->string('slug');
             $table->text('file_path');
             $table->timestamps();

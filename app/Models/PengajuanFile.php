@@ -19,4 +19,9 @@ class PengajuanFile extends Model
         'pesan_pokjapemilihan',
         'status'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

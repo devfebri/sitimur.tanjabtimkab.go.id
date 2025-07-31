@@ -13,25 +13,37 @@ return new class extends Migration
     {
         Schema::create('pengajuans', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id');
+            $table->integer('user_id');
+            $table->integer('metode_pengadaan_id');
             $table->string('kode_rup');
             $table->string('nama_paket');
             $table->string('perangkat_daerah');
             $table->string('rekening_kegiatan');
             $table->string('sumber_dana');
-            $table->string('pagu_anggaran');
-            $table->string('pagu_hps');
+            $table->float('pagu_anggaran');
+            $table->float('pagu_hps');
             $table->string('jenis_pengadaan');
-            $table->string('metode_pengadaan');
             $table->integer('verifikator_id')->nullable();
             $table->boolean('verifikator_status')->default(false);
             $table->datetime('verifikator_updated')->nullable();
+
             $table->integer('kepalaukpbj_id')->nullable();
             $table->boolean('kepalaukpbj_status')->default(false);
             $table->datetime('kepalaukpbj_updated')->nullable();
-            $table->integer('pokjapemilihan_id')->nullable();
-            $table->boolean('pokjapemilihan_status')->default(false);
-            $table->datetime('pokjapemilihan_updated')->nullable();
+
+            $table->integer('pokja1_id')->nullable();
+            $table->boolean('pokja1_status_akhir')->default(false)->comment(' 0=belum direviu, 1=sesuai, 2=tidak sesuai 3=perlu perbaikan');
+            $table->datetime('pokja1_updated_akhir')->nullable();
+            
+            $table->integer('pokja2_id')->nullable();
+            $table->boolean('pokja2_status_akhir')->default(false)->comment(' 0=belum direviu, 1=sesuai, 2=tidak sesuai 3=perlu perbaikan');
+            $table->datetime('pokja2_updated_akhir')->nullable();
+
+            
+            $table->integer('pokja3_id')->nullable();
+            $table->boolean('pokja3_status_akhir')->default(false)->comment(' 0=belum direviu, 1=sesuai, 2=tidak sesuai 3=perlu perbaikan');
+            $table->datetime('pokja3_updated_akhir')->nullable();
+
             $table->boolean('status')->default(false);
             $table->datetime('status_updated')->nullable();
             $table->timestamps();

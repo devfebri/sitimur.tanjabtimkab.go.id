@@ -12,25 +12,28 @@
                 <a class="nav-link dropdown-toggle arrow-none waves-effect" data-toggle="dropdown" href="#"
                     role="button" aria-haspopup="false" aria-expanded="false">
                     <i class="ti-bell noti-icon"></i>
-                    <span class="badge badge-danger noti-icon-badge badgenotif">99+</span>
-                   
-                   
+                    @if(auth()->user()->unreadNotifications->count())
+                    <span class="badge badge-danger noti-icon-badge badgenotif"> {{ auth()->user()->unreadNotifications->count() }}</span>
+                    @endif
                 </a>
                 <div class="dropdown-menu dropdown-menu-right dropdown-arrow dropdown-menu-lg">
                     <!-- item-->
                     <div class="dropdown-item noti-title">
                         <h5>Notification 
-                        
-                        <a href="#" id="clearall" class="float-right">Clear all</a></h5>
+                            <a href="{{ route('notif.baca.semua') }}" class="text-primary small">Tandai semua dibaca</a>
+                            @forelse(auth()->user()->unreadNotifications->take(5) as $notif)
+                            <a class="dropdown-item small" href="{{ $notif->data['url'] }}">
+                                <strong>{{ $notif->data['judul'] }}</strong><br>
+                                <small>{{ $notif->data['pesan'] }}</small>
+                            </a>
+                            @empty
+                            <span class="dropdown-item text-muted">Tidak ada notifikasi</span>
+                            @endforelse
                     </div>
-
-
-
-
                     <!-- All-->
-                    <a href="cuti/viewall" class="dropdown-item notify-item text-center">
+                    {{-- <a href="cuti/viewall" class="dropdown-item notify-item text-center">
                         View All
-                    </a>
+                    </a> --}}
 
                 </div>
             </li>

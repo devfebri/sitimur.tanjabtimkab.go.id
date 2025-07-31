@@ -44,7 +44,58 @@ class DatabaseSeeder extends Seeder
         $data->name = 'Pokja Pemilihan';
         $data->email = 'pokjapemilihan@gmail.com';
         $data->username = 'pokjapemilihan';
+        $data->nik = '12345';
+        $data->nip = '12345';
         $data->role = 'pokjapemilihan';
+        $data->jabatan = 'Kepala 1';
+        $data->password = bcrypt('password');
+        $data->akses = 1;
+        $data->save();
+
+        $data = new User();
+        $data->name = 'Pokja Pemilihan 2';
+        $data->email = 'pokjapemilihan2@gmail.com';
+        $data->username = 'pokjapemilihan2';
+        $data->nik = '12345';
+        $data->nip = '12345';
+        $data->role = 'pokjapemilihan';
+        $data->jabatan = 'Kepala 2';
+        $data->password = bcrypt('password');
+        $data->akses = 1;
+        $data->save();
+
+        $data = new User();
+        $data->name = 'Pokja Pemilihan 3';
+        $data->email = 'pokjapemilihan3@gmail.com';
+        $data->username = 'pokjapemilihan3';
+        $data->nik = '12345';
+        $data->nip = '12345';
+        $data->role = 'pokjapemilihan';
+        $data->jabatan = 'Kepala 3';
+        $data->password = bcrypt('password');
+        $data->akses = 1;
+        $data->save();
+
+        $data = new User();
+        $data->name = 'Pokja Pemilihan 4';
+        $data->email = 'pokjapemilihan4@gmail.com';
+        $data->username = 'pokjapemilihan4';
+        $data->nik = '12345';
+        $data->nip = '12345';
+        $data->role = 'pokjapemilihan';
+        $data->jabatan = 'Kepala 4';
+        $data->password = bcrypt('password');
+        $data->akses = 1;
+        $data->save();
+
+        $data = new User();
+        $data->name = 'Pokja Pemilihan 5';
+        $data->email = 'pokjapemilihan5@gmail.com';
+        $data->username = 'pokjapemilihan5';
+        $data->nik = '12345';
+        $data->nip = '12345';
+        $data->role = 'pokjapemilihan';
+        $data->jabatan = 'Kepala 5';
         $data->password = bcrypt('password');
         $data->akses = 1;
         $data->save();
@@ -76,10 +127,18 @@ class DatabaseSeeder extends Seeder
         $mpb->slug = 'surat_permohonan';
         $mpb->status = 1;
         $mpb->save();
+        
         $mpb = new \App\Models\MetodePengadaanBerkas();
         $mpb->metode_pengadaan_id = 1; // Seleksi
         $mpb->nama_berkas = 'KAK';
         $mpb->slug = 'kak';
+        $mpb->status = 1;
+        $mpb->save();
+
+        $mpb = new \App\Models\MetodePengadaanBerkas();
+        $mpb->metode_pengadaan_id = 2; // Seleksi
+        $mpb->nama_berkas = 'Surat Permohonan';
+        $mpb->slug = 'surat_permohonan';
         $mpb->status = 1;
         $mpb->save();
 
