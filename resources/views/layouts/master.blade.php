@@ -82,10 +82,11 @@
 
     <!-- Alertify css -->
     <link href="{{ asset('template/assets/plugins/alertify/css/alertify.css') }}" rel="stylesheet" type="text/css">    <link href="{{ asset('template/assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('template/assets/css/icons.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('template/assets/css/style.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('template/assets/css/icons.css') }}" rel="stylesheet" type="text/css">    <link href="{{ asset('template/assets/css/style.css') }}" rel="stylesheet" type="text/css">
 
-    @vite(['resources/js/app.js'])
+    <!-- Laravel Echo & Pusher JS for Real-time Chat -->
+    <script src="https://cdn.jsdelivr.net/npm/pusher-js@8.4.0-rc2/dist/web/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.3/dist/echo.iife.js"></script>
 
     <style>
         .modal-backdrop {
