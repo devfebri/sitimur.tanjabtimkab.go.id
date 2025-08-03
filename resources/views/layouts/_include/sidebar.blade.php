@@ -24,11 +24,15 @@
                      <i class="mdi mdi-file"></i>
                      <span> Data Pengajuan </span>
                  </a>
-             </li>
-             <li>
+             </li>             <li>
                  <a href="{{ route('ppk_chats') }}" class="waves-effect">
                      <i class="mdi mdi-forum"></i>
                      <span> Chat </span>
+                     @if(isset($unreadChatCount) && $unreadChatCount > 0)
+                         <span class="badge badge-pill badge-danger float-right chat-badge">{{ $unreadChatCount }}</span>
+                     @else
+                         <span class="badge badge-pill badge-danger float-right chat-badge" style="display: none;"></span>
+                     @endif
                  </a>
              </li>@elseif(auth()->user()->role == 'admin')
             <li class="menu-title">Admin Menu</li>
@@ -74,11 +78,15 @@
                     <i class="mdi mdi-gavel"></i>
                     <span> Dashboard </span>
                 </a>
-            </li>
-            <li>
+            </li>            <li>
                 <a href="{{ route('pokjapemilihan_chats') }}" class="waves-effect">
                     <i class="mdi mdi-forum"></i>
                     <span> Chat </span>
+                    @if(isset($unreadChatCount) && $unreadChatCount > 0)
+                        <span class="badge badge-pill badge-danger float-right chat-badge">{{ $unreadChatCount }}</span>
+                    @else
+                        <span class="badge badge-pill badge-danger float-right chat-badge" style="display: none;"></span>
+                    @endif
                 </a>
             </li>
 
@@ -89,4 +97,57 @@
         </ul>
     </div>
     <div class="clearfix"></div>
+    
+    <!-- Custom CSS for Chat Badge -->
+    <style>
+    .badge-danger {
+        background-color: #dc3545 !important;
+        color: white !important;
+        font-size: 0.6rem !important;
+        padding: 2px 6px !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        min-width: 18px !important;
+        text-align: center !important;
+        line-height: 1.2 !important;
+        margin-left: 8px !important;
+        animation: pulse-badge 2s infinite;
+    }
+    
+    @keyframes pulse-badge {
+        0% { 
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+        }
+        70% { 
+            transform: scale(1.05);
+            box-shadow: 0 0 0 4px rgba(220, 53, 69, 0);
+        }
+        100% { 
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+        }
+    }
+    
+    /* Sidebar link with badge styling */
+    #sidebar-menu ul li a {
+        position: relative;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+    }
+    
+    #sidebar-menu ul li a span:first-of-type {
+        flex: 1;
+    }
+    
+    /* Responsive badge */
+    @media (max-width: 768px) {
+        .badge-danger {
+            font-size: 0.55rem !important;
+            padding: 1px 4px !important;
+            min-width: 16px !important;
+        }
+    }
+    </style>
 </div> <!-- end sidebarinner -->

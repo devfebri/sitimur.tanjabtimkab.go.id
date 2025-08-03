@@ -124,10 +124,10 @@
         var channel = pusher.subscribe('rs-baiturrahim');
         channel.bind('notification', function(data) {
             alertify.success(JSON.stringify(data['message']));
-        });
+        });    </script> --}}
 
-    </script> --}}
-
+    <!-- Livewire Styles -->
+    @livewireStyles
 </head>
 
 
@@ -262,6 +262,66 @@ $(function() {
             } else {
                 alertify.error('Data sudah dihapus pembuat.');
             }
+        });
+    });
+});
+</script>
+
+<!-- Livewire Scripts -->
+@livewireScripts
+
+<!-- Chat Badge Update Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to update chat badge count
+    function updateChatBadge() {
+        @if(auth()->check() && in_array(auth()->user()->role, ['ppk', 'pokjapemilihan']))
+        const role = '{{ auth()->user()->role }}';
+        let apiUrl = '';
+          if (role === 'ppk') {
+            apiUrl = '{{ route("ppk_api.unread.count") }}';
+        } else if (role === 'pokjapemilihan') {
+            apiUrl = '{{ route("pokjapemilihan_api.unread.count") }}';
+        }
+        
+        if (apiUrl) {
+            fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const badges = document.querySelectorAll('.chat-badge');
+                badges.forEach(badge => {
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                });
+            })
+            .catch(error => {
+                console.log('Error updating chat badge:', error);
+            });
+        }
+        @endif
+    }
+    
+    // Update badge every 30 seconds
+    setInterval(updateChatBadge, 30000);
+    
+    // Listen for Livewire events to update badge immediately
+    document.addEventListener('livewire:initialized', () => {
+        Livewire.on('message-sent', () => {
+            setTimeout(updateChatBadge, 1000);
+        });
+        
+        Livewire.on('conversation-selected', () => {
+            setTimeout(updateChatBadge, 1000);
         });
     });
 });

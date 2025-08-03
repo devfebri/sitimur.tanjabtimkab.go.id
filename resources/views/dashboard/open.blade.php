@@ -296,10 +296,26 @@
                                         @else
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Status Error</i></td>
                                         @endif
-                                    </tr>
-                                    <tr>
+                                    </tr>                                    <tr>
                                         <td>
-                                            <a href="#" class="btn btn-primary btn-sm btn-block">Riwayat</a>
+                                            <div class="btn-group w-100" role="group">
+                                                <a href="#" class="btn btn-primary btn-sm">Riwayat</a>                                                @if(auth()->user()->role == 'ppk' || auth()->user()->role == 'pokjapemilihan')
+                                                @php
+                                                    $targetUserId = null;
+                                                    if(auth()->user()->role == 'ppk') {
+                                                        // PPK chat dengan Pokja yang pertama dari pengajuan ini
+                                                        $targetUserId = $data->pokja1_id ?? $data->pokja2_id ?? $data->pokja3_id;
+                                                    } elseif(auth()->user()->role == 'pokjapemilihan') {
+                                                        // Pokja chat dengan PPK (user yang membuat pengajuan)
+                                                        $targetUserId = $data->user_id;
+                                                    }
+                                                @endphp
+                                                <a href="{{ route(auth()->user()->role.'_chats') }}?pengajuan={{ $data->id }}{{ $targetUserId ? '&with_user='.$targetUserId : '' }}" 
+                                                   class="btn btn-success btn-sm">
+                                                    <i class="mdi mdi-chat me-1"></i>Chat
+                                                </a>
+                                                @endif
+                                            </div>
                                         </td>
                                     </tr>
 

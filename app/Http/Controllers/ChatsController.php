@@ -72,6 +72,30 @@ class ChatsController extends Controller
             ];
         });
 
-        return response()->json($formattedUsers);
+        return response()->json([
+            'users' => $users
+        ]);
+    }
+    
+    public function getUnreadCount()
+    {
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $user = Auth::user();
+        $unreadCount = 0;
+        
+        if (in_array($user->role, ['ppk', 'pokjapemilihan'])) {
+            $conversationIds = \App\Models\ChatConversation::whereJsonContains('participants', $user->id)
+                ->pluck('id');
+            
+            $unreadCount = \App\Models\ChatMessage::whereIn('conversation_id', $conversationIds)
+                ->where('user_id', '!=', $user->id)
+                ->whereNull('read_at')
+                ->count();
+        }
+        
+        return response()->json(['count' => $unreadCount]);
     }
 }

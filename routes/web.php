@@ -27,6 +27,11 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('check-username', [UserController::class, 'checkUsername'])->name('usercheckUsername');
 
+// Test Chat Route (temporary for testing)
+Route::get('/test-chat', function () {
+    return view('test-chat');
+})->name('test.chat');
+
 
 Route::get('/notif/baca-semua', [NotificationController::class, 'bacaSemua'])->name('notif.baca.semua');
 Route::get('/notif/read/{id}', function ($id) {
@@ -125,6 +130,7 @@ Route::prefix('ppk')->middleware(['auth', PpkMiddleware::class])->name('ppk_')->
     
     // API for chat users
     Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
+    Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
 });
 
 // =============== POKJA PEMILIHAN ===============
@@ -152,5 +158,6 @@ Route::prefix('pokjapemilihan')->middleware(PokjaPemilihanMiddleware::class)->na
     
     // API for chat users
     Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
+    Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
 
 });

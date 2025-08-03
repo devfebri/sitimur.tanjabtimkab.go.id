@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\Models\ChatConversation;
 use App\Models\ChatMessage;
 use App\Models\User;
-use App\Events\MessageSent;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -13,79 +12,58 @@ use Livewire\WithFileUploads;
 
 class CustomChat extends Component
 {
-    use WithFileUploads;    public $conversations = [];
+    use WithFileUploads;
+
+    public $conversations = [];
     public $selectedConversation = null;
     public $messages = [];
     public $newMessage = '';
-    public $searchConversations = '';
+    public $searchUsers = '';
+    public $availableUsers = [];
     public $pengajuanId = null;
-    public $withUserId = null;
     public $fileUpload = null;
-    public $isUploading = false;public function mount($pengajuanId = null)
-    {        $this->pengajuanId = $pengajuanId;
-        $this->withUserId = request()->query('with_user');
-        
+    public $isUploading = false;
+
+    public function mount($pengajuanId = null)
+    {
+        $this->pengajuanId = $pengajuanId;
         $this->loadConversations();
-        
-        // Auto-open chat dengan user tertentu jika parameter with_user ada
-        if ($this->withUserId) {
-            $this->autoStartChatWithUser($this->withUserId);
-        }
-    }public function loadConversations()
+        $this->loadAvailableUsers();
+    }
+
+    public function loadConversations()
     {
         $userId = Auth::id();
-        $searchQuery = trim($this->searchConversations);
         
-        $conversationsQuery = ChatConversation::whereJsonContains('participants', $userId)
-            ->with(['lastMessage.user', 'pengajuan']);
-            
-        // Tambahkan filter pencarian jika ada query
-        if (!empty($searchQuery)) {
-            $conversationsQuery->whereHas('pengajuan', function($q) use ($searchQuery) {
-                $q->where('nama_pengadaan', 'LIKE', '%' . $searchQuery . '%');
-            })->orWhereHas('lastMessage', function($q) use ($searchQuery) {
-                $q->where('message', 'LIKE', '%' . $searchQuery . '%');
-            })->orWhere(function($q) use ($searchQuery, $userId) {
-                // Cari berdasarkan nama participant lain
-                $q->whereJsonContains('participants', $userId);
-            });
-        }
-        
-        $this->conversations = $conversationsQuery
+        $this->conversations = ChatConversation::whereJsonContains('participants', $userId)
+            ->with(['lastMessage.user', 'pengajuan'])
             ->orderBy('last_message_at', 'desc')
             ->get();
     }
-      public function updatedSearchConversations()
+
+    public function loadAvailableUsers()
     {
-        $this->loadConversations();
-    }
-      public function autoStartChatWithUser($userId)
-    {
-        // Cek apakah sudah ada conversation dengan user ini
-        $existingConversation = ChatConversation::where(function($query) use ($userId) {
-            $query->whereJsonContains('participants', Auth::id())
-                  ->whereJsonContains('participants', (int)$userId);
-        })->first();
+        $currentUser = Auth::user();
         
-        if ($existingConversation) {
-            // Jika sudah ada conversation, langsung buka
-            $this->selectConversation($existingConversation->id);
-            session()->flash('info', 'Chat dibuka dengan ' . User::find($userId)->name);
-        } else {
-            // Jika belum ada, buat conversation baru
-            $this->startNewChat($userId);
-            session()->flash('success', 'Chat baru dimulai dengan ' . User::find($userId)->name);
+        // PPK bisa chat dengan Pokja, Pokja bisa chat dengan PPK
+        if ($currentUser->role === 'ppk') {
+            $this->availableUsers = User::where('role', 'pokjapemilihan')
+                ->where('id', '!=', $currentUser->id)
+                ->get();
+        } elseif ($currentUser->role === 'pokjapemilihan') {
+            $this->availableUsers = User::where('role', 'ppk')
+                ->where('id', '!=', $currentUser->id)
+                ->get();
         }
-    }    public function selectConversation($conversationId)
+    }
+
+    public function selectConversation($conversationId)
     {
         $this->selectedConversation = ChatConversation::find($conversationId);
         
         if ($this->selectedConversation && $this->selectedConversation->hasParticipant(Auth::id())) {
             $this->loadMessages();
             $this->markMessagesAsRead();
-            
-            // Emit event for JavaScript to update badge
-            $this->dispatch('conversation-selected');
         }
     }
 
@@ -134,14 +112,12 @@ class CustomChat extends Component
                 return;
             }
             
-            $this->isUploading = false;        } else {
+            $this->isUploading = false;
+        } else {
             $messageData['message'] = $this->newMessage;
         }
 
         $message = ChatMessage::create($messageData);
-
-        // Fire event untuk real-time broadcasting
-        event(new MessageSent($message));
 
         // Update conversation last message time
         $this->selectedConversation->update(['last_message_at' => now()]);
@@ -186,42 +162,24 @@ class CustomChat extends Component
             ->where('user_id', '!=', Auth::id())
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
-    }    public function downloadFile($messageId)
+    }
+
+    public function downloadFile($messageId)
     {
         $message = ChatMessage::find($messageId);
         
         if (!$message || !$message->isFile() || !$message->file_path) {
             session()->flash('error', 'File tidak ditemukan');
-            return redirect()->back();
+            return;
         }
 
-        $filePath = storage_path('app/public/' . $message->file_path);
-        
-        if (!file_exists($filePath)) {
-            session()->flash('error', 'File tidak ada di server');
-            return redirect()->back();
+        // Check if user has access to this conversation
+        if (!$message->conversation->hasParticipant(Auth::id())) {
+            session()->flash('error', 'Akses ditolak');
+            return;
         }
 
-        return response()->download($filePath, $message->file_name);
-    }
-
-    // API method untuk mengambil unread count
-    public function getUnreadCount()
-    {
-        $unreadCount = 0;
-        $user = Auth::user();
-        
-        if ($user && in_array($user->role, ['ppk', 'pokjapemilihan'])) {
-            $conversationIds = ChatConversation::whereJsonContains('participants', $user->id)
-                ->pluck('id');
-            
-            $unreadCount = ChatMessage::whereIn('conversation_id', $conversationIds)
-                ->where('user_id', '!=', $user->id)
-                ->whereNull('read_at')
-                ->count();
-        }
-        
-        return response()->json(['count' => $unreadCount]);
+        return Storage::disk('public')->download($message->file_path, $message->file_name);
     }
 
     public function render()
