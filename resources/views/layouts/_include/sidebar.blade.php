@@ -11,71 +11,76 @@
 
 <div class="sidebar-inner slimscrollleft" style="font-family:revert-layer;font-size:14px;">
 
-    <div id="sidebar-menu">
-        <ul>
-           @if( auth()->user()->role == 'ppk')
-            {{-- <li class="menu-title">Admin</li> --}}
+    <div id="sidebar-menu">        <ul>           @if( auth()->user()->role == 'ppk')
+            <li class="menu-title">PPK Menu</li>
             <li>
                 <a href="{{ route('ppk_pengajuan_create') }}" class="waves-effect">
-
-                    <i class="mdi mdi-view-dashboard"></i>
-                    <span> Pengajuan </span>
+                    <i class="mdi mdi-plus"></i>
+                    <span> Buat Pengajuan </span>
                 </a>
             </li>
              <li>
                  <a href="{{ route('ppk_dashboard') }}" class="waves-effect">
-                     <i class="mdi mdi-view-dashboard"></i>
-                     <span> Riwayat Pengajuan </span>
+                     <i class="mdi mdi-file"></i>
+                     <span> Data Pengajuan </span>
                  </a>
              </li>
-
-
-            @elseif(auth()->user()->role == 'admin')
-            
+             <li>
+                 <a href="{{ route('ppk_chats') }}" class="waves-effect">
+                     <i class="mdi mdi-forum"></i>
+                     <span> Chat </span>
+                 </a>
+             </li>@elseif(auth()->user()->role == 'admin')
+            <li class="menu-title">Admin Menu</li>
             <li>
                 <a href="{{ route(auth()->user()->role.'_user') }}" class="waves-effect">
-                    <i class="mdi mdi-worker"></i>
-                    <span> User </span>
+                    <i class="fa fa-users"></i>
+                    <span> Kelola User </span>
                 </a>
             </li>
             <li>
                 <a href="{{ route(auth()->user()->role.'_persyaratan') }}" class="waves-effect">
-                    <i class="mdi mdi-worker"></i>
+                    <i class="mdi mdi-clipboard"></i>
                     <span> Kelola Persyaratan </span>
                 </a>
             </li>
             <li>
                 <a href="{{ route(auth()->user()->role.'_dashboard') }}" class="waves-effect">
-                    <i class="mdi mdi-worker"></i>
-                    <span> Data pengajuan </span>
+                    <i class="fa fa-dashboard"></i>
+                    <span> Data Pengajuan </span>
                 </a>
-            </li>
-            @elseif(auth()->user()->role == 'verifikator')
-
+            </li>            @elseif(auth()->user()->role == 'verifikator')
+            <li class="menu-title">Verifikator Menu</li>
             <li>
                 <a href="{{ route('verifikator_dashboard') }}" class="waves-effect">
-                    <i class="mdi mdi-view-dashboard"></i>
+                    <i class="mdi mdi-check"></i>
                     <span> Dashboard </span>
                 </a>
             </li>
+            
             @elseif(auth()->user()->role == 'kepalaukpbj')
-
+            <li class="menu-title">Kepala UKPBJ Menu</li>
             <li>
                 <a href="{{ route('kepalaukpbj_dashboard') }}" class="waves-effect">
-                    <i class="mdi mdi-view-dashboard"></i>
+                    <i class="fa fa-user"></i>
                     <span> Dashboard </span>
                 </a>
             </li>
+            
             @elseif(auth()->user()->role == 'pokjapemilihan')
-
+            <li class="menu-title">Pokja Pemilihan Menu</li>
             <li>
                 <a href="{{ route('pokjapemilihan_dashboard') }}" class="waves-effect">
-                    <i class="mdi mdi-view-dashboard"></i>
+                    <i class="mdi mdi-gavel"></i>
                     <span> Dashboard </span>
                 </a>
             </li>
-
-
+            <li>
+                <a href="{{ route('pokjapemilihan_chats') }}" class="waves-effect">
+                    <i class="mdi mdi-forum"></i>
+                    <span> Chat </span>
+                </a>
+            </li>
 
            @endif
             

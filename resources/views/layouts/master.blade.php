@@ -91,6 +91,20 @@
         .modal-backdrop {
             opacity: 0 !important;
         }
+        /* Tambahan agar pesan panjang di notifikasi tetap rapi */
+        .dropdown-item.notify-item .small.text-muted {
+            white-space: pre-line; /* Biar bisa multi-line */
+            word-break: break-word; /* Biar kata panjang tetap wrap */
+            max-width: 320px; /* Batas lebar pesan */
+            display: block;
+        }
+        @media (max-width: 400px) {
+            .dropdown-item.notify-item .small.text-muted {
+            max-width: 200px;
+            }
+        }
+
+
 
     </style>
 
@@ -227,6 +241,31 @@
 
     </script>
 
+    <script>
+$(function() {
+    $('.notif-link').on('click', function(e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
+        $.get(url, function(res) {
+            if (res && res.error) {
+                alertify.error(res.pesan || 'Data sudah dihapus pembuat.');
+            } else if (res && res.redirect) {
+                window.location.href = res.redirect;
+            } else {
+                // fallback: reload
+                window.location.reload();
+            }
+        }).fail(function(xhr) {
+            // Jika controller return redirect, browser akan redirect otomatis
+            if (xhr.status === 200 && xhr.responseText.indexOf('<!DOCTYPE html>') !== -1) {
+                window.location.href = url;
+            } else {
+                alertify.error('Data sudah dihapus pembuat.');
+            }
+        });
+    });
+});
+</script>
 
 </body>
 

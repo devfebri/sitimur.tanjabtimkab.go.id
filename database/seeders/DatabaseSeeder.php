@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
         $data->save();
 
         $data = new User();
-        $data->name = 'Kepala UKPBJ';
+        $data->name = 'Nama Kepala UKPBJ';
         $data->email = 'kepalaukpbj@gmail.com'; 
         $data->username = 'kepalaukpbj';
         $data->role = 'kepalaukpbj';
@@ -41,9 +41,9 @@ class DatabaseSeeder extends Seeder
         $data->save();
 
         $data = new User();
-        $data->name = 'Pokja Pemilihan';
+        $data->name = 'Nama Pokja 1';
         $data->email = 'pokjapemilihan@gmail.com';
-        $data->username = 'pokjapemilihan';
+        $data->username = 'pokja1';
         $data->nik = '12345';
         $data->nip = '12345';
         $data->role = 'pokjapemilihan';
@@ -53,9 +53,9 @@ class DatabaseSeeder extends Seeder
         $data->save();
 
         $data = new User();
-        $data->name = 'Pokja Pemilihan 2';
+        $data->name = 'Nama Pokja 2';
         $data->email = 'pokjapemilihan2@gmail.com';
-        $data->username = 'pokjapemilihan2';
+        $data->username = 'pokja2';
         $data->nik = '12345';
         $data->nip = '12345';
         $data->role = 'pokjapemilihan';
@@ -65,9 +65,9 @@ class DatabaseSeeder extends Seeder
         $data->save();
 
         $data = new User();
-        $data->name = 'Pokja Pemilihan 3';
+        $data->name = 'Nama Pokja 3';
         $data->email = 'pokjapemilihan3@gmail.com';
-        $data->username = 'pokjapemilihan3';
+        $data->username = 'pokja3';
         $data->nik = '12345';
         $data->nip = '12345';
         $data->role = 'pokjapemilihan';
@@ -77,9 +77,9 @@ class DatabaseSeeder extends Seeder
         $data->save();
 
         $data = new User();
-        $data->name = 'Pokja Pemilihan 4';
+        $data->name = 'Nama Pokja 4';
         $data->email = 'pokjapemilihan4@gmail.com';
-        $data->username = 'pokjapemilihan4';
+        $data->username = 'pokja4';
         $data->nik = '12345';
         $data->nip = '12345';
         $data->role = 'pokjapemilihan';
@@ -89,9 +89,9 @@ class DatabaseSeeder extends Seeder
         $data->save();
 
         $data = new User();
-        $data->name = 'Pokja Pemilihan 5';
+        $data->name = 'Nama Pokja 5';
         $data->email = 'pokjapemilihan5@gmail.com';
-        $data->username = 'pokjapemilihan5';
+        $data->username = 'pokja5';
         $data->nik = '12345';
         $data->nip = '12345';
         $data->role = 'pokjapemilihan';

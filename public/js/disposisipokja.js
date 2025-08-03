@@ -156,7 +156,7 @@ $("#form-disposisi-pokja").on("submit", function (e) {
             pengajuan_id: window.pengajuanId,
         },
         success: function (res) {
-            alert("Disposisi berhasil dikirim.");
+            alertify.success("Disposisi berhasil dikirim.");
             $("#disposisiModal").modal("hide");
             window.location.reload();
         },

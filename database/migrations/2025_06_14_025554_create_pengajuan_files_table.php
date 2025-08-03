@@ -17,9 +17,11 @@ return new class extends Migration
             // $table->integer('metode_pengadaan_berkas_id')->constrained('metode_pengadaan_berkass')->onDelete('cascade');
             $table->string('nama_file');
             $table->integer('revisi_ke')->default(0)->comment('Revisi ke berapa, 0 berarti file asli');
-            $table->boolean('status_verifikator')->default(false)->comment(' 0=belum direviu, 1=sesuai, 2=tidak sesuai 3=perlu perbaikan');
-            $table->text('pesan_verifikator')->nullable();
-            
+            $table->boolean('verifikator_status')->default(false)->comment(' 0=belum direviu, 1=sesuai, 2=tidak sesuai 3=perlu perbaikan');
+            $table->text('verifikator_pesan')->nullable();
+            $table->datetime('verifikator_updated')->nullable();
+
+
             $table->boolean('pokja1_status')->default(false)->comment(' 0=belum direviu, 1=sesuai, 2=tidak sesuai 3=perlu perbaikan');
             $table->text('pokja1_pesan')->nullable();
             $table->datetime('pokja1_updated')->nullable();

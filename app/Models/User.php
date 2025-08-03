@@ -55,12 +55,20 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function canCreateChats(): bool
+    {
+        return $this->hasVerifiedEmail() === false;
+    }
+    public function canCreateGroups(): bool
+    {
+        return $this->hasVerifiedEmail() === false;
+    }
 
     public function getAvatar()
     {
         if (!$this->avatar) {
             return asset('storage/avatars/default.png');
         }
-        return asset('storage/' . auth()->user()->avatar);
+        return asset('storage/' . $this->avatar);
     }
 }

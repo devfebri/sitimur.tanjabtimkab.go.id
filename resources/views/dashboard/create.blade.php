@@ -20,7 +20,8 @@
 
     <div class="card shadow">
         <div class="card-body">
-            <form id="form_pengajuan" action="{{ route('ppk_simpan_step2') }}" method="POST" enctype="multipart/form-data" onsubmit="return confirm('Apakah Anda yakin ingin mengirim pengajuan ini? Pastikan semua data sudah benar.');">
+            <form id="form_pengajuan" action="{{ route('ppk_simpan_step2') }}" method="POST" enctype="multipart/form-data">
+
 
 
                 @csrf
@@ -300,7 +301,9 @@
             }
 
             var formData = new FormData();
-            formData.append('file', files[0]);
+            if (input.prop('multiple')) {
+            for (let i = 0; i < files.length; i++) { formData.append('file[]', files[i]); } } else { formData.append('file', files[0]); }
+
             formData.append('berkas_id', berkas_id);
             formData.append('pengajuan_id', pengajuan_id);
             formData.append('_token', '{{ csrf_token() }}');
@@ -376,5 +379,16 @@
 
     });
 </script>
-
+<script>
+$(function() {
+    $('#form_pengajuan').on('submit', function(e) {
+        e.preventDefault();
+        alertify.confirm(
+            'Apakah Anda yakin ingin mengirim pengajuan ini? Pastikan semua data sudah benar.',
+            () => this.submit(),
+            () => alertify.error('Pengajuan dibatalkan')
+        );
+    });
+});
+</script>
 @endsection

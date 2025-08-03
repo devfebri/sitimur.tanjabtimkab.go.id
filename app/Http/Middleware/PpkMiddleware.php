@@ -16,10 +16,18 @@ class PpkMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Kecualikan request Livewire
+        if (
+            $request->is('livewire/*') ||
+            $request->header('X-Livewire')
+        ) {
+            return $next($request);
+        }
         if (Auth::check()) {
             if (Auth::user()->role == 'ppk') {
                 return $next($request);
             } else {
+                // dd(auth()->user()->role);
                 return redirect(url('/'));
             }
         } else {

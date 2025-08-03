@@ -35,6 +35,13 @@ class Pengajuan extends Model
         'updated_at',
     ];
 
+    protected $casts = [
+       
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'verifikator_updated' => 'datetime',
+    ];
+
     
 
     public function user()

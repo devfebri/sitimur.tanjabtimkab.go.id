@@ -36,8 +36,8 @@ class PengajuanDisetujui extends Notification
     {
         return [
             'judul' => 'Pengajuan Anda Disetujui',
-            'pesan' => 'Pengajuan "' . $this->pengajuan->judul . '" telah disetujui.',
-            'url' => route(auth()->user()->role.'_pengajuanopen', $this->pengajuan->id),
+            'pesan' =>  $this->pesan,
+            'url' => route('user_pengajuanopen', $this->pengajuan->id),
         ];
     }
 

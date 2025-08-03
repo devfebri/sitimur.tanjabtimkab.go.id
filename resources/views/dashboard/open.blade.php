@@ -1,4 +1,34 @@
 @extends('layouts.master')
+@section('css')
+<style>
+    .badge-primary-soft {
+        background: #e3eafd;
+        color: #2a3f54;
+    }
+
+    .badge-success-soft {
+        background: #e6f4ea;
+        color: #256029;
+    }
+
+    .badge-danger-soft {
+        background: #fdeaea;
+        color: #a94442;
+    }
+
+    .badge-warning-soft {
+        background: #fff8e1;
+        color: #8a6d3b;
+    }
+
+    .badge-secondary-soft {
+        background: #f2f2f2;
+        color: #555;
+    }
+
+</style>
+@endsection
+
 
 @section('content')
 
@@ -8,22 +38,40 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <div class="page-title-box">
-                    <a href="javascript:history.back()" class="btn btn-primary">Kembali</a>
+                <div class="page-title-box d-flex align-items-center justify-content-between">
+                    <a href="javascript:history.back()" class="btn btn-primary">
+                        <i class="fa fa-arrow-left"></i> Kembali
+                    </a>
+
+                    @if(auth()->user()->role=='kepalaukpbj' && $data->status==11)
+                    <div>
+                        <button id="disposisiPokja" class="btn btn-success btn-lg mr-2 shadow-sm">
+                            <i class="fa fa-share-square"></i> Disposisi ke Pokja Pemilihan
+                        </button>
+                        <button id="tolakPengajuan" class="btn btn-danger btn-lg shadow-sm">
+                            <i class="fa fa-times-circle"></i> Tolak Pengajuan
+                        </button>
+                    </div>
+                    @elseif(auth()->user()->role=='verifikator' && $data->status==0)
+                    <div>
+                        
+                        <button id="tolakPengajuan" class="btn btn-danger btn-lg shadow-sm">
+                            <i class="fa fa-times-circle"></i> Tolak Pengajuan
+                        </button>
+                    </div>
+
+                    @endif
                 </div>
             </div>
         </div>
+
+
         
+      
+
         <div class="row">
             
-            @if(auth()->user()->role=='kepalaukpbj' && $data->status==11)
-            <div class="col-12 m-b-20 text-center">
-                <button id="disposisiPokja" class="btn btn-success btn-lg">Disposisi ke Pokja Pemilihan</button>
-                <button id="tolakPengajuan" class="btn  btn-lg btn-danger">Tolak Pengajuan</button>
-            </div>
-            @endif
-
-            @if($data->status==21)
+            @if(auth()->user()->role=='pokjapemilihan'||auth()->user()->role=='kepalaukpbj'&&$data->pokja1_id || auth()->user()->role=='kepalaukpbj' &&$data->pokja2_id || auth()->user()->role=='kepalaukpbj'&&$data->pokja3_id)
                 <div class="col-12">
                     <table class="table text-center  table-responsive-sm table-sm">
                         <tr>
@@ -152,21 +200,6 @@
                                 <td width="3%">:</td>
                                 <td>{{ $data->metodePengadaan->nama_metode_pengadaan }}</td>
                             </tr>
-                            {{-- <tr>
-                                <td width="20%">Status</td>
-                                <td width="3%">:</td>
-                                <td>
-                                    @if($data->status==0)
-                                    <span class="badge badge-pill badge-primary"><b><i>Proses</i></b></span>
-                                    @elseif($data->status==1)
-                                    <span class="badge badge-pill badge-success"><b><i>Disetujui</i></b></span>
-                                    @elseif($data->status==2)
-                                    <span class="badge badge-pill badge-danger"><b><i>Tidak Disetujui</i></b></span>
-                                    @elseif($data->status==3)
-                                    <span class="badge badge-pill badge-warning"><b><i>Dikembalikan</i></b></span>
-                                    @endif
-                                </td>
-                            </tr> --}}
                             
 
                         </table>
@@ -238,7 +271,9 @@
                                         @elseif($data->status==11)
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Status Terakhir</b> <br>&emsp; <i>Menunggu Kepala UKPBJ</i></td>
                                         @elseif($data->status==12)
-                                        <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Tidak Disetujui Verifikator</i></td>
+                                        <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Tidak Disetujui Verifikator <br>&emsp;{{ $data->updated_at->format('d/m/Y h:i:s') }}</i></td>
+
+
                                         @elseif($data->status==13)
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-warning"></i> Status Terakhir</b> <br>&emsp; <i>Menunggu Verifikasi Ulang</i></td>
                                         @elseif($data->status==14)
@@ -246,11 +281,14 @@
                                         @elseif($data->status==21)
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Status Terakhir</b> <br>&emsp; <i>Menunggu Reviu Pokja</i></td>
                                         @elseif($data->status==22)
-                                        <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Tidak Disetujui Kepala UKPBJ</i></td>
+                                        <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Tidak Disetujui Kepala UKPBJ <br>&emsp;{{ $data->updated_at->format('d/m/Y h:i:s') }}</i></td>
+
                                         @elseif($data->status==31)
-                                        <td><b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Status Terakhir</b> <br>&emsp; <i>Selesai</i></td>
+                                        <td><b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Status Terakhir</b> <br>&emsp; <i>Selesai <br> &emsp;{{ $data->updated_at->format('d/m/Y h:i:s') }}</i></i></td>
+
                                         @elseif($data->status==32)
-                                        <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Tidak Disetujui Pokja Pemilihan</i></td>
+                                        <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Tidak Disetujui Pokja Pemilihan <br> &emsp;{{ $data->updated_at->format('d/m/Y h:i:s') }}</i></td>
+
                                         @elseif($data->status==33)
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-warning"></i> Status Terakhir</b> <br>&emsp; <i>Menunggu Verifikasi Ulang</i></td>
                                         @elseif($data->status==34)
@@ -259,11 +297,11 @@
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Status Error</i></td>
                                         @endif
                                     </tr>
-                                    {{-- <tr>
+                                    <tr>
                                         <td>
-                                            <a href="#" class="btn btn-primary btn-sm btn-block">Tandai Selesai Reviu</a>
+                                            <a href="#" class="btn btn-primary btn-sm btn-block">Riwayat</a>
                                         </td>
-                                    </tr> --}}
+                                    </tr>
 
                                 </table>
                             </div>
@@ -326,17 +364,15 @@
                     <div class="card-body">
                         <h4 class="mt-0 header-title"> File Pengajuan
                             @if(auth()->user()->role=='verifikator' || auth()->user()->role=='pokjapemilihan')
-                            <button type="submit" class="btn btn-danger mb-2 ml-2  float-right btn-sm update-status col-12 col-lg-2" disabled data-status="2" id="blm-lngkp">
-                                Tidak Sesuai
-                            </button>
-                            <button type="submit" class="btn btn-warning mb-2 ml-2  float-right btn-sm update-status col-12 col-lg-2" disabled data-status="3" id="dikembalikan">
+                            
+                            <button type="submit" class="btn btn-warning mb-2 ml-2  float-right btn-sm update-status col-12 col-lg-2" disabled data-status="3" >
                                 Perlu Perbaikan
                             </button>
-                            <button type="submit" class="btn btn-success mb-2 ml-2  float-right btn-sm update-status col-12 col-lg-2" disabled data-status="1" id="sdh-lngkp">
+                            <button type="submit" class="btn btn-success mb-2 ml-2  float-right btn-sm update-status col-12 col-lg-2" disabled data-status="1" >
                                 Sesuai
                             </button>
                             
-                            <textarea name="keterangan" id="keterangan" cols="30" rows="1" class="float-right col-sm-12 col-lg-3 form-control" placeholder="Keterangan"></textarea>
+                            <textarea name="keterangan" id="keterangan" cols="30" rows="1" class="float-right col-sm-12 col-lg-3 form-control" placeholder="Pesan Status"></textarea>
                             @endif
                         </h4>
 
@@ -368,11 +404,22 @@
                         </div>
 
 
-                    </div>
-                    @if(auth()->user()->role=='pokjapemilihan')
+                    </div>                    @if(auth()->user()->role=='pokjapemilihan')
                     <div class="card-footer">
-                        <a href="#" id="tandai-selesai-reviu" class="btn btn-primary btn-sm btn-block disabled" tabindex="-1" aria-disabled="true" disabled>Tandai Selesai Reviu</a>
-
+                        @php
+                            $pokjaKe = null;
+                            if($data->pokja1_id == auth()->user()->id) $pokjaKe = 1;
+                            elseif($data->pokja2_id == auth()->user()->id) $pokjaKe = 2;
+                            elseif($data->pokja3_id == auth()->user()->id) $pokjaKe = 3;
+                            
+                            $statusAkhir = $pokjaKe ? $data->{'pokja' . $pokjaKe . '_status_akhir'} : 0;
+                        @endphp
+                        
+                        @if($statusAkhir == 2)
+                            <a href="#" id="tandai-selesai-reviu" class="btn btn-success btn-sm btn-block disabled" tabindex="-1" aria-disabled="true" disabled>Reviu Telah Selesai</a>
+                        @else
+                            <a href="#" id="tandai-selesai-reviu" class="btn btn-primary btn-sm btn-block disabled" tabindex="-1" aria-disabled="true" disabled>Tandai Selesai Reviu</a>
+                        @endif
                     </div>
                     @endif
                 </div>
@@ -380,58 +427,83 @@
             </div>  
             @if(auth()->user()->role!='pokjapemilihan')
             <div class="col-12">
-                <div class="card m-b-20">
+                <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body">
-                        <div class="table-rep-plugin">
-                            <div class="table-responsive b-0" data-pattern="priority-columns">
-                        <h4 class="mt-0 header-title">Riwayat Pengajuan
-                        </h4>
-                                <table id="datatable1" class="table table-striped table-bordered table-sm text-center" style="font-size: 13px" cellspacing="0" width="100%">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Kode RUP</th>
-                                            <th>Nama Paket</th>
-                                            <th>Perangkat Daerah</th>
-                                            <th>Rekening Kegiatan</th>
-                                            <th>Sumber Dana</th>
-                                            <th>Pagu Anggaran</th>
-                                            <th>Pagu HPS</th>
-                                            <th>Jenis Pengadaan</th>
-                                            <th>Tanggal dibuat</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($history as $key=>$item)
-                                        <tr>
-                                            <td>{{ ++$key }}</td>
-                                            <td>{{ $item->kode_rup }}</td>
-                                            <td>{{ $item->nama_paket }}</td>
-                                            <td>{{ $item->perangkat_daerah }}</td>
-                                            <td>{{ $item->rekening_kegiatan }}</td>
-                                            <td>{{ $item->sumber_dana }}</td>
-                                            <td>Rp {{ number_format($item->pagu_anggaran,0) }}</td>
-                                            <td>Rp {{ number_format($item->pagu_hps,0) }}</td>
-                                            <td>{{ $item->jenis_pengadaan }}</td>
-                                            <td>{{ $item->created_at->format('d/m/Y H:i:s') }}</td>
-                                            <td>
-                                                <a href="{{ route(auth()->user()->role.'_pengajuanopen',$item->id) }}" class="btn btn-primary btn-sm">Open</a>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
+                        <h4 class="header-title mb-3">Riwayat Pengajuan</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered table-sm text-center align-middle" style="font-size: 13px;">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Kode RUP</th>
+                                        <th>Nama Paket</th>
+                                        <th>Perangkat Daerah</th>
+                                        <th>Rekening Kegiatan</th>
+                                        <th>Sumber Dana</th>
+                                        <th>Pagu Anggaran</th>
+                                        <th>Pagu HPS</th>
+                                        <th>Jenis Pengadaan</th>
+                                        <th>Tanggal dibuat</th>
+                                        <th>Posisi Paket</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($history as $key => $item)
+                                    <tr>
+                                        <td>{{ ++$key }}</td>
+                                        <td>{{ $item->kode_rup }}</td>
+                                        <td>{{ $item->nama_paket }}</td>
+                                        <td>{{ $item->perangkat_daerah }}</td>
+                                        <td>{{ $item->rekening_kegiatan }}</td>
+                                        <td>{{ $item->sumber_dana }}</td>
+                                        <td>Rp {{ number_format($item->pagu_anggaran,0) }}</td>
+                                        <td>Rp {{ number_format($item->pagu_hps,0) }}</td>
+                                        <td>{{ $item->jenis_pengadaan }}</td>
+                                        <td>{{ $item->created_at->format('d/m/Y H:i:s') }}</td>
+                                         <td>
+                                             @if($item->status == 0)
+                                             <span class="badge badge-pill badge-primary">Verifikator</span>
+                                             @elseif($item->status == 11)
+                                             <span class="badge badge-pill badge-primary">Kepala UKPBJ</span>
+                                             @elseif($item->status == 12)
+                                             <span class="badge badge-pill badge-danger">Verifikator</span><br>
+                                             <small><i>Pengajuan tidak disetujui</i></small>
+                                             @elseif($item->status == 13)
+                                             <span class="badge badge-pill badge-primary">Verifikator</span>
+                                             @elseif($item->status == 14)
+                                             <span class="badge badge-pill badge-warning">PPK</span>
+                                             @elseif($item->status == 21)
+                                             <span class="badge badge-pill badge-primary">Pokja Pemilihan</span>
+                                             @elseif($item->status == 22)
+                                             <span class="badge badge-pill badge-primary">Kepala UKPBJ</span>
+                                             @elseif($item->status == 31)
+                                             <span class="badge badge-pill badge-primary">Pokja Pemilihan</span>
+                                             @elseif($item->status == 32)
+                                             <span class="badge badge-pill badge-primary">Pokja Pemilihan</span>
+                                             @elseif($item->status == 33)
+                                             <span class="badge badge-pill badge-primary">Pokja Pemilihan</span>
+                                             @elseif($item->status == 34)
+                                             <span class="badge badge-pill badge-warning">PPK</span>
+                                             @else
+                                             <span class="badge badge-pill badge-primary">Error</span>
+                                             @endif
+                                         </td>
 
-
-                                </table>
-                            </div>
+                                        <td>
+                                            <a href="{{ route(auth()->user()->role.'_pengajuanopen',$item->id) }}" class="btn btn-outline-primary btn-sm">
+                                                 Open
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-
-
                     </div>
                 </div>
-
             </div>
+
             @endif
         </div>
 
@@ -552,9 +624,7 @@
         url = url.replace(':data_id', data_id);
         let dStatus = $(this).attr('data-status');
         let dketerangan = $('#keterangan').val();
-        console.log(dketerangan);
         alertify.confirm('Data pengajuan ini akan diupdate, Apa anda yakin ?', function() {
-            // console.log(idData);
             $.ajax({
                 data: {
                     id: idData
@@ -570,7 +640,7 @@
                 , success: function() { //jika berhasil
                     // console.log(data);
                     var oTable = $('#datatable2').dataTable(); //inialisasi datatable
-                    $('#keterangan').html('');
+                    $('#keterangan').val('');
                     oTable.fnDraw(false); //reset datatable
                     $('#checkAll').html('');
                     $('#checkAll').html(`<input type="checkbox" class="checkall" >`);
@@ -585,14 +655,9 @@
                     $('#tombol-simpan').html('Simpan');
                 }
             });
-
-
         }, function() {
             alertify.error('Cancel')
         });
-
-
-
     });
 
 </script>
@@ -625,7 +690,7 @@
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'nama_file', name: 'nama_file' },
             @if(auth()->user()->role=='verifikator')
-            { data: 'status_verifikator', name: 'status_verifikator' },
+            { data: 'verifikator_status', name: 'verifikator_status' },
             @elseif(auth()->user()->role=='pokjapemilihan')
             { data: 'statuss', name: 'statuss'},
             @else
@@ -684,7 +749,8 @@
             success: function(response) {
                 $('#editFileModal').modal('hide');
                 $('#datatable2').DataTable().ajax.reload();
-                alert('File pengajuan berhasil diperbarui.');
+                alertify.success('File pengajuan berhasil diperbarui.');
+
             },
             error: function(xhr) {
                 var errorMessage = 'Terjadi kesalahan, silakan coba lagi.';
@@ -698,13 +764,33 @@
     @endif
     
     // Tolak Pengajuan
-    $('#tolakPengajuan').on('click', function(e) {
+    @if(auth()->user()->role=='verifikator' || auth()->user()->role=='kepalaukpbj')
+     $('#tolakPengajuan').on('click', function(e) {
         e.preventDefault();
-        $.post("{{ route('kepalaukpbj_pengajuan_tolak', $data->id) }}", {_token: '{{ csrf_token() }}'}, function(res) {
-            alert(res.pesan);
-            location.reload();
-        });
+        alertify.confirm(
+            '<textarea id="pesan_akhir" class="form-control" rows="3" placeholder="Tulis alasan penolakan..." style="resize:vertical"></textarea>',
+            function() {
+                var pesan = $('#pesan_akhir').val();
+                if (!pesan) {
+                    alertify.error('Pesan penolakan wajib diisi!');
+                    return false;
+                }
+                $.post("{{ route(auth()->user()->role.'_pengajuan_tolak', $data->id) }}", {
+                    _token: '{{ csrf_token() }}',
+                    pesan_akhir: pesan
+                }, function(res) {
+                    alertify.success(res.pesan);
+                    location.reload();
+                }).fail(function() {
+                    alertify.error('Gagal menolak pengajuan.');
+                });
+            },
+            function() {
+                alertify.error('Aksi dibatalkan');
+            }
+        ).set('labels', {ok:'Tolak', cancel:'Batal'});
     });
+    @endif
     
     window.routeGetPokja = "{{ route('kepalaukpbj_getPokja') }}";
     window.routeKirimPokja = "{{ route('kepalaukpbj_kirimPokja') }}";
@@ -715,41 +801,103 @@
 </script>
 
 <script src="{{ asset('js/disposisipokja.js') }}"></script>
-<script>
-    @if(auth()->user()->role=='pokjapemilihan')
+<script>    @if(auth()->user()->role=='pokjapemilihan')
     $('#datatable2').on('xhr.dt', function (e, settings, json, xhr) {
-        let semuaSesuai = true;
-        let adaBelum = false;
-        let adaTidakSesuai = false;
+        let semuaDisetujuiPokjaIni = true;
+        let adaBelumDiperiksa = false;
+        let pokjaIniSudahSelesai = {{ $data->{'pokja' . (
+                                         $data->pokja1_id == auth()->user()->id ? '1' : 
+                                         ($data->pokja2_id == auth()->user()->id ? '2' : 
+                                         ($data->pokja3_id == auth()->user()->id ? '3' : '0'))
+                                       ) . '_status_akhir'} ?? 0 }};
 
-        if(json && json.data) {
+        if(json && json.data && json.data.length > 0) {
             json.data.forEach(function(row) {
+                // Cek hanya status pokja yang sedang login
                 if(row.statuss.includes('Belum diperiksa')) {
-                    semuaSesuai = false;
-                    adaBelum = true;
+                    semuaDisetujuiPokjaIni = false;
+                    adaBelumDiperiksa = true;
                 }
-                if(row.statuss.includes('Tidak Disetujui')) {
-                    semuaSesuai = false;
-                    adaTidakSesuai = true;
+                if(row.statuss.includes('Dikembalikan')) {
+                    semuaDisetujuiPokjaIni = false;
                 }
             });
         }
 
-        // Enable/disable <a> link
-        if(semuaSesuai && !adaBelum && !adaTidakSesuai && json.data.length > 0) {
-            $('#tandai-selesai-reviu').removeClass('disabled').removeAttr('aria-disabled').attr('tabindex', '0');
+        // Enable/disable tombol "Tandai Selesai Reviu"
+        if (pokjaIniSudahSelesai == 2) {
+            // Jika pokja ini sudah selesai reviu
+            $('#tandai-selesai-reviu').addClass('disabled').attr('aria-disabled', 'true').attr('tabindex', '-1')
+                .text('Reviu Telah Selesai').removeClass('btn-primary').addClass('btn-success');
+        } else if (semuaDisetujuiPokjaIni && !adaBelumDiperiksa && json.data.length > 0) {
+            // Jika semua file sudah disetujui oleh pokja ini
+            $('#tandai-selesai-reviu').removeClass('disabled').removeAttr('aria-disabled').attr('tabindex', '0')
+                .prop('disabled', false).text('Tandai Selesai Reviu').removeClass('btn-success').addClass('btn-primary');
         } else {
-            $('#tandai-selesai-reviu').addClass('disabled').attr('aria-disabled', 'true').attr('tabindex', '-1');
+            // Jika masih ada file yang belum disetujui
+            $('#tandai-selesai-reviu').addClass('disabled').attr('aria-disabled', 'true').attr('tabindex', '-1')
+                .prop('disabled', true).text('Tandai Selesai Reviu').removeClass('btn-success').addClass('btn-primary');
         }
     });
-    @endif
-
-    $('#tandai-selesai-reviu').on('click', function(e) {
+    @endif$('#tandai-selesai-reviu').on('click', function(e) {
         if ($(this).hasClass('disabled')) {
             e.preventDefault();
             return false;
         }
-        // ...aksi jika aktif...
+        
+        e.preventDefault();
+        
+        // Konfirmasi sebelum menandai selesai reviu
+        alertify.confirm(
+            'Apakah Anda yakin ingin menandai reviu sebagai selesai?<br><small class="text-muted">Setelah dikonfirmasi, Anda tidak dapat mengubah status file lagi.</small>',
+            function() {
+                // Disable tombol untuk mencegah double click
+                $('#tandai-selesai-reviu').addClass('disabled').prop('disabled', true).text('Memproses...');
+                
+                $.ajax({
+                    url: "{{ route('pokjapemilihan_selesai_reviu', $data->id) }}",
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alertify.success(response.message);
+                            
+                            // Reload DataTable
+                            $('#datatable2').DataTable().ajax.reload();
+                            
+                            // Jika semua pokja sudah selesai, reload halaman
+                            if (response.all_pokja_selesai) {
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 2000);
+                            } else {
+                                // Tetap disable tombol karena pokja ini sudah selesai
+                                $('#tandai-selesai-reviu').text('Reviu Telah Selesai').removeClass('btn-primary').addClass('btn-success');
+                            }
+                        } else {
+                            alertify.error(response.message || 'Terjadi kesalahan');
+                            // Re-enable tombol jika ada error
+                            $('#tandai-selesai-reviu').removeClass('disabled').prop('disabled', false).text('Tandai Selesai Reviu');
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'Terjadi kesalahan, silakan coba lagi.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        alertify.error(errorMessage);
+                        
+                        // Re-enable tombol jika ada error
+                        $('#tandai-selesai-reviu').removeClass('disabled').prop('disabled', false).text('Tandai Selesai Reviu');
+                    }
+                });
+            },
+            function() {
+                alertify.error('Aksi dibatalkan');
+            }
+        ).set('labels', {ok:'Ya, Selesai', cancel:'Batal'});
     });
 </script>
 @stop

@@ -24,8 +24,8 @@ return new class extends Migration
             $table->float('pagu_hps');
             $table->string('jenis_pengadaan');
             $table->integer('verifikator_id')->nullable();
-            $table->boolean('verifikator_status')->default(false);
-            $table->datetime('verifikator_updated')->nullable();
+            $table->boolean('verifikator_status_akhir')->default(false);
+            $table->datetime('verifikator_updated_akhir')->nullable();
 
             $table->integer('kepalaukpbj_id')->nullable();
             $table->boolean('kepalaukpbj_status')->default(false);
@@ -44,6 +44,7 @@ return new class extends Migration
             $table->boolean('pokja3_status_akhir')->default(false)->comment(' 0=belum direviu, 1=sesuai, 2=tidak sesuai 3=perlu perbaikan');
             $table->datetime('pokja3_updated_akhir')->nullable();
 
+            $table->text('pesan_akhir')->nullable();
             $table->boolean('status')->default(false);
             $table->datetime('status_updated')->nullable();
             $table->timestamps();
