@@ -77,4 +77,9 @@ class Pengajuan extends Model
     {
         return $this->belongsTo(MetodePengadaan::class, 'metode_pengadaan_id');
     }
+
+    public function files()
+    {
+        return $this->hasMany(PengajuanFile::class);
+    }
 }

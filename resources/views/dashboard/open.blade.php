@@ -297,9 +297,9 @@
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Status Error</i></td>
                                         @endif
                                     </tr>                                    <tr>
-                                        <td>
-                                            <div class="btn-group w-100" role="group">
-                                                <a href="#" class="btn btn-primary btn-sm">Riwayat</a>                                                @if(auth()->user()->role == 'ppk' || auth()->user()->role == 'pokjapemilihan')
+                                        <td>                                            <div class="btn-group w-100" role="group">
+                                                                                            
+                                                @if(auth()->user()->role == 'pokjapemilihan' || auth()->user()->role == 'ppk')
                                                 @php
                                                     $targetUserId = null;
                                                     if(auth()->user()->role == 'ppk') {
@@ -309,12 +309,15 @@
                                                         // Pokja chat dengan PPK (user yang membuat pengajuan)
                                                         $targetUserId = $data->user_id;
                                                     }
-                                                @endphp
-                                                <a href="{{ route(auth()->user()->role.'_chats') }}?pengajuan={{ $data->id }}{{ $targetUserId ? '&with_user='.$targetUserId : '' }}" 
-                                                   class="btn btn-success btn-sm">
+                                                @endphp                                                <a href="{{ route(auth()->user()->role.'_chats') }}?pengajuan={{ $data->id }}{{ $targetUserId ? '&with_user='.$targetUserId : '' }}" 
+                                                   class="btn btn-success btn-sm me-1">
                                                     <i class="mdi mdi-chat me-1"></i>Chat
-                                                </a>
+                                                </a>             
                                                 @endif
+                                                <a href="{{ route(auth()->user()->role.'_riwayat_revisi') }}" class="btn btn-warning btn-sm">Riwayat Revisi</a>
+
+
+
                                             </div>
                                         </td>
                                     </tr>
@@ -631,13 +634,10 @@
 @if(auth()->user()->role=='verifikator' || auth()->user()->role=='pokjapemilihan')
 <script>
     let idData = [];
-    let Otable;
-
-    $(document).on('click', '.update-status', function(e) {
+    let Otable;    $(document).on('click', '.update-status', function(e) {
         e.preventDefault();
         var data_id = '{{ $data->id }}';
-        var url = "{{ route(auth()->user()->role.'_pengajuan_files_approval',':data_id') }}";
-        url = url.replace(':data_id', data_id);
+        var url = "{{ route(auth()->user()->role.'_pengajuan_files_approval', $data->id) }}";
         let dStatus = $(this).attr('data-status');
         let dketerangan = $('#keterangan').val();
         alertify.confirm('Data pengajuan ini akan diupdate, Apa anda yakin ?', function() {
@@ -731,7 +731,7 @@
     // Edit File Pengajuan
     $('body').on('click', '.edit-post', function() {
         var file_id = $(this).data('id');
-        var url = "{{ route('ppk_pengajuan_open_edit', ':id') }}".replace(':id', file_id);
+        var url = "{{ route('ppk_pengajuan_open_edit', ['id' => ':id']) }}".replace(':id', file_id);
 
 
         $.get(url, function(data) {
@@ -750,7 +750,7 @@
         var formData = new FormData(this);
         var file_id = $('#file_id').val();
         // alert(file_id);
-        var url = "{{ route('ppk_pengajuan_open_update', ':id') }}".replace(':id', file_id);
+        var url = "{{ route('ppk_pengajuan_open_update', ['id' => ':id']) }}".replace(':id', file_id);
 
         // Disable tombol simpan agar tidak bisa klik dua kali
         var $btn = $(this).find('button[type="submit"]');
@@ -912,8 +912,10 @@
             },
             function() {
                 alertify.error('Aksi dibatalkan');
-            }
-        ).set('labels', {ok:'Ya, Selesai', cancel:'Batal'});
+            }        ).set('labels', {ok:'Ya, Selesai', cancel:'Batal'});
     });
+
+    
 </script>
+
 @stop

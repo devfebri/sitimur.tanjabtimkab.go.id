@@ -1,17 +1,15 @@
 <!-- Single root element for Livewire component -->
-<div class="custom-chat-wrapper">
+<div class="custom-chat-wrapper" data-modal-chat="{{ request()->routeIs('*.open') ? 'true' : 'false' }}">
     <!-- Flash Messages -->
     @if (session()->has('success'))
         <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-            <i class="mdi mdi-check-circle-outline me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <i class="mdi mdi-check-circle-outline me-2"></i>{{ session('success') }}.
         </div>
     @endif
     
     @if (session()->has('info'))
         <div class="alert alert-info alert-dismissible fade show mb-3" role="alert">
-            <i class="mdi mdi-information-outline me-2"></i>{{ session('info') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <i class="mdi mdi-information-outline me-2"></i>{{ session('info') }}.
         </div>
     @endif
     
@@ -158,7 +156,7 @@
                                 <div class="pengajuan-context">
                                     <div class="pengajuan-info">
                                         <i class="mdi mdi-file-document-outline me-1"></i>
-                                        <span class="fw-medium">{{ Str::limit($selectedConversation->pengajuan->nama_pengadaan, 40) }}</span>
+                                        <span class="fw-medium">{{ Str::limit($selectedConversation->pengajuan->nama_paket, 40) }}</span>
                                     </div>
                                 </div>
                             @endif</div>
@@ -1363,14 +1361,46 @@
                         icon.className = 'mdi mdi-loading mdi-spin search-icon';
                         setTimeout(() => {
                             icon.className = 'mdi mdi-magnify search-icon';
-                        }, 500);
-                    }
+                        }, 500);                    }
                 });
             });
         }
-        
-        // Initialize search enhancements
+          // Initialize search enhancements
         setTimeout(enhanceSearchInputs, 1000);
+        
+        // Setup Echo listener for real-time messages
+        setupEchoListener();
+
+        // Listen for message-received event to scroll to bottom
+        window.addEventListener('message-received', event => {
+            setTimeout(scrollToBottom, 100);
+        });
     });
+
+    // Function to setup Echo listener - called when conversation changes
+    function setupEchoListener() {
+        // Leave previous channel if exists
+        if (window.currentChatChannel) {
+            window.currentChatChannel.unsubscribe();
+        }
+        
+        @if($selectedConversation)
+        if (typeof Echo !== 'undefined') {
+            console.log('Setting up Echo listener for conversation: {{ $selectedConversation->id }}');
+            window.currentChatChannel = Echo.private('chat.{{ $selectedConversation->id }}')
+                .listen('MessageSent', (e) => {
+                    console.log('Message received via Echo:', e);
+                    // Trigger Livewire to reload messages
+                    @this.call('messageReceived', e);
+                });
+        } else {
+            console.warn('Echo is not defined. Make sure Laravel Echo is loaded.');
+        }
+        @endif
+    }
+
+    // Listen for Livewire updates to reset Echo listener
+    document.addEventListener('livewire:navigated', setupEchoListener);
+    window.addEventListener('livewire:load', setupEchoListener);
     </script>
 </div>

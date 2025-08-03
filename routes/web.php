@@ -9,6 +9,7 @@ use App\Http\Controllers\PengajuanOpenController;
 use App\Http\Controllers\PersyaratanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RiwayatRevisiController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\KepalaukpbjMiddleware;
 use App\Http\Middleware\PokjaPemilihanMiddleware;
@@ -68,6 +69,8 @@ Route::prefix('admin')->middleware(AdminMiddleware::class)->name('admin_')->grou
     Route::post('/persyaratan/berkas/store', [PersyaratanController::class, 'berkasStore'])->name('persyaratan_berkas_store');
     Route::get('/persyaratan/berkas/{id}/edit', [PersyaratanController::class, 'berkasEdit'])->name('persyaratan_berkas_edit');
     Route::delete('/persyaratan/berkas/{id}', [PersyaratanController::class, 'berkasDestroy'])->name('persyaratan_berkas_delete');
+    Route::get('riwayat_revisi', [RiwayatRevisiController::class, 'index'])->name('riwayat_revisi');
+    Route::get('download_revision/{id}', [RiwayatRevisiController::class, 'downloadRevision'])->name('download_revision');
 });
 
 // =============== VERIFIKATOR ===============
@@ -83,7 +86,8 @@ Route::prefix('verifikator')->middleware(VerifikatorMiddleware::class)->name('ve
     Route::post('pengajuan/{id}/files/approval',[PengajuanOpenController::class,'filesApproval'])->name('pengajuan_files_approval');
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     Route::post('/profile/update',[ProfileController::class,'update'])->name('profileupdate');
-
+    Route::get('riwayat_revisi', [RiwayatRevisiController::class, 'index'])->name('riwayat_revisi');
+    Route::get('download_revision/{id}', [RiwayatRevisiController::class, 'downloadRevision'])->name('download_revision');
     Route::post('/pengajuan/{id}/tolak', [PengajuanOpenController::class, 'tolakPengajuan'])->name('pengajuan_tolak');
 });
 
@@ -100,6 +104,8 @@ Route::prefix('kepalaukpbj')->middleware(KepalaukpbjMiddleware::class)->name('ke
 
     Route::get('/getPokja', [PengajuanOpenController::class, 'getPokja'])->name('getPokja');
     Route::post('/kirim_pokja', [PengajuanOpenController::class, 'kirimPokja'])->name('kirimPokja');
+    Route::get('riwayat_revisi', [RiwayatRevisiController::class, 'index'])->name('riwayat_revisi');
+    Route::get('download_revision/{id}', [RiwayatRevisiController::class, 'downloadRevision'])->name('download_revision');
 });
 
 // =============== PPK ===============
@@ -131,6 +137,9 @@ Route::prefix('ppk')->middleware(['auth', PpkMiddleware::class])->name('ppk_')->
     // API for chat users
     Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
     Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
+
+    Route::get('riwayat_revisi',[RiwayatRevisiController::class,'index'])->name('riwayat_revisi');
+    Route::get('download_revision/{id}', [RiwayatRevisiController::class, 'downloadRevision'])->name('download_revision');
 });
 
 // =============== POKJA PEMILIHAN ===============
@@ -159,5 +168,53 @@ Route::prefix('pokjapemilihan')->middleware(PokjaPemilihanMiddleware::class)->na
     // API for chat users
     Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
     Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
+    Route::get('riwayat_revisi', [RiwayatRevisiController::class, 'index'])->name('riwayat_revisi');
+    Route::get('download_revision/{id}', [RiwayatRevisiController::class, 'downloadRevision'])->name('download_revision');
 
 });
+
+// Test routes for debugging
+Route::get('/test-chat', function () {
+    return view('test-chat');
+})->name('test.chat');
+
+Route::get('/test-chat-debug', function () {
+    return view('test-chat-debug');
+})->name('test.chat.debug');
+
+Route::post('/test-send-message', function (\Illuminate\Http\Request $request) {
+    try {
+        // Get or create test conversation
+        $conversation = \App\Models\ChatConversation::firstOrCreate([
+            'id' => $request->conversation_id
+        ], [
+            'user1_id' => \Illuminate\Support\Facades\Auth::id(),
+            'user2_id' => \Illuminate\Support\Facades\Auth::id() + 1, // For testing
+            'pengajuan_id' => null,
+            'last_message_at' => now()
+        ]);
+
+        // Create test message
+        $message = \App\Models\ChatMessage::create([
+            'conversation_id' => $conversation->id,
+            'user_id' => \Illuminate\Support\Facades\Auth::id(),
+            'message' => $request->message,
+            'type' => 'text'
+        ]);
+
+        // Fire broadcasting event
+        event(new \App\Events\MessageSent($message));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Test message sent and broadcasted',
+            'data' => $message->load('user')
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+})->name('test.send.message');

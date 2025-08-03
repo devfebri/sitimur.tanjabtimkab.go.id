@@ -21,7 +21,20 @@ class CustomChat extends Component
     public $pengajuanId = null;
     public $withUserId = null;
     public $fileUpload = null;
-    public $isUploading = false;public function mount($pengajuanId = null)
+    public $isUploading = false;    protected $listeners = [
+        'set-chat-context' => 'setChatContext'
+    ];public function setChatContext($params)
+    {
+        $this->pengajuanId = $params['pengajuanId'] ?? null;
+        $this->withUserId = $params['withUserId'] ?? null;
+        
+        $this->loadConversations();
+        
+        // Auto-open chat dengan user tertentu jika ada
+        if ($this->withUserId) {
+            $this->autoStartChatWithUser($this->withUserId);
+        }
+    }public function mount($pengajuanId = null)
     {        $this->pengajuanId = $pengajuanId;
         $this->withUserId = request()->query('with_user');
         
@@ -75,8 +88,9 @@ class CustomChat extends Component
             // Jika belum ada, buat conversation baru
             $this->startNewChat($userId);
             session()->flash('success', 'Chat baru dimulai dengan ' . User::find($userId)->name);
-        }
-    }    public function selectConversation($conversationId)
+        }    }
+
+    public function selectConversation($conversationId)
     {
         $this->selectedConversation = ChatConversation::find($conversationId);
         
@@ -220,8 +234,16 @@ class CustomChat extends Component
                 ->whereNull('read_at')
                 ->count();
         }
+          return response()->json(['count' => $unreadCount]);
+    }
+
+    public function messageReceived($data)
+    {
+        // Reload messages when new message received
+        $this->loadMessages();
         
-        return response()->json(['count' => $unreadCount]);
+        // Emit event to scroll to bottom
+        $this->dispatch('message-received');
     }
 
     public function render()
