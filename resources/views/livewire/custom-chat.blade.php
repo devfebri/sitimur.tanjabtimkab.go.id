@@ -234,9 +234,7 @@
                                         </button>
                                     </div>
                                 </div>
-                            @endif
-
-                            <form wire:submit.prevent="sendMessage" class="message-form">
+                            @endif                            <form wire:submit.prevent="sendMessage" class="message-form">
                                 <div class="input-group-modern">
                                     <!-- File Upload Button -->
                                     <label class="file-upload-btn" for="fileUpload">
@@ -253,12 +251,13 @@
                                            class="message-input" 
                                            placeholder="Ketik pesan atau lampirkan dokumen..."
                                            wire:model="newMessage"
-                                           wire:keydown.enter.prevent="sendMessage">
+                                           wire:keydown.enter.prevent="sendMessage"
+                                           {{ $isUploading ? 'disabled' : '' }}>
                                     
                                     <!-- Send Button -->
                                     <button type="submit" 
                                             class="send-btn"
-                                            {{ $isUploading ? 'disabled' : '' }}>
+                                            {{ $isUploading || (empty(trim($newMessage)) && !$fileUpload) ? 'disabled' : '' }}>
                                         @if($isUploading)
                                             <div class="spinner-border spinner-border-sm" role="status"></div>
                                         @else
@@ -1375,26 +1374,41 @@
         window.addEventListener('message-received', event => {
             setTimeout(scrollToBottom, 100);
         });
-    });
-
-    // Function to setup Echo listener - called when conversation changes
+    });    // Function to setup Echo listener - called when conversation changes
     function setupEchoListener() {
         // Leave previous channel if exists
         if (window.currentChatChannel) {
-            window.currentChatChannel.unsubscribe();
+            try {
+                window.currentChatChannel.unsubscribe();
+            } catch (error) {
+                console.warn('Error unsubscribing from previous channel:', error);
+            }
+            window.currentChatChannel = null;
         }
         
         @if($selectedConversation)
-        if (typeof Echo !== 'undefined') {
-            console.log('Setting up Echo listener for conversation: {{ $selectedConversation->id }}');
-            window.currentChatChannel = Echo.private('chat.{{ $selectedConversation->id }}')
-                .listen('MessageSent', (e) => {
-                    console.log('Message received via Echo:', e);
-                    // Trigger Livewire to reload messages
-                    @this.call('messageReceived', e);
-                });
+        if (typeof window.Echo !== 'undefined' && window.Echo) {
+            console.log('🎧 Setting up Echo listener for conversation: {{ $selectedConversation->id }}');
+            try {
+                window.currentChatChannel = window.Echo.private('chat.{{ $selectedConversation->id }}')
+                    .listen('MessageSent', (e) => {
+                        console.log('📨 Message received via Echo:', e);
+                        // Trigger Livewire to reload messages
+                        @this.call('messageReceived', e);
+                        
+                        // Dispatch custom event for scroll
+                        window.dispatchEvent(new CustomEvent('message-received', { detail: e }));
+                    })
+                    .error((error) => {
+                        console.error('❌ Echo channel error:', error);
+                    });
+                
+                console.log('✅ Successfully subscribed to chat.{{ $selectedConversation->id }}');
+            } catch (error) {
+                console.error('❌ Error setting up Echo listener:', error);
+            }
         } else {
-            console.warn('Echo is not defined. Make sure Laravel Echo is loaded.');
+            console.warn('⚠️ Echo is not available. Make sure Vite build is running and Laravel Echo is loaded.');
         }
         @endif
     }

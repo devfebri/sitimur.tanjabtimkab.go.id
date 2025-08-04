@@ -150,15 +150,16 @@ class CustomChat extends Component
             
             $this->isUploading = false;        } else {
             $messageData['message'] = $this->newMessage;
-        }
-
-        $message = ChatMessage::create($messageData);
+        }        $message = ChatMessage::create($messageData);
 
         // Fire event untuk real-time broadcasting
         event(new MessageSent($message));
 
         // Update conversation last message time
         $this->selectedConversation->update(['last_message_at' => now()]);
+
+        // Emit Livewire event for UI updates
+        $this->dispatch('message-sent');
 
         $this->newMessage = '';
         $this->loadMessages();

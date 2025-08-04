@@ -22,9 +22,21 @@ window.Echo = new Echo({
                     callback(false, response.data);
                 })
                 .catch(error => {
+                    console.error('Echo authorization error:', error);
                     callback(true, error);
                 });
             }
         };
     },
 });
+
+// Debug logging for development
+if (import.meta.env.DEV) {
+    console.log('🔊 Echo initialized with Reverb config:', {
+        broadcaster: 'reverb',
+        key: import.meta.env.VITE_REVERB_APP_KEY,
+        wsHost: import.meta.env.VITE_REVERB_HOST,
+        wsPort: import.meta.env.VITE_REVERB_PORT,
+        scheme: import.meta.env.VITE_REVERB_SCHEME
+    });
+}
