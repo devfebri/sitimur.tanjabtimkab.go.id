@@ -28,6 +28,14 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('check-username', [UserController::class, 'checkUsername'])->name('usercheckUsername');
 
+// Global User routes (accessible by all authenticated users)
+Route::middleware('auth')->group(function () {
+    Route::get('/users/data', [UserController::class, 'getUserData'])->name('users.data');
+    Route::get('/user/{id}/edit', [UserController::class, 'edit'])->name('user.edit');
+    Route::post('/user/create', [UserController::class, 'create'])->name('user.create');
+    Route::delete('/user/{id}', [UserController::class, 'delete'])->name('user.delete');
+});
+
 // Test Chat Route (temporary for testing)
 Route::get('/test-chat', function () {
     return view('test-chat');
@@ -57,7 +65,7 @@ Route::prefix('admin')->middleware(AdminMiddleware::class)->name('admin_')->grou
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profileupdate');
     Route::get('/user', [UserController::class, 'index'])->name('user');
     Route::get('/users/data', [UserController::class,'getUserData'])->name('userdata');
-    Route::get('/user/{id}/edit', [UserController::class, 'edit'])->name('useredit');
+    Route::get('/user/{id}/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::post('/user/create', [UserController::class, 'create'])->name('usercreate');
     Route::delete('/user/{id}', [UserController::class, 'delete'])->name('userdelete');
 

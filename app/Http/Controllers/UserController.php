@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use datatables;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -66,18 +67,29 @@ class UserController extends Controller
         $result = [];
         $no = $start + 1;
         foreach ($data as $row) {
+            $actionButtons = '';
+            if (Auth::user()->role == 'admin') {
+                $actionButtons = '
+                    <button class="btn btn-warning btn-sm edit-post" data-id="'.$row->id.'">
+                        <i class="fa fa-edit"></i> Edit
+                    </button>
+                    
+                ';
+            }
+
             $result[] = [
                 'no' => $no++,
                 'username' => $row->username,
                 'name' => $row->name,
                 'role' => $row->role,
-                'nohp' => $row->nohp,
-                'jabatan' => $row->jabatan,
-                'pangkat' => $row->pangkat,
-                'jk' => $row->jk,
-                'nip' => $row->nip,
-                'nik' => $row->nik,
-                'status' => $row->akses == 1 ? 'Active' : 'Inactive',
+                'nohp' => $row->nohp ?? '-',
+                'jabatan' => $row->jabatan ?? '-',
+                'pangkat' => $row->pangkat ?? '-',
+                'jk' => $row->jk ?? '-',
+                'nip' => $row->nip ?? '-',
+                'nik' => $row->nik ?? '-',
+                'status' => $row->akses == 1 ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>',
+                'action' => $actionButtons
             ];
         }
 
@@ -93,48 +105,112 @@ class UserController extends Controller
     {
         $id = $request->id;
         if ($id) {
-            // dd($request->all());
-          
+            // Update existing user
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'role' => 'required|string',
+            ]);
+
             $user = User::find($id);
             
-            $user->update([
+            $updateData = [
                 'name' => $request->name,
                 'role' => $request->role,
-                'akses' => $request->statuss,
-                'password' => bcrypt($request->password),
-                'role' => $request->role,
-            ]);
+                'nohp' => $request->nohp,
+                'jabatan' => $request->jabatan,
+                'pangkat' => $request->pangkat,
+                'jk' => $request->jk,
+                'nip' => $request->nip,
+                'nik' => $request->nik,
+                'akses' => $request->statuss ?? 1,
+            ];
+
+            // Only update password if provided
+            if ($request->password) {
+                $updateData['password'] = bcrypt($request->password);
+            }
+
+            $user->update($updateData);
         } else {
-            // dd($request->all());
-            $validated = $request->validate([
+            // Create new user
+            $request->validate([
                 'username' => 'required|unique:users,username',
+                'name' => 'required|string|max:255',
+                'role' => 'required|string',
+                'password' => 'required|min:6|confirmed',
             ]);
-            
 
-            $user = new User;
-            $user->username = $request->username;
-            $user->name = $request->name;
-            $user->role = $request->role;
-            $user->password = bcrypt($request->password);
-            $user->akses    = $request->statuss;
-            $user->save();
-
+            $user = User::create([
+                'username' => $request->username,
+                'name' => $request->name,
+                'role' => $request->role,
+                'password' => bcrypt($request->password),
+                'nohp' => $request->nohp,
+                'jabatan' => $request->jabatan,
+                'pangkat' => $request->pangkat,
+                'jk' => $request->jk,
+                'nip' => $request->nip,
+                'nik' => $request->nik,
+                'akses' => $request->statuss ?? 1,
+            ]);
         }
-        return response()->json($user);
+        
+        return response()->json([
+            'success' => true,
+            'message' => $id ? 'User berhasil diupdate' : 'User berhasil ditambahkan',
+            'data' => $user
+        ]);
     }
 
     public function delete($id)
     {
-        $user = User::find($id);
-        $user->status= 0; // Set status to inactive instead of deleting
-        $user->save();
-        return response()->json($user);
+        try {
+            $user = User::find($id);
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User tidak ditemukan'
+                ], 404);
+            }
+
+            // Soft delete - set akses to 0 instead of actual deletion
+            $user->update(['akses' => 0]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'User berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghapus user'
+            ], 500);
+        }
     }
 
     public function edit($id)
     {
-        $data =  User::find($id);
-        return response()->json($data);
+        try {
+            $user = User::find($id);
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User tidak ditemukan'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $user
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data user'
+            ], 500);
+        }
     }
     public function checkUsername(Request $request)
     {

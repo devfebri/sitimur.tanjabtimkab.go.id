@@ -250,7 +250,7 @@
                                     <!-- Message Input -->                                    <input type="text" 
                                            class="message-input" 
                                            placeholder="Ketik pesan atau lampirkan dokumen..."
-                                           wire:model="newMessage"
+                                           wire:model="newMestooltip-textsage"
                                            wire:keydown.enter.prevent="sendMessage"
                                            {{ $isUploading ? 'disabled' : '' }}>
                                     
