@@ -16,6 +16,13 @@ use App\Http\Middleware\PokjaPemilihanMiddleware;
 use App\Http\Middleware\PpkMiddleware;
 use App\Http\Middleware\VerifikatorMiddleware;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Broadcast;
+
+// Register broadcasting routes for real-time chat
+Broadcast::routes(['middleware' => ['web', 'auth']]);
+
+// Include test routes
+require __DIR__.'/test-broadcast.php';
 
 // Route::get('/', function () {
 //     return view('maintenance');

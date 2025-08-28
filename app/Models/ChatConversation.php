@@ -43,12 +43,16 @@ class ChatConversation extends Model
 
     public function hasParticipant($userId): bool
     {
-        return in_array($userId, $this->participants);
+         // Ensure participants array contains integers for comparison
+        $participants = array_map('intval', $this->participants ?? []);
+        return in_array((int)$userId, $participants);
     }
 
     public function addParticipant($userId): self
     {
-        $participants = $this->participants;
+        $participants = array_map('intval', $this->participants ?? []);
+        $userId = (int)$userId;
+        
         if (!in_array($userId, $participants)) {
             $participants[] = $userId;
             $this->update(['participants' => $participants]);

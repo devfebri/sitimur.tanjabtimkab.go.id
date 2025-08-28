@@ -22,7 +22,8 @@ class CustomChat extends Component
     public $withUserId = null;
     public $fileUpload = null;
     public $isUploading = false;    protected $listeners = [
-        'set-chat-context' => 'setChatContext'
+        'set-chat-context' => 'setChatContext',
+        'messageReceived' => 'messageReceived'
     ];public function setChatContext($params)
     {
         $this->pengajuanId = $params['pengajuanId'] ?? null;
@@ -115,14 +116,22 @@ class CustomChat extends Component
 
     public function sendMessage()
     {
-        if (trim($this->newMessage) === '' && !$this->fileUpload) return;
+        // Validasi: harus ada pesan text atau file
+        if (trim($this->newMessage) === '' && !$this->fileUpload) {
+            session()->flash('error', 'Silakan ketik pesan atau pilih file untuk dikirim.');
+            return;
+        }
 
-        if (!$this->selectedConversation) return;
+        if (!$this->selectedConversation) {
+            session()->flash('error', 'Tidak ada percakapan yang dipilih.');
+            return;
+        }
 
         $messageData = [
             'conversation_id' => $this->selectedConversation->id,
             'user_id' => Auth::id(),
-            'type' => 'text'
+            'type' => 'text',
+            'message' => trim($this->newMessage) // Default message
         ];
 
         // Handle file upload
@@ -135,40 +144,63 @@ class CustomChat extends Component
                 $filePath = $this->fileUpload->storeAs('chat-files', $fileName, 'public');
                 
                 $messageData['type'] = 'document';
-                $messageData['message'] = $this->newMessage ?: 'Mengirim file: ' . $this->fileUpload->getClientOriginalName();
+                $messageData['message'] = trim($this->newMessage) ?: 'Mengirim file: ' . $this->fileUpload->getClientOriginalName();
                 $messageData['file_path'] = $filePath;
                 $messageData['file_name'] = $this->fileUpload->getClientOriginalName();
                 $messageData['file_size'] = $this->fileUpload->getSize();
                 $messageData['file_type'] = $this->fileUpload->getClientOriginalExtension();
                 
                 $this->fileUpload = null;
+                $this->isUploading = false;
             } catch (\Exception $e) {
                 session()->flash('error', 'Gagal mengupload file: ' . $e->getMessage());
                 $this->isUploading = false;
                 return;
             }
+        }
+
+        try {
+            $message = ChatMessage::create($messageData);
+
+            // Fire event untuk real-time broadcasting
+            event(new MessageSent($message));
             
-            $this->isUploading = false;        } else {
-            $messageData['message'] = $this->newMessage;
-        }        $message = ChatMessage::create($messageData);
+            // Log for debugging
+            \Log::info('Message sent and event fired', [
+                'message_id' => $message->id,
+                'conversation_id' => $message->conversation_id,
+                'user_id' => $message->user_id,
+                'message' => $message->message,
+                'type' => $message->type
+            ]);
 
-        // Fire event untuk real-time broadcasting
-        event(new MessageSent($message));
+            // Update conversation last message time
+            $this->selectedConversation->update(['last_message_at' => now()]);
 
-        // Update conversation last message time
-        $this->selectedConversation->update(['last_message_at' => now()]);
-
-        // Emit Livewire event for UI updates
-        $this->dispatch('message-sent');
-
-        $this->newMessage = '';
-        $this->loadMessages();
-        $this->loadConversations();
+            // Clear input
+            $this->newMessage = '';
+            
+            // Reload data
+            $this->loadMessages();
+            $this->loadConversations();
+            
+            // Emit Livewire event for UI updates
+            $this->dispatch('message-sent');
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal mengirim pesan: ' . $e->getMessage());
+            \Log::error('Failed to send message', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'conversation_id' => $this->selectedConversation->id
+            ]);
+        }
     }
 
     public function startNewChat($userId)
     {
-        $currentUserId = Auth::id();
+        $currentUserId = (int)Auth::id();
+        $userId = (int)$userId;
         
         // Check jika sudah ada conversation
         $existingConversation = ChatConversation::where(function($query) use ($currentUserId, $userId) {
@@ -181,12 +213,21 @@ class CustomChat extends Component
             return;
         }
 
-        // Buat conversation baru
+        // Buat conversation baru dengan participants sebagai array integer
         $conversation = ChatConversation::create([
             'type' => 'direct',
             'participants' => [$currentUserId, $userId],
             'pengajuan_id' => $this->pengajuanId,
             'last_message_at' => now()
+        ]);
+
+        // Log untuk debugging
+        \Log::info('New chat conversation created', [
+            'conversation_id' => $conversation->id,
+            'participants' => $conversation->participants,
+            'pengajuan_id' => $this->pengajuanId,
+            'created_by' => $currentUserId,
+            'with_user' => $userId
         ]);
 
         $this->loadConversations();
@@ -238,10 +279,23 @@ class CustomChat extends Component
           return response()->json(['count' => $unreadCount]);
     }
 
-    public function messageReceived($data)
+    public function messageReceived($data = null)
     {
+        // Log untuk debugging
+        \Log::info('messageReceived called', [
+            'user_id' => Auth::id(),
+            'selected_conversation' => $this->selectedConversation ? $this->selectedConversation->id : null,
+            'data' => $data
+        ]);
+        
         // Reload messages when new message received
-        $this->loadMessages();
+        if ($this->selectedConversation) {
+            $this->loadMessages();
+            $this->loadConversations();
+            
+            // Mark new messages as read
+            $this->markMessagesAsRead();
+        }
         
         // Emit event to scroll to bottom
         $this->dispatch('message-received');

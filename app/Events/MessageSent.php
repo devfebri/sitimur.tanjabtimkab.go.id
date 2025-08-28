@@ -10,6 +10,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class MessageSent implements ShouldBroadcastNow
 {
@@ -20,6 +21,14 @@ class MessageSent implements ShouldBroadcastNow
     public function __construct(ChatMessage $message)
     {
         $this->message = $message->load('user', 'conversation');
+        
+        // Log for debugging
+        Log::info('MessageSent event created', [
+            'message_id' => $this->message->id,
+            'conversation_id' => $this->message->conversation_id,
+            'user_id' => $this->message->user_id,
+            'channel' => 'chat.' . $this->message->conversation_id
+        ]);
     }
 
     public function broadcastOn()
@@ -49,6 +58,6 @@ class MessageSent implements ShouldBroadcastNow
 
     public function broadcastAs()
     {
-        return 'message.sent';
+        return 'MessageSent';
     }
 }

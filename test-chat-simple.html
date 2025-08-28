@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Chat Connection</title>
+    <meta name="csrf-token" content="TEST_TOKEN">
+</head>
+<body>
+    <h1>Test Echo Connection</h1>
+    <div id="status">Checking connection...</div>
+    <div id="messages"></div>
+    
+    <script src="http://localhost:5173/@vite/client" type="module"></script>
+    <script type="module">
+        import './resources/js/app.js'
+        
+        // Wait for Echo to be ready
+        setTimeout(() => {
+            const statusDiv = document.getElementById('status');
+            const messagesDiv = document.getElementById('messages');
+            
+            if (window.Echo) {
+                statusDiv.innerHTML = '✅ Echo loaded successfully';
+                
+                // Test connection to a public channel
+                try {
+                    window.Echo.private('chat.1')
+                        .listen('MessageSent', (e) => {
+                            messagesDiv.innerHTML += '<p>📨 Message received: ' + JSON.stringify(e) + '</p>';
+                        })
+                        .error((error) => {
+                            messagesDiv.innerHTML += '<p>❌ Error: ' + JSON.stringify(error) + '</p>';
+                        });
+                    
+                    statusDiv.innerHTML += '<br>📡 Attempting to connect to chat.1 channel...';
+                } catch (error) {
+                    statusDiv.innerHTML += '<br>❌ Error connecting: ' + error.message;
+                }
+            } else {
+                statusDiv.innerHTML = '❌ Echo not loaded';
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

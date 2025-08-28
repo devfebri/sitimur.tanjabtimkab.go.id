@@ -1374,11 +1374,28 @@
         window.addEventListener('message-received', event => {
             setTimeout(scrollToBottom, 100);
         });
-    });    // Function to setup Echo listener - called when conversation changes
+        
+        // Listen for conversation selection to setup new Echo channel
+        Livewire.on('conversation-selected', () => {
+            console.log('🔄 Conversation selected, setting up new Echo listener');
+            setTimeout(setupEchoListener, 500);
+        });
+        
+        // Listen for message sent to setup Echo if not already set
+        Livewire.on('message-sent', () => {
+            if (!window.currentChatChannel) {
+                console.log('🔄 Message sent but no Echo channel, setting up listener');
+                setTimeout(setupEchoListener, 100);
+            }
+        });
+    });
+
+    // Function to setup Echo listener - called when conversation changes
     function setupEchoListener() {
         // Leave previous channel if exists
         if (window.currentChatChannel) {
             try {
+                console.log('🔇 Unsubscribing from previous channel');
                 window.currentChatChannel.unsubscribe();
             } catch (error) {
                 console.warn('Error unsubscribing from previous channel:', error);
@@ -1389,12 +1406,19 @@
         @if($selectedConversation)
         if (typeof window.Echo !== 'undefined' && window.Echo) {
             console.log('🎧 Setting up Echo listener for conversation: {{ $selectedConversation->id }}');
+            console.log('🔑 Current user ID: {{ auth()->id() }}');
+            
+            @auth
             try {
                 window.currentChatChannel = window.Echo.private('chat.{{ $selectedConversation->id }}')
                     .listen('MessageSent', (e) => {
                         console.log('📨 Message received via Echo:', e);
-                        // Trigger Livewire to reload messages
-                        @this.call('messageReceived', e);
+                        console.log('📨 Message sender ID:', e.message ? e.message.user_id : 'unknown');
+                        console.log('📨 Current user ID: {{ auth()->id() }}');
+                        
+                        // Always reload messages for all participants
+                        console.log('🔄 Triggering message reload...');
+                        Livewire.dispatch('messageReceived', e);
                         
                         // Dispatch custom event for scroll
                         window.dispatchEvent(new CustomEvent('message-received', { detail: e }));
@@ -1407,14 +1431,25 @@
             } catch (error) {
                 console.error('❌ Error setting up Echo listener:', error);
             }
+            @endauth
         } else {
             console.warn('⚠️ Echo is not available. Make sure Vite build is running and Laravel Echo is loaded.');
         }
+        @else
+        console.log('ℹ️ No conversation selected, skipping Echo setup');
         @endif
     }
 
     // Listen for Livewire updates to reset Echo listener
-    document.addEventListener('livewire:navigated', setupEchoListener);
-    window.addEventListener('livewire:load', setupEchoListener);
+    document.addEventListener('livewire:navigated', () => {
+        console.log('🔄 Livewire navigated, setting up Echo listener');
+        setTimeout(setupEchoListener, 100);
+    });
+    
+    // Ensure Echo is setup when component loads
+    document.addEventListener('livewire:init', () => {
+        console.log('🔄 Livewire initialized, setting up Echo listener');
+        setTimeout(setupEchoListener, 1000);
+    });
     </script>
 </div>
