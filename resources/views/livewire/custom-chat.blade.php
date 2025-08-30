@@ -162,7 +162,15 @@
                             @endif</div>
 
                         <!-- Messages Area -->
-                        <div class="messages-container">
+                        <div class="messages-container" id="messagesContainer">
+                            <!-- Scroll to bottom indicator -->
+                            <div class="scroll-to-bottom-indicator" id="scrollToBottomBtn" style="display: none;">
+                                <button class="btn-scroll-bottom" onclick="scrollToBottom(true)">
+                                    <i class="mdi mdi-chevron-down"></i>
+                                    <span>Pesan baru</span>
+                                </button>
+                            </div>
+                            
                             @forelse($messages as $message)
                                 <div class="message-wrapper {{ $message->user_id == Auth::id() ? 'own-message' : 'other-message' }}">
                                     <div class="message-bubble">
@@ -250,14 +258,12 @@
                                     <!-- Message Input -->                                    <input type="text" 
                                            class="message-input" 
                                            placeholder="Ketik pesan atau lampirkan dokumen..."
-                                           wire:model="newMestooltip-textsage"
+                                           wire:model="newMessage"
                                            wire:keydown.enter.prevent="sendMessage"
                                            {{ $isUploading ? 'disabled' : '' }}>
                                     
                                     <!-- Send Button -->
-                                    <button type="submit" 
-                                            class="send-btn"
-                                            {{ $isUploading || (empty(trim($newMessage)) && !$fileUpload) ? 'disabled' : '' }}>
+                                    <button type="submit"  class="send-btn" >
                                         @if($isUploading)
                                             <div class="spinner-border spinner-border-sm" role="status"></div>
                                         @else
@@ -689,8 +695,70 @@
     .messages-container {
         flex: 1;
         overflow-y: auto;
+        overflow-x: hidden;
         padding: 10px;
         background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+        height: calc(100vh - 240px); /* Adjust for header + input area */
+        min-height: 300px;
+        max-height: calc(100vh - 200px);
+        scroll-behavior: smooth;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(44, 90, 160, 0.3) transparent;
+    }
+    
+    /* Scroll to bottom indicator */
+    .scroll-to-bottom-indicator {
+        position: absolute;
+        bottom: 80px;
+        right: 20px;
+        z-index: 100;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+    
+    .scroll-to-bottom-indicator.show {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+    }
+    
+    .btn-scroll-bottom {
+        background: linear-gradient(45deg, #2c5aa0, #1e3c72);
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+    
+    .btn-scroll-bottom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(44, 90, 160, 0.4);
+    }
+    
+    .btn-scroll-bottom i {
+        animation: bounce 1s infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-3px);
+        }
+        60% {
+            transform: translateY(-2px);
+        }
     }
     
     .message-wrapper {
@@ -1028,6 +1096,12 @@
             min-height: 400px;
         }
         
+        .messages-container {
+            height: calc(100vh - 200px); /* Adjusted for tablet */
+            min-height: 280px;
+            max-height: calc(100vh - 170px);
+        }
+        
         .chat-sidebar {
             position: absolute;
             left: -100%;
@@ -1080,6 +1154,9 @@
         
         .messages-container {
             padding: 8px;
+            height: calc(100vh - 180px); /* Adjusted for mobile */
+            min-height: 250px;
+            max-height: calc(100vh - 150px);
         }
         
         .message-input-area {
@@ -1121,6 +1198,13 @@
             min-height: 300px;
         }
         
+        .messages-container {
+            height: calc(100vh - 160px); /* Adjusted for very small mobile */
+            min-height: 200px;
+            max-height: calc(100vh - 130px);
+            padding: 6px;
+        }
+        
         .participant-details {
             display: none;
         }
@@ -1157,26 +1241,44 @@
     }
       /* Custom Scrollbar */
     .conversations-section::-webkit-scrollbar,
-    .messages-container::-webkit-scrollbar,
     .new-chat-section::-webkit-scrollbar {
         width: 4px;
     }
     
+    .messages-container::-webkit-scrollbar {
+        width: 6px; /* Slightly wider for better visibility */
+    }
+    
     .conversations-section::-webkit-scrollbar-track,
-    .messages-container::-webkit-scrollbar-track,
     .new-chat-section::-webkit-scrollbar-track {
         background: rgba(255, 255, 255, 0.1);
     }
     
+    .messages-container::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+    }
+    
     .conversations-section::-webkit-scrollbar-thumb,
-    .messages-container::-webkit-scrollbar-thumb,
     .new-chat-section::-webkit-scrollbar-thumb {
         background: rgba(255, 215, 0, 0.5);
         border-radius: 8px;
     }
     
+    .messages-container::-webkit-scrollbar-thumb {
+        background: rgba(44, 90, 160, 0.4);
+        border-radius: 3px;
+        transition: background 0.3s ease;
+    }
+    
     .conversations-section::-webkit-scrollbar-thumb:hover,
-    .messages-container::-webkit-scrollbar-thumb:hover,
+    .new-chat-section::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 215, 0, 0.7);
+    }
+    
+    .messages-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(44, 90, 160, 0.7);
+    }
     .new-chat-section::-webkit-scrollbar-thumb:hover {
         background: rgba(255, 215, 0, 0.7);
     }
@@ -1185,19 +1287,104 @@
         console.log('🏛️ Government Chat Component Initialized');
         
         // Auto scroll to bottom when new messages arrive
-        function scrollToBottom() {
+        function scrollToBottom(smooth = true) {
             const messagesContainer = document.querySelector('.messages-container');
             if (messagesContainer) {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                if (smooth) {
+                    messagesContainer.scrollTo({
+                        top: messagesContainer.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
             }
         }
         
-        // Initial scroll to bottom
-        setTimeout(scrollToBottom, 500);
+        // Function to check if user is near bottom of chat
+        function isNearBottom() {
+            const messagesContainer = document.querySelector('.messages-container');
+            if (!messagesContainer) return true;
+            
+            const threshold = 100; // pixels from bottom
+            return messagesContainer.scrollTop + messagesContainer.clientHeight >= 
+                   messagesContainer.scrollHeight - threshold;
+        }
         
-        // Listen for new messages
+        // Function to toggle scroll to bottom indicator
+        function toggleScrollIndicator() {
+            const indicator = document.getElementById('scrollToBottomBtn');
+            if (indicator) {
+                if (isNearBottom()) {
+                    indicator.style.display = 'none';
+                    indicator.classList.remove('show');
+                } else {
+                    indicator.style.display = 'block';
+                    setTimeout(() => indicator.classList.add('show'), 10);
+                }
+            }
+        }
+        
+        // Listen for scroll events on messages container
+        document.addEventListener('DOMContentLoaded', () => {
+            const messagesContainer = document.querySelector('.messages-container');
+            if (messagesContainer) {
+                messagesContainer.addEventListener('scroll', toggleScrollIndicator);
+            }
+        });
+        
+        // Make scrollToBottom function global
+        window.scrollToBottom = function(smooth = true) {
+            const messagesContainer = document.querySelector('.messages-container');
+            if (messagesContainer) {
+                if (smooth) {
+                    messagesContainer.scrollTo({
+                        top: messagesContainer.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+                
+                // Hide indicator after scrolling
+                setTimeout(toggleScrollIndicator, 100);
+            }
+        };
+        
+        // Function to ensure scroll to bottom on page load
+        function ensureScrollToBottom() {
+            const messagesContainer = document.querySelector('.messages-container');
+            if (messagesContainer && messagesContainer.scrollHeight > 0) {
+                scrollToBottom(false);
+                console.log('📍 Ensured scroll to bottom on load');
+                return true;
+            }
+            return false;
+        }
+        
+        // Initial scroll to bottom with multiple attempts
+        setTimeout(() => {
+            if (!ensureScrollToBottom()) {
+                // Try again after DOM is more ready
+                setTimeout(() => {
+                    if (!ensureScrollToBottom()) {
+                        // Final attempt
+                        setTimeout(() => ensureScrollToBottom(), 500);
+                    }
+                }, 200);
+            }
+        }, 100);
+        
+        // Listen for new messages - only auto scroll if user is near bottom
         Livewire.on('message-sent', () => {
-            setTimeout(scrollToBottom, 100);
+            setTimeout(() => {
+                if (isNearBottom()) {
+                    scrollToBottom(true);
+                } else {
+                    // Show indicator if user is not at bottom
+                    toggleScrollIndicator();
+                }
+            }, 100);
         });
         
         // Mobile sidebar toggle
@@ -1297,6 +1484,18 @@
         // Initialize chat system
         console.log('✅ Government Chat System Ready for Communication');
         
+        // Listen for Livewire component updates (when DOM changes)
+        document.addEventListener('livewire:updated', () => {
+            console.log('🔄 Livewire component updated, ensuring scroll to bottom');
+            setTimeout(() => {
+                // Check if we have messages and scroll to bottom
+                const messagesContainer = document.querySelector('.messages-container');
+                if (messagesContainer && messagesContainer.children.length > 0) {
+                    ensureScrollToBottom();
+                }
+            }, 100);
+        });
+        
         // Auto-dismiss flash messages
         setTimeout(() => {
             const alerts = document.querySelectorAll('.alert-dismissible');
@@ -1367,18 +1566,32 @@
           // Initialize search enhancements
         setTimeout(enhanceSearchInputs, 1000);
         
-        // Setup Echo listener for real-time messages
-        setupEchoListener();
+        // Setup chat polling for real-time messages
+        setupChatPolling();
 
         // Listen for message-received event to scroll to bottom
         window.addEventListener('message-received', event => {
-            setTimeout(scrollToBottom, 100);
+            setTimeout(() => {
+                if (isNearBottom()) {
+                    scrollToBottom(true);
+                } else {
+                    toggleScrollIndicator();
+                }
+            }, 100);
         });
         
         // Listen for conversation selection to setup new Echo channel
         Livewire.on('conversation-selected', () => {
-            console.log('🔄 Conversation selected, setting up new Echo listener');
-            setTimeout(setupEchoListener, 500);
+            console.log('🔄 Conversation selected, scrolling to bottom and setting up polling');
+            
+            // Immediately scroll to bottom when conversation is selected
+            setTimeout(() => {
+                scrollToBottom(false); // Not smooth for immediate positioning
+                console.log('📍 Scrolled to bottom for new conversation');
+            }, 100);
+            
+            // Setup polling for the new conversation
+            setTimeout(setupChatPolling, 200);
         });
         
         // Listen for message sent to setup Echo if not already set
@@ -1390,66 +1603,79 @@
         });
     });
 
-    // Function to setup Echo listener - called when conversation changes
-    function setupEchoListener() {
-        // Leave previous channel if exists
-        if (window.currentChatChannel) {
-            try {
-                console.log('🔇 Unsubscribing from previous channel');
-                window.currentChatChannel.unsubscribe();
-            } catch (error) {
-                console.warn('Error unsubscribing from previous channel:', error);
-            }
-            window.currentChatChannel = null;
+    // Function to setup chat polling - called when conversation changes
+    let chatPollInterval = null;
+    
+    function setupChatPolling() {
+        // Clear existing interval
+        if (chatPollInterval) {
+            clearInterval(chatPollInterval);
+            console.log('🧹 Cleared previous polling interval');
         }
         
         @if($selectedConversation)
-        if (typeof window.Echo !== 'undefined' && window.Echo) {
-            console.log('🎧 Setting up Echo listener for conversation: {{ $selectedConversation->id }}');
-            console.log('🔑 Current user ID: {{ auth()->id() }}');
-            
-            @auth
-            try {
-                window.currentChatChannel = window.Echo.private('chat.{{ $selectedConversation->id }}')
-                    .listen('MessageSent', (e) => {
-                        console.log('📨 Message received via Echo:', e);
-                        console.log('📨 Message sender ID:', e.message ? e.message.user_id : 'unknown');
-                        console.log('📨 Current user ID: {{ auth()->id() }}');
-                        
-                        // Always reload messages for all participants
-                        console.log('🔄 Triggering message reload...');
-                        Livewire.dispatch('messageReceived', e);
-                        
-                        // Dispatch custom event for scroll
-                        window.dispatchEvent(new CustomEvent('message-received', { detail: e }));
-                    })
-                    .error((error) => {
-                        console.error('❌ Echo channel error:', error);
-                    });
-                
-                console.log('✅ Successfully subscribed to chat.{{ $selectedConversation->id }}');
-            } catch (error) {
-                console.error('❌ Error setting up Echo listener:', error);
-            }
-            @endauth
-        } else {
-            console.warn('⚠️ Echo is not available. Make sure Vite build is running and Laravel Echo is loaded.');
-        }
+        console.log('🔄 Setting up chat polling for conversation: {{ $selectedConversation->id }}');
+        
+        // Poll for new messages every 5 seconds
+        chatPollInterval = setInterval(() => {
+            console.log('🔄 Polling for new messages...');
+            Livewire.dispatch('refreshChat');
+        }, 5000);
         @else
-        console.log('ℹ️ No conversation selected, skipping Echo setup');
+        console.log('ℹ️ No conversation selected, skipping polling setup');
         @endif
     }
 
-    // Listen for Livewire updates to reset Echo listener
+    // Listen for Livewire updates to reset polling
     document.addEventListener('livewire:navigated', () => {
-        console.log('🔄 Livewire navigated, setting up Echo listener');
-        setTimeout(setupEchoListener, 100);
+        console.log('🔄 Livewire navigated, setting up chat polling and scrolling to bottom');
+        setTimeout(setupChatPolling, 100);
+        setTimeout(() => ensureScrollToBottom(), 200);
     });
     
-    // Ensure Echo is setup when component loads
+    // Ensure polling is setup when component loads
     document.addEventListener('livewire:init', () => {
-        console.log('🔄 Livewire initialized, setting up Echo listener');
-        setTimeout(setupEchoListener, 1000);
+        console.log('🔄 Livewire initialized, setting up chat polling');
+        setTimeout(setupChatPolling, 1000);
+        setTimeout(() => ensureScrollToBottom(), 1200);
+    });
+
+    // Clean up interval when page unloads
+    window.addEventListener('beforeunload', () => {
+        if (chatPollInterval) {
+            clearInterval(chatPollInterval);
+        }
+    });
+
+    // Listen for manual refresh trigger from backend
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('echo_chat_polling', () => {
+            console.log('🔔 Manual refresh triggered from backend');
+            Livewire.dispatch('refreshChat');
+            // Auto scroll after polling refresh if user is near bottom
+            setTimeout(() => {
+                if (isNearBottom()) {
+                    scrollToBottom(true);
+                }
+            }, 200);
+        });
+        
+        // Listen for component updated (when data changes)
+        Livewire.on('refreshChat', () => {
+            console.log('🔄 Chat refreshed, checking scroll position');
+            setTimeout(() => {
+                // If this is a new conversation or user is at bottom, scroll down
+                if (isNearBottom()) {
+                    scrollToBottom(true);
+                }
+            }, 150);
+        });
+    });
+
+    // Listen for message sent event to trigger immediate refresh
+    window.addEventListener('message-sent', () => {
+        console.log('📨 Message sent, triggering immediate refresh');
+        Livewire.dispatch('refreshChat');
     });
     </script>
 </div>

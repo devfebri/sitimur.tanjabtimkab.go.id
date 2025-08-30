@@ -82,16 +82,36 @@ class PengajuanOpenController extends Controller
     }
     public function getFiles($id, Request $request)
     {
-
         if ($request->ajax()) {
-            $files =  DB::table('pengajuan_files')
-                ->select('pengajuan_files.*', 'pengajuans.pokja1_id', 'pengajuans.pokja2_id', 'pengajuans.pokja3_id', 'pengajuans.verifikator_updated_akhir','pengajuans.verifikator_status_akhir',  'pengajuans.updated_at')
-                ->join('pengajuans', 'pengajuan_files.pengajuan_id', '=', 'pengajuans.id')
-                ->where('pengajuan_files.pengajuan_id', $id)
-                ->where('pengajuan_files.status', '!=', 99)
-                ->orderBy('pengajuan_files.nama_file')
-                ->orderBy('pengajuan_files.revisi_ke')
-                ->get();
+            $datapengajuan = Pengajuan::findOrFail($id);
+            if($datapengajuan->verifikator_id && $datapengajuan->pokja1_id && $datapengajuan->pokja2_id && $datapengajuan->pokja3_id){
+
+                $files =  DB::table('pengajuan_files')
+                    ->select('verifikator.name as verifikator_name','pokja1.name as pokja1_name', 'pokja2.name as pokja2_name', 'pokja3.name as pokja3_name', 'pengajuan_files.*', 'pengajuans.pokja1_id', 'pengajuans.pokja2_id', 'pengajuans.pokja3_id', 'pengajuans.verifikator_updated_akhir','pengajuans.verifikator_status_akhir',  'pengajuans.updated_at')
+                    ->join('pengajuans', 'pengajuan_files.pengajuan_id', '=', 'pengajuans.id')
+                    ->join('users as pokja1','pengajuans.pokja1_id', '=', 'pokja1.id')
+                    ->join('users as pokja2', 'pengajuans.pokja2_id', '=', 'pokja2.id')
+                    ->join('users as pokja3', 'pengajuans.pokja3_id', '=', 'pokja3.id')
+                    ->join('users as verifikator', 'pengajuans.verifikator_id', '=', 'verifikator.id')
+                    ->where('pengajuan_files.pengajuan_id', $id)
+                    // ->where('pengajuan_files.status', '!=', 99)
+                    ->orderBy('pengajuan_files.status')
+                    ->orderBy('pengajuan_files.nama_file')
+                    ->orderBy('pengajuan_files.revisi_ke')
+                    ->get();
+            }else{
+
+                $files =  DB::table('pengajuan_files')
+                    ->select( 'pengajuan_files.*', 'pengajuans.pokja1_id', 'pengajuans.pokja2_id', 'pengajuans.pokja3_id', 'pengajuans.verifikator_updated_akhir','pengajuans.verifikator_status_akhir',  'pengajuans.updated_at')
+                    ->join('pengajuans', 'pengajuan_files.pengajuan_id', '=', 'pengajuans.id')
+
+                    ->where('pengajuan_files.pengajuan_id', $id)
+                    // ->where('pengajuan_files.status', '!=', 99)
+                    ->orderBy('pengajuan_files.status')
+                    ->orderBy('pengajuan_files.nama_file')
+                    ->orderBy('pengajuan_files.revisi_ke')
+                    ->get();
+            }
 
             return DataTables::of($files)
                 ->addIndexColumn()
@@ -148,7 +168,7 @@ class PengajuanOpenController extends Controller
                             $pokjaStatus = $row->$statusField ?? 0;
                             
                             // Tampilkan checkbox hanya jika belum disetujui atau dikembalikan
-                            if ($pokjaStatus == 0) {
+                            if ($pokjaStatus == 0 && $row->status==0 || $pokjaStatus == 0 && $row->status==1) {
                                 return '<input type="checkbox" name="check_data" class="checkboks" value="' . $row->id . '" id="select' . $row->id . '">';
                             } else {
                                 return '<input type="checkbox" hidden class="checkboks" >';
@@ -175,71 +195,222 @@ class PengajuanOpenController extends Controller
                             $updatedValue = $row->$updatedField ?? null;
                             $pesanValue = $row->$pesanField ?? null;
 
+                            $badge = '';
+                            $icon = '';
                             if ($statusValue == 0) {
-                                $status = '<span class="badge badge-pill badge-primary"><b><i>Belum diperiksa</i></b></span>';
+                                $badge = 'primary';
+                                $icon = 'mdi mdi-timer-sand';
+                                $statusText = 'Belum diperiksa';
                             } elseif ($statusValue == 1) {
-                                $status = '<span class="badge badge-pill badge-success"><b><i>Disetujui</i></b></span>';
+                                $badge = 'success';
+                                $icon = 'mdi mdi-check-circle-outline';
+                                $statusText = 'Disetujui';
                             } elseif ($statusValue == 2) {
-                                $status = '<span class="badge badge-pill badge-danger"><b><i>Tidak Disetujui</i></b></span>';
+                                $badge = 'danger';
+                                $icon = 'mdi mdi-close-circle-outline';
+                                $statusText = 'Tidak Disetujui';
                             } elseif ($statusValue == 3 || $statusValue == 99) {
-                                $status = '<span class="badge badge-pill badge-warning"><b><i>Dikembalikan</i></b></span>';
+                                $badge = 'warning';
+                                $icon = 'mdi mdi-undo-variant';
+                                $statusText = 'Dikembalikan';
                             } else {
-                                $status = '<span class="badge badge-pill badge-secondary"><b><i>Null</i></b></span>';
+                                $badge = 'secondary';
+                                $icon = 'mdi mdi-help-circle-outline';
+                                $statusText = 'Null';
                             }
+                            $status = '<span class="badge badge-pill badge-' . $badge . '"><i class="' . $icon . '"></i> <b><i>' . $statusText . '</i></b></span>';
                             if ($updatedValue) {
-                                $status .= '<br> ' . \Carbon\Carbon::parse($updatedValue)->format('d/m/Y H:i:s');
+                                $status .= '<br><span class="text-muted" style="font-size:11px"><i class="mdi mdi-clock-outline"></i> ' . \Carbon\Carbon::parse($updatedValue)->format('d/m/Y H:i:s') . '</span>';
                             }
                             if ($pesanValue) {
-                                $status .= '<br>' . $pesanValue;
+                                $status .= '<br><span class="text-info" style="font-size:12px"><i class="mdi mdi-message-outline"></i> ' . e($pesanValue) . '</span>';
                             }
                             return $status;
                         }
                     }
-                    // Default: status umum
-                    if($row->pokja1_status == null || $row->pokja1_status == 0){
-                        $pokja1_status='Belum Reviu';
-                    }elseif($row->pokja1_status == 1){
-                        $pokja1_status = 'Selesai';
-                    } elseif ($row->pokja1_status == 3) {
-                        $pokja1_status = 'Dikembalikan';
+                    // Default: status umum untuk semua pokja
+                    $pokjaStatusArr = [];
+                    for ($i = 1; $i <= 3; $i++) {
+                        $statusVal = $row->{'pokja' . $i . '_status'};
+                        $updatedVal = $row->{'pokja' . $i . '_updated'} ?? null;
+                        $pesanVal = $row->{'pokja' . $i . '_pesan'} ?? null;
+                        if ($statusVal === null || $statusVal == 0) {
+                            $badge = 'primary';
+                            $icon = 'mdi mdi-timer-sand';
+                            $statusText = 'Belum Reviu';
+                        } elseif ($statusVal == 1) {
+                            $badge = 'success';
+                            $icon = 'mdi mdi-check-circle-outline';
+                            $statusText = 'Selesai';
+                        } elseif ($statusVal == 3) {
+                            $badge = 'warning';
+                            $icon = 'mdi mdi-undo-variant';
+                            $statusText = 'Dikembalikan';
+                        } else {
+                            $badge = 'secondary';
+                            $icon = 'mdi mdi-help-circle-outline';
+                            $statusText = 'Status: ' . $statusVal;
+                        }
+                        $html = '<span class="badge badge-pill badge-' . $badge . '"><i class="' . $icon . '"></i> <b><i>' . $statusText . '</i></b></span>';
+                        if ($updatedVal) {
+                            $html .= '<br><span class="text-muted" style="font-size:11px"><i class="mdi mdi-clock-outline"></i> ' . \Carbon\Carbon::parse($updatedVal)->format('d/m/Y H:i:s') . '</span>';
+                        }
+                        if ($pesanVal) {
+                            $html .= '<br><span class="text-info" style="font-size:12px"><i class="mdi mdi-message-outline"></i> ' . e($pesanVal) . '</span>';
+                        }
+                        $pokjaStatusArr[] = 'Pokja ' . $i . ' : ' . $html;
+                    }
+                    if ($row->status == 99) {
+                        return '-';
                     } else {
-                        $pokja1_status = 'Status: ' . $row->pokja1_status;
+                        return '<div style="line-height:1.5">' . implode('<br>', $pokjaStatusArr) . '</div>';
+                    }
+                })
+                ->addColumn('statusnew', function ($row) {
+                    $datapengajuan = Pengajuan::findOrFail($row->pengajuan_id);
+                   $status = '';
+                   
+                    // if (Auth::user()->role == 'pokjapemilihan') {
+                    //     $pokjaKe = null;
+                    //     $userId = Auth::user()->id;
+                    //     if ($row->pokja1_id == $userId) $pokjaKe = 1;
+                    //     if ($row->pokja2_id == $userId) $pokjaKe = 2;
+                    //     if ($row->pokja3_id == $userId) $pokjaKe = 3;
+                    //     if ($pokjaKe) {
+                    //         $statusField = 'pokja' . $pokjaKe . '_status';
+                    //         $updatedField = 'pokja' . $pokjaKe . '_updated';
+                    //         $pesanField = 'pokja' . $pokjaKe . '_pesan';
+                    //         $statusValue = $row->$statusField ?? 0;
+                    //         $updatedValue = $row->$updatedField ?? null;
+                    //         $pesanValue = $row->$pesanField ?? null;
+
+                    //         $badge = '';
+                    //         $icon = '';
+                    //         if ($statusValue == 0) {
+                    //             $badge = 'primary';
+                    //             $icon = 'mdi mdi-timer-sand';
+                    //             $statusText = 'Belum diperiksa';
+                    //         } elseif ($statusValue == 1) {
+                    //             $badge = 'success';
+                    //             $icon = 'mdi mdi-check-circle-outline';
+                    //             $statusText = 'Disetujui';
+                    //         } elseif ($statusValue == 2) {
+                    //             $badge = 'danger';
+                    //             $icon = 'mdi mdi-close-circle-outline';
+                    //             $statusText = 'Tidak Disetujui';
+                    //         } elseif ($statusValue == 3 || $statusValue == 99) {
+                    //             $badge = 'warning';
+                    //             $icon = 'mdi mdi-undo-variant';
+                    //             $statusText = 'Dikembalikan';
+                    //         } else {
+                    //             $badge = 'secondary';
+                    //             $icon = 'mdi mdi-help-circle-outline';
+                    //             $statusText = 'Null';
+                    //         }
+                    //         $status = '<span class="badge badge-pill badge-' . $badge . '"><i class="' . $icon . '"></i> <b><i>' . $statusText . '</i></b></span>';
+                    //         if ($updatedValue) {
+                    //             $status .= '<br><span class="text-muted" style="font-size:11px"><i class="mdi mdi-clock-outline"></i> ' . \Carbon\Carbon::parse($updatedValue)->format('d/m/Y H:i:s') . '</span>';
+                    //         }
+                    //         if ($pesanValue) {
+                    //             $status .= '<br><span class="text-info" style="font-size:12px"><i class="mdi mdi-message-outline"></i> ' . e($pesanValue) . '</span>';
+                    //         }
+                    //         return $status;
+                    //     }
+                    // }
+
+
+                    // Default: status umum untuk semua pokja
+                    $pokjaStatusArr = [];
+                    //! untuk verifikator
+                    if(auth()->user()->role!='pokjapemilihan'){
+                        $statusVerifikator = $row->verifikator_status;
+                        $updatedVerifikator = $row->verifikator_updated ?? null;
+                        $pesanVerifikator = $row->verifikator_pesan ?? null;
+                        if ($statusVerifikator === null || $statusVerifikator == 0) {
+                            $badge1 = 'primary';
+                            $icon1 = 'mdi mdi-timer-sand';
+                            $statusText1 = 'Belum Reviu';
+                        } elseif ($statusVerifikator == 1) {
+                            $badge1 = 'success';
+                            $icon1 = 'mdi mdi-check-circle-outline';
+                            $statusText1 = 'Selesai';
+                        } elseif ($statusVerifikator == 3) {
+                            $badge1 = 'warning';
+                            $icon1 = 'mdi mdi-undo-variant';
+                            $statusText1 = 'Dikembalikan';
+                        } else {
+                            $badge1 = 'secondary';
+                            $icon1 = 'mdi mdi-help-circle-outline';
+                            $statusText1 = 'Status: ' . $statusVerifikator;
+                        }
+                        $html1 = '<span class="badge badge-pill badge-' . $badge1 . '"><i class="' . $icon1 . '"></i> <b><i>' . $statusText1 . '</i></b></span>';
+                        if ($updatedVerifikator) {
+                            $html1 .= '<br><span class="text-muted" style="font-size:11px"><i class="mdi mdi-clock-outline"></i> ' . \Carbon\Carbon::parse($updatedVerifikator)->format('d/m/Y H:i:s') . '</span>';
+                        }
+                        if ($pesanVerifikator) {
+                            $html1 .= '<br><span class="text-info" style="font-size:12px"><i class="mdi mdi-message-outline"></i> ' . e($pesanVerifikator) . '</span>';
+                        }
+                        //! end
+                        if($statusVerifikator!=0 & $row->status==99 ||$row->status==1||$row->status == 0){
+                            if($datapengajuan->verifikator_id && $datapengajuan->pokja1_id && $datapengajuan->pokja2_id && $datapengajuan->pokja3_id){
+
+                                $pokjaStatusArr[0]='verifikator <u>'.$row->verifikator_name.'</u> : '.$html1;
+                            }else{
+
+                                $pokjaStatusArr[0]='verifikator : '.$html1;
+                            }
+                            }else{
+                            $pokjaStatusArr[0]='Sedang menunggu perbaikan dari PPK';
+    
+                            }
                     }
                     
-                    if($row->pokja2_status == null || $row->pokja2_status == 0){
-                        $pokja2_status='Belum Reviu';
-                    }elseif($row->pokja2_status == 1){
-                        $pokja2_status = 'Selesai';
-                    } elseif ($row->pokja2_status == 3) {
-                        $pokja2_status = 'Dikembalikan';
-                    } else {
-                        $pokja2_status = 'Status: ' . $row->pokja2_status;
+                    for ($i = 1; $i <= 3; $i++) {
+                        $statusVal = $row->{'pokja' . $i . '_status'};
+                        $updatedVal = $row->{'pokja' . $i . '_updated'} ?? null;
+                        $pesanVal = $row->{'pokja' . $i . '_pesan'} ?? null;
+                        if ($statusVal === null || $statusVal == 0) {
+                            $badge = 'primary';
+                            $icon = 'mdi mdi-timer-sand';
+                            $statusText = 'Belum Reviu';
+                        } elseif ($statusVal == 1) {
+                            $badge = 'success';
+                            $icon = 'mdi mdi-check-circle-outline';
+                            $statusText = 'Selesai';
+                        } elseif ($statusVal == 3) {
+                            $badge = 'warning';
+                            $icon = 'mdi mdi-undo-variant';
+                            $statusText = 'Dikembalikan';
+                        } else {
+                            $badge = 'secondary';
+                            $icon = 'mdi mdi-help-circle-outline';
+                            $statusText = 'Status: ' . $statusVal;
+                        }
+                        $html = '<span class="badge badge-pill badge-' . $badge . '"><i class="' . $icon . '"></i> <b><i>' . $statusText . '</i></b></span>';
+                        if ($updatedVal) {
+                            $html .= '<br><span class="text-muted" style="font-size:11px"><i class="mdi mdi-clock-outline"></i> ' . \Carbon\Carbon::parse($updatedVal)->format('d/m/Y H:i:s') . '</span>';
+                        }
+                        if ($pesanVal) {
+                            $html .= '<br><span class="text-info" style="font-size:12px"><i class="mdi mdi-message-outline"></i> ' . e($pesanVal) . '</span>';
+                        }
+                        if($statusVal!=0 & $row->status==99 ||$row->status==1||$row->status == 0){
+
+                            if($datapengajuan->verifikator_id && $datapengajuan->pokja1_id && $datapengajuan->pokja2_id && $datapengajuan->pokja3_id){
+
+                                $pokjaStatusArr[] = 'Pokja ' . $i . ' <u>'.$row->{'pokja'.$i.'_name'}.'</u> : ' . $html;
+                            }else{
+                                
+                                $pokjaStatusArr[] = 'Pokja ' . $i . ' : ' . $html;
+                            }
+                        }
+                        
                     }
-                    
-                    if($row->pokja3_status == null || $row->pokja3_status == 0){
-                        $pokja3_status='Belum Reviu';
-                    }elseif($row->pokja3_status == 1){
-                        $pokja3_status = 'Selesai';
-                    } elseif ($row->pokja3_status == 3) {
-                        $pokja3_status = 'Dikembalikan';
-                    } else {
-                        $pokja3_status = 'Status: ' . $row->pokja3_status;
-                    }
-                    $status = '<span ><b><i>Pokja 1 :'. $pokja1_status. '<br> Pokja 2 :' . $pokja2_status . '<br> Pokja 3 :' . $pokja3_status . '<br></i></b></span>';
-                    // if ($row->status == 0) {
-                    // } elseif ($row->status == 1) {
-                    //     $status = '<span class="badge badge-pill badge-success"><b><i>Disetujui</i></b></span>';
-                    // } elseif ($row->status == 2) {
-                    //     $status = '<span class="badge badge-pill badge-danger"><b><i>Tidak Disetujui</i></b></span>';
-                    // } elseif ($row->status == 3 || $row->status == 99) {
-                    //     $status = '<span class="badge badge-pill badge-warning"><b><i>Dikembalikan</i></b></span>';
+                    // if ($row->status == 99) {
+                    //    return '<div style="line-height:1.5">' . implode('<br>', $pokjaStatusArr) . '</div>';
                     // } else {
-                    //     $status = '<span class="badge badge-pill badge-secondary"><b><i>Null</i></b></span>';
                     // }
-                    // if ($row->updated_at) {
-                    //     $status .= '<br> ' . \Carbon\Carbon::parse($row->updated_at)->format('d/m/Y H:i:s');
-                    // }
-                    return $status;
+                    return '<div style="line-height:1.5">' . implode('<br>', $pokjaStatusArr) . '</div>';
+                   
                 })
                 ->addColumn('verifikator_status', function ($row) {
                     if ($row->verifikator_status == 0) {
@@ -321,7 +492,7 @@ class PengajuanOpenController extends Controller
                     }
                     return $status;
                 })
-                ->rawColumns(['action', 'checkedd', 'statuss', 'nama_file', 'verifikator_status','pokja1_status','pokja2_status','pokja3_status'])
+                ->rawColumns(['action', 'checkedd','statusnew', 'statuss', 'nama_file', 'verifikator_status','pokja1_status','pokja2_status','pokja3_status'])
                 ->make(true);
         }
     }
@@ -456,6 +627,11 @@ class PengajuanOpenController extends Controller
             // Update status file sesuai request
             foreach ($request->id as $row) {
                 $pFile = PengajuanFile::find($row);
+                if($pengajuan->status==31){
+                    $request->status=1;
+                    
+                }
+                // dd($request->status);
                 if ($pFile) {
                     $pFile->verifikator_status = $request->status;
                     $pFile->verifikator_pesan = $request->keterangan;
@@ -480,6 +656,9 @@ class PengajuanOpenController extends Controller
                         
                     } elseif ($request->status == 3) {
                         $pFile->status = 3; // Perlu perbaikan
+                        // $pFile->pokja1_status=3;
+                        // $pFile->pokja2_status=3;
+                        // $pFile->pokja3_status=3;
                         
                         // Notifikasi ke user bahwa file perlu diperbaiki
                         try {
@@ -1103,5 +1282,152 @@ class PengajuanOpenController extends Controller
             'message' => 'Reviu Anda telah selesai dan berhasil disimpan.',
             'all_pokja_selesai' => $allPokjaSelesai
         ]);
+    }
+
+    // Fungsi untuk mengecek apakah pokja bisa menandai selesai reviu
+    public function checkCanMarkComplete($id)
+    {
+        $pengajuan = Pengajuan::findOrFail($id);
+        $userId = auth()->user()->id;
+        
+        // Tentukan pokja yang sedang login
+        $pokjaKe = null;
+        if ($pengajuan->pokja1_id == $userId) $pokjaKe = 1;
+        elseif ($pengajuan->pokja2_id == $userId) $pokjaKe = 2;
+        elseif ($pengajuan->pokja3_id == $userId) $pokjaKe = 3;
+        
+        if (!$pokjaKe) {
+            return response()->json([
+                'can_complete' => false,
+                'message' => 'Anda bukan pokja yang ditugaskan untuk pengajuan ini.'
+            ]);
+        }
+        
+        // Cek apakah pokja ini sudah selesai reviu
+        $statusAkhirField = 'pokja' . $pokjaKe . '_status_akhir';
+        if ($pengajuan->$statusAkhirField == 2) {
+            return response()->json([
+                'can_complete' => false,
+                'message' => 'Reviu telah selesai.',
+                'button_text' => 'Reviu Telah Selesai',
+                'button_class' => 'btn-success'
+            ]);
+        }
+        
+        // Ambil semua file pengajuan yang aktif (status != 99)
+        $files = PengajuanFile::where('pengajuan_id', $id)
+            ->where('status', '!=', 99)
+            ->get();
+            
+        // Cek apakah semua file sudah disetujui oleh pokja ini (status == 1)
+        $pokjaStatusField = 'pokja' . $pokjaKe . '_status';
+        $allApproved = true;
+        
+        foreach ($files as $file) {
+            if ($file->$pokjaStatusField != 1) {
+                $allApproved = false;
+                break;
+            }
+        }
+        
+        return response()->json([
+            'can_complete' => $allApproved,
+            'message' => $allApproved ? 'Semua file sudah disetujui, Anda dapat menandai reviu sebagai selesai.' : 'Masih ada file yang belum disetujui.',
+            'button_text' => 'Tandai Selesai Reviu',
+            'button_class' => $allApproved ? 'btn-primary' : 'btn-primary',
+            'pokja_ke' => $pokjaKe,
+            'total_files' => $files->count(),
+            'approved_files' => $files->where($pokjaStatusField, 1)->count()
+        ]);
+    }
+
+    /**
+     * Update pengajuan dengan status 14 atau 34 ke status 88 jika sudah lewat 3 hari
+     */
+    public function autoChangeExpiredStatus()
+    {
+        try {
+            $threeDaysAgo = now()->subDays(3);
+            
+            // Cari pengajuan dengan status 14 atau 34 yang sudah lebih dari 3 hari
+            $expiredPengajuans = Pengajuan::where(function($query) {
+                    $query->where('status', 14)->orWhere('status', 34);
+                })
+                ->where('updated_at', '<=', $threeDaysAgo)
+                ->get();
+
+            $updatedCount = 0;
+
+            foreach ($expiredPengajuans as $pengajuan) {
+                $pengajuan->update([
+                    'status' => 88,
+                    'status_updated' => now(),
+                    'pesan_akhir' => 'Status otomatis diubah ke 88 karena sudah melewati batas waktu 3 hari.'
+                ]);
+                $updatedCount++;
+            }
+
+            return [
+                'success' => true,
+                'message' => "Berhasil mengupdate {$updatedCount} pengajuan yang expired.",
+                'updated_count' => $updatedCount
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+                'updated_count' => 0
+            ];
+        }
+    }
+
+    /**
+     * Mendapatkan daftar pengajuan dengan status 14 atau 34 beserta informasi umurnya
+     */
+    public function getPengajuanWithStatus14And34()
+    {
+        try {
+            $pengajuans = Pengajuan::with(['user', 'metodePengadaan'])
+                ->where(function($query) {
+                    $query->where('status', 14)->orWhere('status', 34);
+                })
+                ->orderBy('updated_at', 'asc')
+                ->get();
+
+            $result = [];
+            $now = now();
+
+            foreach ($pengajuans as $pengajuan) {
+                $updatedAt = \Carbon\Carbon::parse($pengajuan->updated_at);
+                $daysSinceUpdate = $updatedAt->diffInDays($now);
+                $willExpireIn = 3 - $daysSinceUpdate;
+                
+                $result[] = [
+                    'id' => $pengajuan->id,
+                    'nama_paket' => $pengajuan->nama_paket,
+                    'user_name' => $pengajuan->user->name ?? 'Unknown',
+                    'status' => $pengajuan->status,
+                    'updated_at' => $updatedAt->format('Y-m-d H:i:s'),
+                    'days_since_update' => $daysSinceUpdate,
+                    'will_expire_in_days' => $willExpireIn,
+                    'is_expired' => $willExpireIn <= 0,
+                ];
+            }
+
+            return [
+                'success' => true,
+                'data' => $result,
+                'total_count' => count($result),
+                'expired_count' => collect($result)->where('is_expired', true)->count()
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+                'data' => []
+            ];
+        }
     }
 }

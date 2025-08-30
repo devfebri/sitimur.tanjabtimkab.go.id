@@ -71,7 +71,7 @@
 
         <div class="row">
             
-            @if(auth()->user()->role=='pokjapemilihan'||auth()->user()->role=='kepalaukpbj'&&$data->pokja1_id || auth()->user()->role=='kepalaukpbj' &&$data->pokja2_id || auth()->user()->role=='kepalaukpbj'&&$data->pokja3_id)
+            {{-- @if($data->pokja1_id || $data->pokja2_id || $data->pokja3_id)
                 <div class="col-12">
                     <table class="table text-center  table-responsive-sm table-sm">
                         <tr>
@@ -152,7 +152,7 @@
                         </tr>
                     </table>
                 </div>
-            @endif
+            @endif --}}
             <div class="col-lg-7 col-sm-12">
                 <div class="card m-b-20">
                     <div class="card-body">
@@ -255,6 +255,8 @@
                                                  Pokja Pemilihan
                                                  @elseif($data->status==34)
                                                  PPK
+                                                 @elseif($data->status==88)
+                                                 PPK
 
 
                                                 @else
@@ -293,11 +295,15 @@
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-warning"></i> Status Terakhir</b> <br>&emsp; <i>Menunggu Verifikasi Ulang</i></td>
                                         @elseif($data->status==34)
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-warning"></i> Status Terakhir</b> <br>&emsp; <small><i>File dikembalikan pada PPK</i></small></td>
+                                        @elseif($data->status==88)
+                                        <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <small><i>System stops auto-submission, no updates for 3 days</i></small></td>
                                         @else
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Status Error</i></td>
                                         @endif
-                                    </tr>                                    <tr>
-                                        <td>                                            <div class="btn-group w-100" role="group">
+                                    </tr>                                    
+                                    <tr>
+                                        <td>                                            
+                                            <div class="btn-group w-100" role="group">
                                                                                             
                                                 @if(auth()->user()->role == 'pokjapemilihan' || auth()->user()->role == 'ppk')
                                                 @php
@@ -314,7 +320,7 @@
                                                     <i class="mdi mdi-chat me-1"></i>Chat
                                                 </a>             
                                                 @endif
-                                                <a href="{{ route(auth()->user()->role.'_riwayat_revisi') }}" class="btn btn-warning btn-sm">Riwayat Revisi</a>
+                                                {{-- <a href="{{ route(auth()->user()->role.'_riwayat_revisi') }}" class="btn btn-warning btn-sm">Riwayat Revisi</a> --}}
 
 
 
@@ -549,10 +555,10 @@
                         <input type="text" class="form-control" id="nama_file" name="nama_file" readonly>
                     </div>
                    
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <label for="pesan">Pesan</label>
                         <textarea class="form-control" id="pesan" name="pesan" readonly></textarea>
-                    </div>
+                    </div> --}}
                     {{-- @endif
                     @if(auth()->user()->role=='ppk') --}}
                     <div class="form-group">
@@ -665,6 +671,12 @@
                     $('#lengthcek').html(' (' + idData.length + ')');
                     alertify.success('Data Berhasil Diperbaharui !!');
 
+                    @if(auth()->user()->role=='pokjapemilihan')
+                    // Update status tombol setelah approval
+                    setTimeout(function() {
+                        checkCanMarkComplete();
+                    }, 500);
+                    @endif
                 }
                 , error: function(data) { //jika error tampilkan error pada console
                     console.log('Error:', data);
@@ -708,9 +720,9 @@
             @if(auth()->user()->role=='verifikator')
             { data: 'verifikator_status', name: 'verifikator_status' },
             @elseif(auth()->user()->role=='pokjapemilihan')
-            { data: 'statuss', name: 'statuss'},
+            { data: 'statusnew', name: 'statusnew'},
             @else
-            { data: 'statuss', name: 'statuss' },
+            { data: 'statusnew', name: 'statusnew' },
 
 
             @endif
@@ -817,45 +829,63 @@
 </script>
 
 <script src="{{ asset('js/disposisipokja.js') }}"></script>
-<script>    @if(auth()->user()->role=='pokjapemilihan')
+<script>    
+@if(auth()->user()->role=='pokjapemilihan')
+    // Fungsi untuk mengecek apakah tombol dapat diklik
+    function checkCanMarkComplete() {
+        $.ajax({
+            url: "{{ route('pokjapemilihan_check_can_mark_complete', $data->id) }}",
+            type: 'GET',
+            success: function(response) {
+                console.log('Response from server:', response);
+                
+                const button = $('#tandai-selesai-reviu');
+                
+                if (response.can_complete) {
+                    // Button dapat diklik
+                    button.removeClass('disabled btn-success')
+                          .removeAttr('aria-disabled')
+                          .attr('tabindex', '0')
+                          .prop('disabled', false)
+                          .addClass('btn-primary')
+                          .text(response.button_text);
+                } else {
+                    // Button tidak dapat diklik
+                    if (response.button_text === 'Reviu Telah Selesai') {
+                        button.addClass('disabled btn-success')
+                              .removeClass('btn-primary')
+                              .attr('aria-disabled', 'true')
+                              .attr('tabindex', '-1')
+                              .prop('disabled', true)
+                              .text(response.button_text);
+                    } else {
+                        button.addClass('disabled btn-primary')
+                              .removeClass('btn-success')
+                              .attr('aria-disabled', 'true')
+                              .attr('tabindex', '-1')
+                              .prop('disabled', true)
+                              .text(response.button_text);
+                    }
+                }
+            },
+            error: function(xhr) {
+                console.error('Error checking button status:', xhr);
+            }
+        });
+    }
+
+    // Panggil fungsi saat DataTable selesai load
     $('#datatable2').on('xhr.dt', function (e, settings, json, xhr) {
-        let semuaDisetujuiPokjaIni = true;
-        let adaBelumDiperiksa = false;
-        let pokjaIniSudahSelesai = {{ $data->{'pokja' . (
-                                         $data->pokja1_id == auth()->user()->id ? '1' : 
-                                         ($data->pokja2_id == auth()->user()->id ? '2' : 
-                                         ($data->pokja3_id == auth()->user()->id ? '3' : '0'))
-                                       ) . '_status_akhir'} ?? 0 }};
-
-        if(json && json.data && json.data.length > 0) {
-            json.data.forEach(function(row) {
-                // Cek hanya status pokja yang sedang login
-                if(row.statuss.includes('Belum diperiksa')) {
-                    semuaDisetujuiPokjaIni = false;
-                    adaBelumDiperiksa = true;
-                }
-                if(row.statuss.includes('Dikembalikan')) {
-                    semuaDisetujuiPokjaIni = false;
-                }
-            });
-        }
-
-        // Enable/disable tombol "Tandai Selesai Reviu"
-        if (pokjaIniSudahSelesai == 2) {
-            // Jika pokja ini sudah selesai reviu
-            $('#tandai-selesai-reviu').addClass('disabled').attr('aria-disabled', 'true').attr('tabindex', '-1')
-                .text('Reviu Telah Selesai').removeClass('btn-primary').addClass('btn-success');
-        } else if (semuaDisetujuiPokjaIni && !adaBelumDiperiksa && json.data.length > 0) {
-            // Jika semua file sudah disetujui oleh pokja ini
-            $('#tandai-selesai-reviu').removeClass('disabled').removeAttr('aria-disabled').attr('tabindex', '0')
-                .prop('disabled', false).text('Tandai Selesai Reviu').removeClass('btn-success').addClass('btn-primary');
-        } else {
-            // Jika masih ada file yang belum disetujui
-            $('#tandai-selesai-reviu').addClass('disabled').attr('aria-disabled', 'true').attr('tabindex', '-1')
-                .prop('disabled', true).text('Tandai Selesai Reviu').removeClass('btn-success').addClass('btn-primary');
-        }
+        // Panggil fungsi untuk mengecek status tombol
+        checkCanMarkComplete();
     });
-    @endif$('#tandai-selesai-reviu').on('click', function(e) {
+
+    // Panggil fungsi saat halaman pertama kali load
+    $(document).ready(function() {
+        checkCanMarkComplete();
+    });
+@endif
+    $('#tandai-selesai-reviu').on('click', function(e) {
         if ($(this).hasClass('disabled')) {
             e.preventDefault();
             return false;

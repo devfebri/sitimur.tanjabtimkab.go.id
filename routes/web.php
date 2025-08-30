@@ -173,6 +173,7 @@ Route::prefix('pokjapemilihan')->middleware(PokjaPemilihanMiddleware::class)->na
     Route::get('/pengajuan/{id}/files', [PengajuanOpenController::class, 'getFiles'])->name('pengajuan_files');
     Route::post('pengajuan/{id}/files/approval', [PengajuanOpenController::class, 'filesApproval'])->name('pengajuan_files_approval');
     Route::post('/selesai-reviu/{id}', [PengajuanOpenController::class, 'selesaiReviu'])->name('selesai_reviu');
+    Route::get('/check-can-mark-complete/{id}', [PengajuanOpenController::class, 'checkCanMarkComplete'])->name('check_can_mark_complete');
     Route::post('/pengajuan/kirim-pokja', [PengajuanOpenController::class, 'kirimPokja'])->name('kirimPokja');
 
     Route::post('/selesai-reviu/{id}', [PengajuanOpenController::class, 'selesaiReviu'])->name('selesai_reviu');
@@ -218,7 +219,7 @@ Route::post('/test-send-message', function (\Illuminate\Http\Request $request) {
         ]);
 
         // Fire broadcasting event
-        event(new \App\Events\MessageSent($message));
+        // event(new \App\Events\MessageSent($message)); // Disabled untuk produksi
 
         return response()->json([
             'success' => true,
@@ -233,3 +234,39 @@ Route::post('/test-send-message', function (\Illuminate\Http\Request $request) {
         ]);
     }
 })->name('test.send.message');
+
+// Route untuk testing auto-expire pengajuan status
+Route::get('/test/auto-expire-pengajuan', function () {
+    try {
+        $controller = new PengajuanOpenController();
+        $result = $controller->autoChangeExpiredStatus();
+        
+        return response()->json([
+            'success' => true,
+            'result' => $result,
+            'message' => 'Auto-expire test completed'
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+})->name('test.auto.expire');
+
+// Route untuk melihat pengajuan dengan status 14/34
+Route::get('/test/pengajuan-status-14-34', function () {
+    try {
+        $controller = new PengajuanOpenController();
+        $result = $controller->getPengajuanWithStatus14And34();
+        
+        return response()->json($result);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+})->name('test.pengajuan.status');

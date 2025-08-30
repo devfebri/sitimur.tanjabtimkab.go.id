@@ -31,6 +31,7 @@ class Pengajuan extends Model
         'pokjapemilihan_updated',
         'status',
         'status_updated',
+        'pesan_akhir',
         'created_at',
         'updated_at',
     ];

@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\Models\ChatConversation;
 use App\Models\ChatMessage;
 use App\Models\User;
-use App\Events\MessageSent;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -23,8 +22,19 @@ class CustomChat extends Component
     public $fileUpload = null;
     public $isUploading = false;    protected $listeners = [
         'set-chat-context' => 'setChatContext',
-        'messageReceived' => 'messageReceived'
-    ];public function setChatContext($params)
+        'messageReceived' => 'messageReceived',
+        'refreshChat' => 'refreshChat'
+    ];
+
+    // Method untuk refresh chat secara otomatis
+    public function refreshChat()
+    {
+        if ($this->selectedConversation) {
+            $this->loadMessages();
+            $this->markMessagesAsRead();
+        }
+        $this->loadConversations();
+    }public function setChatContext($params)
     {
         $this->pengajuanId = $params['pengajuanId'] ?? null;
         $this->withUserId = $params['withUserId'] ?? null;
@@ -116,14 +126,18 @@ class CustomChat extends Component
 
     public function sendMessage()
     {
-        // Validasi: harus ada pesan text atau file
-        if (trim($this->newMessage) === '' && !$this->fileUpload) {
-            session()->flash('error', 'Silakan ketik pesan atau pilih file untuk dikirim.');
+        // Validasi: hanya cek apakah ada conversation yang dipilih
+        if (!$this->selectedConversation) {
+            session()->flash('error', 'Tidak ada percakapan yang dipilih.');
             return;
         }
 
-        if (!$this->selectedConversation) {
-            session()->flash('error', 'Tidak ada percakapan yang dipilih.');
+        // Ambil pesan yang diketik user
+        $messageText = trim($this->newMessage);
+        
+        // Jika tidak ada pesan text dan tidak ada file, tidak kirim apa-apa
+        if (empty($messageText) && !$this->fileUpload) {
+            // Tidak kirim pesan kosong, hanya return tanpa error
             return;
         }
 
@@ -131,7 +145,7 @@ class CustomChat extends Component
             'conversation_id' => $this->selectedConversation->id,
             'user_id' => Auth::id(),
             'type' => 'text',
-            'message' => trim($this->newMessage) // Default message
+            'message' => $messageText ?: '' // Gunakan pesan asli atau kosong jika ada file
         ];
 
         // Handle file upload
@@ -144,7 +158,7 @@ class CustomChat extends Component
                 $filePath = $this->fileUpload->storeAs('chat-files', $fileName, 'public');
                 
                 $messageData['type'] = 'document';
-                $messageData['message'] = trim($this->newMessage) ?: 'Mengirim file: ' . $this->fileUpload->getClientOriginalName();
+                $messageData['message'] = $messageText ?: 'Mengirim file: ' . $this->fileUpload->getClientOriginalName();
                 $messageData['file_path'] = $filePath;
                 $messageData['file_name'] = $this->fileUpload->getClientOriginalName();
                 $messageData['file_size'] = $this->fileUpload->getSize();
@@ -162,11 +176,8 @@ class CustomChat extends Component
         try {
             $message = ChatMessage::create($messageData);
 
-            // Fire event untuk real-time broadcasting
-            event(new MessageSent($message));
-            
             // Log for debugging
-            \Log::info('Message sent and event fired', [
+            \Log::info('Message sent successfully', [
                 'message_id' => $message->id,
                 'conversation_id' => $message->conversation_id,
                 'user_id' => $message->user_id,
@@ -177,22 +188,28 @@ class CustomChat extends Component
             // Update conversation last message time
             $this->selectedConversation->update(['last_message_at' => now()]);
 
-            // Clear input
+            // Clear input dan reset properties
             $this->newMessage = '';
+            $this->reset('newMessage'); // Pastikan Livewire property ter-reset
             
-            // Reload data
+            // Reload data untuk update UI
             $this->loadMessages();
             $this->loadConversations();
             
-            // Emit Livewire event for UI updates
+            // Emit Livewire event untuk trigger polling di frontend
             $this->dispatch('message-sent');
+            $this->dispatch('echo_chat_polling'); // Trigger refresh polling
+            
+            // Tidak perlu flash message untuk setiap pesan yang dikirim
+            // session()->flash('success', 'Pesan berhasil dikirim');
             
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal mengirim pesan: ' . $e->getMessage());
             \Log::error('Failed to send message', [
                 'error' => $e->getMessage(),
                 'user_id' => Auth::id(),
-                'conversation_id' => $this->selectedConversation->id
+                'conversation_id' => $this->selectedConversation->id ?? 'null',
+                'message_data' => $messageData
             ]);
         }
     }

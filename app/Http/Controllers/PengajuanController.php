@@ -88,16 +88,16 @@ class PengajuanController extends Controller
                     'pokja3_id',
                     'created_at'
                 )
-                ->where(function ($q) {
-                    $q->where('status', 21)
-                        ->orWhere('status', 31);
-                })
-                ->where(function ($q) {
-                    $userId = auth()->user()->id;
-                    $q->where('pokja1_id', $userId)
-                        ->orWhere('pokja2_id', $userId)
-                        ->orWhere('pokja3_id', $userId);
-                })
+                // ->where(function ($q) {
+                //     $q->where('status', 21)
+                //         ->orWhere('status', 31);
+                // })
+                // ->where(function ($q) {
+                //     $userId = auth()->user()->id;
+                //     $q->where('pokja1_id', $userId)
+                //         ->orWhere('pokja2_id', $userId)
+                //         ->orWhere('pokja3_id', $userId);
+                // })
                 ->orderBy('created_at', 'desc');
         }
         
@@ -287,6 +287,9 @@ class PengajuanController extends Controller
                 } elseif ($row->status == 34) {
 
                     $status = '<span class="badge badge-pill badge-warning">PPK</span>';
+                }elseif ($row->status == 88) {
+
+                    $status = '<span class="badge badge-pill badge-danger">PPK</span><br><small><i>System stops auto-submission, no updates for 3 days</i></small>';
                 } else {
 
                     $status = '<span class="badge badge-pill badge-primary">Error</span>';

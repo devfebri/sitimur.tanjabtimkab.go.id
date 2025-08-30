@@ -67,7 +67,7 @@
                                             <th>Pagu Anggaran</th>
                                             <th>Pagu HPS</th> --}}
                                             <th>Jenis Pengadaan</th>
-                                            @if(auth()->user()->role == 'ppk')
+                                            @if(auth()->user()->role == 'ppk' || auth()->user()->role == 'admin')
                                             <th>Posisi Paket</th>
                                             @else
                                             <th>Status</th>
