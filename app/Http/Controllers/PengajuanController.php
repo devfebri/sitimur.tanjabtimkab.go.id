@@ -433,6 +433,14 @@ class PengajuanController extends Controller
     {
         $metode = $request->query('metode');
 
+        // Debug log untuk troubleshooting
+        \Log::info('metodePengadaanBerkas called', [
+            'pengajuan_id' => $id,
+            'metode_pengadaan_id' => $metode,
+            'request_url' => $request->fullUrl(),
+            'user_role' => auth()->user()->role ?? 'guest'
+        ]);
+
         $data = DB::select("
             SELECT 
                 mpb.id,
@@ -456,7 +464,22 @@ class PengajuanController extends Controller
             ) pf ON pf.slug = mpb.slug
              where mpb.metode_pengadaan_id=?;
         ", [$id, $metode]);
-        return response()->json(['data' => $data]);
+
+        // Debug log hasil query
+        \Log::info('metodePengadaanBerkas result', [
+            'data_count' => count($data),
+            'data' => $data
+        ]);
+
+        return response()->json([
+            'data' => $data,
+            'debug' => [
+                'pengajuan_id' => $id,
+                'metode_pengadaan_id' => $metode,
+                'count' => count($data),
+                'timestamp' => now()
+            ]
+        ]);
     }
 
     public function destroy($id)
