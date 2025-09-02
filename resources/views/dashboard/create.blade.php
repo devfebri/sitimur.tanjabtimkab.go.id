@@ -245,39 +245,11 @@
                                 $('#dokumen_berkas').show();
                                 $('.step-2').show();
                             },
-                            error: function(xhr, status, error) {
+                            error: function() {
                                 $('#loading_dokumen').hide();
-                                
-                                // Enhanced error handling untuk debugging
-                                console.error('AJAX Error Details:', {
-                                    status: xhr.status,
-                                    statusText: xhr.statusText,
-                                    responseText: xhr.responseText,
-                                    url: url1,
-                                    error: error
-                                });
-                                
-                                var errorMsg = 'Gagal memuat dokumen berkas.';
-                                if (xhr.status === 404) {
-                                    errorMsg += ' Endpoint tidak ditemukan (404).';
-                                } else if (xhr.status === 500) {
-                                    errorMsg += ' Server error (500).';
-                                } else if (xhr.status === 0) {
-                                    errorMsg += ' Tidak dapat terhubung ke server.';
-                                }
-                                
-                                $('#dokumen_berkas').html(`
-                                    <div class="alert alert-danger">
-                                        <h6>Error Loading Documents</h6>
-                                        <p>${errorMsg}</p>
-                                        <small><strong>Debug Info:</strong><br>
-                                        URL: ${url1}<br>
-                                        Status: ${xhr.status} ${xhr.statusText}<br>
-                                        <a href="javascript:void(0)" onclick="console.log(${JSON.stringify(xhr.responseText)})">View Response in Console</a>
-                                        </small>
-                                    </div>
-                                `);
-                                $('#dokumen_berkas').show();
+                                // fileInput.after('<small class="text-danger">Gagal memuat dokumen, silakan coba lagi.</small>');
+
+
                                 $('.step-2').show();
                             }
                         });

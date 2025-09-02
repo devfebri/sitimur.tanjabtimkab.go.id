@@ -198,66 +198,6 @@ Route::get('/test-chat-debug', function () {
     return view('test-chat-debug');
 })->name('test.chat.debug');
 
-// Debug route untuk berkas
-Route::get('/debug-berkas/{pengajuan_id}/{metode_id}', function ($pengajuan_id, $metode_id) {
-    try {
-        $data = DB::select("
-            SELECT 
-                mpb.id,
-                mpb.slug,
-                mpb.nama_berkas,
-                mpb.multiple,
-                COALESCE(pf.status, 0) as status,
-                pf.id as pengajuan_files_id,
-                pf.slug as pf_slug,
-                pf.file_path
-            FROM metode_pengadaan_berkass mpb
-            LEFT JOIN (
-                SELECT pf1.*
-                FROM pengajuan_files pf1
-                INNER JOIN (
-                    SELECT slug, MAX(created_at) as max_created
-                    FROM pengajuan_files
-                    WHERE pengajuan_id = ?
-                    GROUP BY slug
-                ) pf2 ON pf1.slug = pf2.slug AND pf1.created_at = pf2.max_created
-            ) pf ON pf.slug = mpb.slug
-            WHERE mpb.metode_pengadaan_id = ?
-        ", [$pengajuan_id, $metode_id]);
-
-        // Cek juga tabel terpisah
-        $metode_berkas = DB::table('metode_pengadaan_berkass')
-            ->where('metode_pengadaan_id', $metode_id)
-            ->get();
-            
-        $pengajuan = DB::table('pengajuans')
-            ->where('id', $pengajuan_id)
-            ->first();
-
-        return response()->json([
-            'status' => 'success',
-            'pengajuan_id' => $pengajuan_id,
-            'metode_pengadaan_id' => $metode_id,
-            'pengajuan_data' => $pengajuan,
-            'main_query_result' => $data,
-            'main_query_count' => count($data),
-            'metode_berkas_count' => $metode_berkas->count(),
-            'metode_berkas_data' => $metode_berkas,
-            'database' => config('database.default'),
-            'db_host' => config('database.connections.mysql.host'),
-            'db_name' => config('database.connections.mysql.database'),
-            'timestamp' => now()
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage(),
-            'pengajuan_id' => $pengajuan_id,
-            'metode_pengadaan_id' => $metode_id
-        ], 500);
-    }
-})->name('debug.berkas');
-
 Route::post('/test-send-message', function (\Illuminate\Http\Request $request) {
     try {
         // Get or create test conversation
