@@ -10,6 +10,7 @@ use App\Models\PengajuanFile;
 use App\Models\User;
 use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
+ use Barryvdh\DomPDF\Facade\Pdf;
 
 class PengajuanOpenController extends Controller
 {
@@ -1429,5 +1430,15 @@ class PengajuanOpenController extends Controller
                 'data' => []
             ];
         }
+    }
+
+    public function downloadpdf($id)
+    {
+        $pengajuan = Pengajuan::findOrFail($id);
+        $files = PengajuanFile::where('pengajuan_id', $id)
+            ->where('status', '!=', 99)
+            ->get();
+        $pdf = PDF::loadView('dashboard.pdf', compact('pengajuan','files'));
+        return $pdf->download('pengajuan_'.$pengajuan->id.'.pdf');
     }
 }

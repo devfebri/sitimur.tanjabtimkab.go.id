@@ -145,6 +145,7 @@ Route::prefix('ppk')->middleware(['auth', PpkMiddleware::class])->name('ppk_')->
     
     Route::get('pengajuan/{id}/open/edit', [PengajuanOpenController::class, 'pengajuan_open_edit'])->name('pengajuan_open_edit');
     Route::post('pengajuan/{id}/open/update', [PengajuanOpenController::class, 'pengajuan_open_update'])->name('pengajuan_open_update');
+    Route::get('pengajuan/{id}/open/downloadpdf', [PengajuanOpenController::class, 'downloadpdf'])->name('pengajuan_open_downloadpdf');
 
     // Chat route for PPK
     Route::get('/chats',[ChatsController::class, 'index'])->name('chats');

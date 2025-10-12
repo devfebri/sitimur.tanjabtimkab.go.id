@@ -315,12 +315,19 @@
                                                         // Pokja chat dengan PPK (user yang membuat pengajuan)
                                                         $targetUserId = $data->user_id;
                                                     }
-                                                @endphp                                                <a href="{{ route(auth()->user()->role.'_chats') }}?pengajuan={{ $data->id }}{{ $targetUserId ? '&with_user='.$targetUserId : '' }}" 
+                                                @endphp                                                
+                                                <a href="{{ route(auth()->user()->role.'_chats') }}?pengajuan={{ $data->id }}{{ $targetUserId ? '&with_user='.$targetUserId : '' }}" 
                                                    class="btn btn-success btn-sm me-1">
                                                     <i class="mdi mdi-chat me-1"></i>Chat
                                                 </a>             
                                                 @endif
-                                                {{-- <a href="{{ route(auth()->user()->role.'_riwayat_revisi') }}" class="btn btn-warning btn-sm">Riwayat Revisi</a> --}}
+                                                {{-- <a href="#" 
+                                                   class="btn btn-success btn-sm me-1">
+                                                    <i class="mdi mdi-chat me-1"></i>Chat
+                                                </a> --}}
+                                                <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}" class="btn btn-warning btn-sm"> PDF</a>
+
+                                                <a href="#" class="btn btn-warning btn-sm"> Excel</a>
 
 
 
