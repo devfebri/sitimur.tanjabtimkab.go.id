@@ -286,7 +286,7 @@
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Tidak Disetujui Kepala UKPBJ <br>&emsp;{{ $data->updated_at->format('d/m/Y h:i:s') }}</i></td>
 
                                         @elseif($data->status==31)
-                                        <td><b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Status Terakhir</b> <br>&emsp; <i>Selesai <br> &emsp;{{ $data->updated_at->format('d/m/Y h:i:s') }}</i></i></td>
+                                        <td><b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Status Terakhir</b> <br>&emsp; <i>Siap Ditayangkan <br> &emsp;{{ $data->updated_at->format('d/m/Y h:i:s') }}</i></i></td>
 
                                         @elseif($data->status==32)
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Tidak Disetujui Pokja Pemilihan <br> &emsp;{{ $data->updated_at->format('d/m/Y h:i:s') }}</i></td>
