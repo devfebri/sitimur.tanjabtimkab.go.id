@@ -206,7 +206,7 @@ class PengajuanController extends Controller
                 if ($row->verifikator_status_akhir == 0) {
                     $status = '<span class="badge badge-pill badge-primary">Proses</span>';
                 } elseif ($row->verifikator_status_akhir == 1) {
-                    $status = '<span class="badge badge-pill badge-success">Disetujui</span>';
+                    $status = '<span class="badge badge-pill badge-success">Diteruskan Kepada Kepala UKPBJ</span>';
                 } elseif ($row->verifikator_status_akhir == 2) {
                     $status = '<span class="badge badge-pill badge-danger">Tidak Disetujui</span>';
                 } elseif ($row->verifikator_status_akhir == 3) {

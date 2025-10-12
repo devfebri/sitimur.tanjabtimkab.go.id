@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('metode_pengadaans', function (Blueprint $table) {
             $table->id();
             $table->string('nama_metode_pengadaan')->unique();
-            $table->text('slug')->unique();
+            $table->text('slug');
             $table->boolean('status')->default(true)->comment('1=aktif, 0=nonaktif'); // true for active, false for inactive
             $table->timestamps();
         });

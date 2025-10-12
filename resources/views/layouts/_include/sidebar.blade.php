@@ -11,49 +11,53 @@
 
 <div class="sidebar-inner slimscrollleft" style="font-family:revert-layer;font-size:14px;">
 
-    <div id="sidebar-menu">        <ul>           @if( auth()->user()->role == 'ppk')
-            <li class="menu-title">PPK Menu</li>
-            <li>
-                <a href="{{ route('ppk_pengajuan_create') }}" class="waves-effect">
-                    <i class="mdi mdi-plus"></i>
-                    <span> Buat Pengajuan </span>
-                </a>
-            </li>
-             <li>
-                 <a href="{{ route('ppk_dashboard') }}" class="waves-effect">
-                     <i class="mdi mdi-file"></i>
-                     <span> Data Pengajuan </span>
-                 </a>
-             </li>             <li>
-                 <a href="{{ route('ppk_chats') }}" class="waves-effect">
-                     <i class="mdi mdi-forum"></i>
-                     <span> Chat </span>
-                     @if(isset($unreadChatCount) && $unreadChatCount > 0)
-                         <span class="badge badge-pill badge-danger float-right chat-badge">{{ $unreadChatCount }}</span>
-                     @else
-                         <span class="badge badge-pill badge-danger float-right chat-badge" style="display: none;"></span>
-                     @endif
-                 </a>
-             </li>@elseif(auth()->user()->role == 'admin')
-            <li class="menu-title">Admin Menu</li>
-            <li>
-                <a href="{{ route(auth()->user()->role.'_user') }}" class="waves-effect">
-                    <i class="fa fa-users"></i>
-                    <span> Kelola User </span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ route(auth()->user()->role.'_persyaratan') }}" class="waves-effect">
-                    <i class="mdi mdi-clipboard"></i>
-                    <span> Kelola Persyaratan </span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ route(auth()->user()->role.'_dashboard') }}" class="waves-effect">
-                    <i class="fa fa-dashboard"></i>
-                    <span> Data Pengajuan </span>
-                </a>
-            </li>            @elseif(auth()->user()->role == 'verifikator')
+    <div id="sidebar-menu">        
+        <ul>           
+            @if( auth()->user()->role == 'ppk')
+                <li class="menu-title">PPK Menu</li>
+                <li>
+                    <a href="{{ route('ppk_pengajuan_create') }}" class="waves-effect">
+                        <i class="mdi mdi-plus"></i>
+                        <span> Buat Pengajuan </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('ppk_dashboard') }}" class="waves-effect">
+                        <i class="mdi mdi-file"></i>
+                        <span> Data Pengajuan </span>
+                    </a>
+                </li>             <li>
+                    <a href="{{ route('ppk_chats') }}" class="waves-effect">
+                        <i class="mdi mdi-forum"></i>
+                        <span> Chat </span>
+                        @if(isset($unreadChatCount) && $unreadChatCount > 0)
+                            <span class="badge badge-pill badge-danger float-right chat-badge">{{ $unreadChatCount }}</span>
+                        @else
+                            <span class="badge badge-pill badge-danger float-right chat-badge" style="display: none;"></span>
+                        @endif
+                    </a>
+                </li>
+            @elseif(auth()->user()->role == 'admin')
+                <li class="menu-title">Admin Menu</li>
+                <li>
+                    <a href="{{ route(auth()->user()->role.'_user') }}" class="waves-effect">
+                        <i class="fa fa-users"></i>
+                        <span> Kelola User </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route(auth()->user()->role.'_persyaratan') }}" class="waves-effect">
+                        <i class="mdi mdi-clipboard"></i>
+                        <span> Kelola Persyaratan </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route(auth()->user()->role.'_dashboard') }}" class="waves-effect">
+                        <i class="fa fa-user"></i>
+                        <span> Data Pengajuan </span>
+                    </a>
+                </li>            
+            @elseif(auth()->user()->role == 'verifikator')
             <li class="menu-title">Verifikator Menu</li>
             <li>
                 <a href="{{ route('verifikator_dashboard') }}" class="waves-effect">
