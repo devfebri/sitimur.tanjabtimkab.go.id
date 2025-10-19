@@ -147,8 +147,10 @@ Route::prefix('ppk')->middleware(['auth', PpkMiddleware::class])->name('ppk_')->
     Route::post('pengajuan/{id}/open/update', [PengajuanOpenController::class, 'pengajuan_open_update'])->name('pengajuan_open_update');
     Route::get('pengajuan/{id}/open/downloadpdf', [PengajuanOpenController::class, 'downloadpdf'])->name('pengajuan_open_downloadpdf');
 
-    // Chat route for PPK
-    Route::get('/chats',[ChatsController::class, 'index'])->name('chats');
+    // Chat routes for PPK
+    Route::get('/pengajuan/{id}/chat', [ChatsController::class, 'index'])->name('pengajuan.chat');
+    Route::post('/pengajuan/{id}/chat/send', [ChatsController::class, 'sendMessage'])->name('pengajuan.chat.send');
+    Route::get('/pengajuan/{id}/chat/get-new', [ChatsController::class, 'getNewMessages'])->name('pengajuan.chat.get-new');
     
     // API for chat users
     Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
@@ -179,8 +181,10 @@ Route::prefix('pokjapemilihan')->middleware(PokjaPemilihanMiddleware::class)->na
 
     Route::post('/selesai-reviu/{id}', [PengajuanOpenController::class, 'selesaiReviu'])->name('selesai_reviu');
     
-    // Chat route for Pokja Pemilihan
-    Route::get('/chats', [ChatsController::class, 'index'])->name('chats');
+    // Chat routes for Pokja Pemilihan
+    Route::get('/pengajuan/{id}/chat', [ChatsController::class, 'index'])->name('pengajuan.chat');
+    Route::post('/pengajuan/{id}/chat/send', [ChatsController::class, 'sendMessage'])->name('pengajuan.chat.send');
+    Route::get('/pengajuan/{id}/chat/get-new', [ChatsController::class, 'getNewMessages'])->name('pengajuan.chat.get-new');
     
     // API for chat users
     Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
@@ -198,6 +202,12 @@ Route::get('/test-chat', function () {
 Route::get('/test-chat-debug', function () {
     return view('test-chat-debug');
 })->name('test.chat.debug');
+
+// Global chat routes (accessible by authenticated users)
+Route::middleware('auth')->group(function () {
+    Route::post('/chats/send', [ChatsController::class, 'sendMessage'])->name('chats.send');
+    Route::get('/chats/get-new', [ChatsController::class, 'getNewMessages'])->name('chats.get-new');
+});
 
 Route::post('/test-send-message', function (\Illuminate\Http\Request $request) {
     try {

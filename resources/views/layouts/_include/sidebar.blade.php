@@ -26,7 +26,8 @@
                         <i class="mdi mdi-file"></i>
                         <span> Data Pengajuan </span>
                     </a>
-                </li>             <li>
+                </li>             
+                {{-- <li>
                     <a href="{{ route('ppk_chats') }}" class="waves-effect">
                         <i class="mdi mdi-forum"></i>
                         <span> Chat </span>
@@ -36,7 +37,7 @@
                             <span class="badge badge-pill badge-danger float-right chat-badge" style="display: none;"></span>
                         @endif
                     </a>
-                </li>
+                </li> --}}
             @elseif(auth()->user()->role == 'admin')
                 <li class="menu-title">Admin Menu</li>
                 <li>
@@ -82,7 +83,8 @@
                     <i class="mdi mdi-gavel"></i>
                     <span> Dashboard </span>
                 </a>
-            </li>            <li>
+            </li>            
+            {{-- <li>
                 <a href="{{ route('pokjapemilihan_chats') }}" class="waves-effect">
                     <i class="mdi mdi-forum"></i>
                     <span> Chat </span>
@@ -92,7 +94,7 @@
                         <span class="badge badge-pill badge-danger float-right chat-badge" style="display: none;"></span>
                     @endif
                 </a>
-            </li>
+            </li> --}}
 
            @endif
             

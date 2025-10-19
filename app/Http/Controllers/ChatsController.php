@@ -8,7 +8,7 @@ use App\Models\User;
 
 class ChatsController extends Controller
 {
-    public function index()
+    public function index($pengajuanId)
     {
         // Check if user is authenticated
         if (!Auth::check()) {
@@ -24,8 +24,16 @@ class ChatsController extends Controller
         $user = Auth::user();
         $userRole = $user->role;
         $userName = $user->name;
+
+        // Get pengajuan data
+        $pengajuan = \App\Models\Pengajuan::findOrFail($pengajuanId);
         
-        return view('chats', compact('userRole', 'userName'));
+        // Determine return route based on user role
+        $returnRoute = $userRole === 'ppk' 
+            ? route('ppk_pengajuanopen', ['id' => $pengajuanId])
+            : route('pokjapemilihan_pengajuanopen', ['id' => $pengajuanId]);
+        
+        return view('chatsnew', compact('userRole', 'userName', 'pengajuan', 'returnRoute'));
     }
 
     public function getChatUsers(Request $request)
@@ -97,5 +105,92 @@ class ChatsController extends Controller
         }
         
         return response()->json(['count' => $unreadCount]);
+    }
+
+    public function sendMessage(Request $request, $pengajuanId)
+    {
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        if (!in_array(Auth::user()->role, ['ppk', 'pokjapemilihan'])) {
+            return response()->json(['error' => 'Akses ditolak'], 403);
+        }
+
+        $validatedData = $request->validate([
+            'message' => 'required_without:file|string|nullable',
+            'file' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png'
+        ]);
+        
+        // Ensure pengajuan exists and user has access
+        $pengajuan = \App\Models\Pengajuan::findOrFail($pengajuanId);
+
+        $user = Auth::user();
+        $filePath = null;
+
+        // Handle file upload if present
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            
+            // Store file in public/chat_uploads directory
+            $file->storeAs('public/chat_uploads', $fileName);
+            $filePath = '/storage/chat_uploads/' . $fileName;
+        }
+
+        // Create chat message
+        $message = new \App\Models\ChatMessage([
+            'user_id' => $user->id,
+            'message' => $request->input('message'),
+            'file_path' => $filePath
+        ]);
+        $message->save();
+
+        // Format response
+        $response = [
+            'id' => $message->id,
+            'sender_name' => $user->name,
+            'sender_initial' => strtoupper(substr($user->name, 0, 1)),
+            'message' => $message->message,
+            'time' => $message->created_at->format('M j, Y g:i A'),
+            'file_path' => $filePath,
+            'file_name' => $request->hasFile('file') ? $request->file('file')->getClientOriginalName() : null
+        ];
+
+        return response()->json($response);
+    }
+
+    public function getNewMessages($pengajuanId)
+    {
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        if (!in_array(Auth::user()->role, ['ppk', 'pokjapemilihan'])) {
+            return response()->json(['error' => 'Akses ditolak'], 403);
+        }
+
+        // Ensure pengajuan exists and user has access
+        $pengajuan = \App\Models\Pengajuan::findOrFail($pengajuanId);
+        
+        // Get messages for this pengajuan
+        $messages = \App\Models\ChatMessage::where('pengajuan_id', $pengajuanId)
+            ->with('user')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $comments = $messages->map(function($message) {
+            return [
+                'id' => $message->id,
+                'sender_name' => $message->user->name,
+                'sender_initial' => strtoupper(substr($message->user->name, 0, 1)),
+                'message' => $message->message,
+                'time' => $message->created_at->format('M j, Y g:i A'),
+                'file_path' => $message->file_path,
+                'file_name' => $message->file_path ? basename($message->file_path) : null
+            ];
+        });
+
+        return response()->json(['comments' => $comments]);
     }
 }

@@ -316,7 +316,7 @@
                                                         $targetUserId = $data->user_id;
                                                     }
                                                 @endphp                                                
-                                                <a href="{{ route(auth()->user()->role.'_chats') }}?pengajuan={{ $data->id }}{{ $targetUserId ? '&with_user='.$targetUserId : '' }}" 
+                                                <a href="{{ route(auth()->user()->role.'_pengajuan.chat',[$data->id]) }}" 
                                                    class="btn btn-success btn-sm me-1">
                                                     <i class="mdi mdi-chat me-1"></i>Chat
                                                 </a>             

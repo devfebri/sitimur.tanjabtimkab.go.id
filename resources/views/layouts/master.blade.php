@@ -125,7 +125,7 @@
         });    </script> --}}
 
     <!-- Livewire Styles -->
-    @livewireStyles
+    {{-- @livewireStyles --}}
 </head>
 
 
@@ -266,7 +266,7 @@ $(function() {
 </script>
 
 <!-- Livewire Scripts -->
-@livewireScripts
+{{-- @livewireScripts --}}
 
 <!-- Chat Badge Update Script -->
 <script>
