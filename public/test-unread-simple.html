@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Unread Count Simple</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Test Unread Count - Simple jQuery</h1>
+    
+    <div id="result"></div>
+    
+    <script>
+        // Test untuk mendapatkan unread count tanpa API
+        $(document).ready(function() {
+            var pengajuanId = 1; // Test dengan pengajuan ID 1
+            var userRole = 'ppk'; // Assume user role is ppk
+            
+            // Build URL secara dinamis
+            var baseUrl = "/ppk/pengajuan/PLACEHOLDER/unread-count";
+            var url = baseUrl.replace('PLACEHOLDER', pengajuanId);
+            
+            console.log('Testing URL: ' + url);
+            
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(response) {
+                    console.log('Success response:', response);
+                    $('#result').html('<h2 style="color: green;">✓ Success!</h2>' +
+                        '<pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error response:', xhr.responseText);
+                    $('#result').html('<h2 style="color: red;">✗ Error!</h2>' +
+                        '<p>Status: ' + status + '</p>' +
+                        '<p>Error: ' + error + '</p>' +
+                        '<pre>' + xhr.responseText + '</pre>');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
