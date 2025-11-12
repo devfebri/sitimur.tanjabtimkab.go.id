@@ -740,15 +740,13 @@
     // Function to load unread message counts
     function loadUnreadCounts() {
         var userRole = '{{ auth()->user()->role }}'; // Get role from server
-        var routePrefix = userRole + '_'; // Build route prefix: ppk_, verifikator_, pokjapemilihan_
         
         $('.chat-button').each(function() {
             var pengajuanId = $(this).data('pengajuan-id');
             var $badge = $(this).find('.chat-badge');
             
-            // Build URL using Laravel route with dynamic prefix
-            var baseUrl = "{{ route('ppk_unread.count', ['id' => 'PLACEHOLDER']) }}";
-            var url = baseUrl.replace('ppk_', userRole + '_').replace('PLACEHOLDER', pengajuanId);
+            // Build URL directly: /ppk/pengajuan/{id}/unread-count
+            var url = '/' + userRole + '/pengajuan/' + pengajuanId + '/unread-count';
             
             $.ajax({
                 url: url,
