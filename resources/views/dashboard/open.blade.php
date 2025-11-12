@@ -739,20 +739,23 @@
 
     // Function to load unread message counts
     function loadUnreadCounts() {
+        var userRole = '{{ auth()->user()->role }}'; // Get role from server
+        
         $('.chat-button').each(function() {
             var pengajuanId = $(this).data('pengajuan-id');
-            var chatType = $(this).data('chat-type');
-            var $badge = $('span.chat-badge[data-pengajuan-id="' + pengajuanId + '"]');
+            var $badge = $(this).find('.chat-badge');
             
-            // Build URL based on current page URL
-            var currentUrl = window.location.pathname;
-            var userRole = '{{ auth()->user()->role }}';
+            // Construct URL directly without route helper
             var url = '/' + userRole + '/api/unread-count/' + pengajuanId;
+
+            console.log('Loading unread count from: ' + url);
 
             $.ajax({
                 url: url,
                 type: 'GET',
+                dataType: 'json',
                 success: function(response) {
+                    console.log('Unread count response:', response);
                     var unreadCount = response.unread_count;
                     if (unreadCount > 0) {
                         $badge.text(unreadCount).removeClass('d-none');
@@ -760,8 +763,13 @@
                         $badge.addClass('d-none');
                     }
                 },
-                error: function(err) {
-                    console.error('Error loading unread count from ' + url + ':', err);
+                error: function(xhr, status, error) {
+                    console.error('Error loading unread count:', {
+                        url: url,
+                        status: status,
+                        error: error,
+                        response: xhr.responseText
+                    });
                 }
             });
         });
