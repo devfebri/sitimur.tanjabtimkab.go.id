@@ -103,17 +103,17 @@
                             $statusBgClass = $pengajuan->status < 20 ? 'bg-warning' : 'bg-info';
                         @endphp
 
-                        <div class="list-group-item list-group-item-action py-3 border-bottom chat-item transition-all" 
+                        <div class="list-group-item list-group-item-action py-3 border-bottom chat-item transition-all"
                              data-pengajuan-id="{{ $pengajuan->id }}"
                              data-status="{{ strtolower($statusText) }}"
                              data-search="{{ strtolower($pengajuan->nama_paket . ' ' . $pengajuan->user->name) }}"
                              data-unread="{{ $unreadMessages }}">
-                            
+
                             <div class="row align-items-center h-100">
                                 <div class="col-lg-8">
                                     <!-- Pengajuan Info -->
                                     <div class="d-flex align-items-start mb-2">
-                                        <div class="avatar-circle me-3 bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0" 
+                                        <div class="avatar-circle me-3 bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0"
                                              style="width: 50px; height: 50px; border-radius: 50%; font-weight: bold; font-size: 1.2rem;">
                                             {{ strtoupper(substr($pengajuan->user->name, 0, 1)) }}
                                         </div>
@@ -163,7 +163,7 @@
                                             <div class="h5 mb-0 font-weight-bold text-primary">{{ $totalMessages }}</div>
                                             <small class="text-muted">Pesan</small>
                                         </div>
-                                        <a href="{{ route('verifikator_pengajuan.chat', ['id' => $pengajuan->id]) }}" 
+                                        <a href="{{ route('verifikator_pengajuan.chat', ['id' => $pengajuan->id]) }}"
                                            class="btn btn-sm btn-primary order-0 order-lg-1">
                                             <i class="fas fa-comments me-1"></i>Buka Chat
                                         </a>
@@ -241,11 +241,11 @@
     }
 
     @keyframes pulse-badge {
-        0%, 100% { 
+        0%, 100% {
             transform: scale(1);
             box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
         }
-        50% { 
+        50% {
             transform: scale(1.1);
             box-shadow: 0 0 0 4px rgba(220, 53, 69, 0);
         }

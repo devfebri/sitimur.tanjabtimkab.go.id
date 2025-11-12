@@ -11,8 +11,8 @@
 
 <div class="sidebar-inner slimscrollleft" style="font-family:revert-layer;font-size:14px;">
 
-    <div id="sidebar-menu">        
-        <ul>           
+    <div id="sidebar-menu">
+        <ul>
             @if( auth()->user()->role == 'ppk')
                 <li class="menu-title">PPK Menu</li>
                 <li>
@@ -26,8 +26,8 @@
                         <i class="mdi mdi-file"></i>
                         <span> Data Pengajuan </span>
                     </a>
-                </li>             
-               
+                </li>
+
             @elseif(auth()->user()->role == 'admin')
                 <li class="menu-title">Admin Menu</li>
                 <li>
@@ -47,7 +47,7 @@
                         <i class="fa fa-user"></i>
                         <span> Data Pengajuan </span>
                     </a>
-                </li>            
+                </li>
             @elseif(auth()->user()->role == 'verifikator')
             <li class="menu-title">Verifikator Menu</li>
             <li>
@@ -62,7 +62,7 @@
                     <span> Chat History </span>
                 </a>
             </li>
-            
+
             @elseif(auth()->user()->role == 'kepalaukpbj')
             <li class="menu-title">Kepala UKPBJ Menu</li>
             <li>
@@ -71,7 +71,7 @@
                     <span> Dashboard </span>
                 </a>
             </li>
-            
+
             @elseif(auth()->user()->role == 'pokjapemilihan')
             <li class="menu-title">Pokja Pemilihan Menu</li>
             <li>
@@ -79,7 +79,7 @@
                     <i class="mdi mdi-gavel"></i>
                     <span> Dashboard </span>
                 </a>
-            </li>            
+            </li>
             {{-- <li>
                 <a href="{{ route('pokjapemilihan_chats') }}" class="waves-effect">
                     <i class="mdi mdi-forum"></i>
@@ -93,13 +93,13 @@
             </li> --}}
 
            @endif
-            
+
 
 
         </ul>
     </div>
     <div class="clearfix"></div>
-    
+
     <!-- Custom CSS for Chat Badge -->
     <style>
     .badge-danger {
@@ -115,22 +115,22 @@
         margin-left: 8px !important;
         animation: pulse-badge 2s infinite;
     }
-    
+
     @keyframes pulse-badge {
-        0% { 
+        0% {
             transform: scale(1);
             box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
         }
-        70% { 
+        70% {
             transform: scale(1.05);
             box-shadow: 0 0 0 4px rgba(220, 53, 69, 0);
         }
-        100% { 
+        100% {
             transform: scale(1);
             box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
         }
     }
-    
+
     /* Sidebar link with badge styling */
     #sidebar-menu ul li a {
         position: relative;
@@ -138,11 +138,11 @@
         align-items: center !important;
         justify-content: space-between !important;
     }
-    
+
     #sidebar-menu ul li a span:first-of-type {
         flex: 1;
     }
-    
+
     /* Responsive badge */
     @media (max-width: 768px) {
         .badge-danger {

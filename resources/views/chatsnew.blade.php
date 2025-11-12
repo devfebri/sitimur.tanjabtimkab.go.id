@@ -350,6 +350,9 @@ $(document).ready(function() {
     // Set up polling for new messages
     setInterval(loadMessages, 5000); // Poll every 5 seconds
 
+    // Mark messages as read when user opens chat
+    markAllAsRead();
+
     // File input change handler
     $('#fileInput').change(function() {
         const file = this.files[0];
@@ -370,14 +373,31 @@ $(document).ready(function() {
         }
     });
 
-    // Handle Enter key in textarea (Ctrl+Enter or Shift+Enter to send)
+    // Handle Enter key in textarea (Enter to send, Shift+Enter for new line)
     $('#messageInput').keydown(function(e) {
-        // Check if Enter is pressed with Ctrl or Shift
-        if ((e.ctrlKey || e.shiftKey) && (e.key === 'Enter' || e.keyCode === 13)) {
+        // Check if Enter is pressed without Shift (Shift+Enter allows new line)
+        if ((e.key === 'Enter' || e.keyCode === 13) && !e.shiftKey) {
             e.preventDefault();
             $('#commentForm').submit();
         }
     });
+
+    // Function to mark all messages as read
+    function markAllAsRead() {
+        $.ajax({
+            url: "{{ route(auth()->user()->role.'_api.mark.read', ['id' => $pengajuan->id]) }}",
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                console.log('Messages marked as read');
+            },
+            error: function(err) {
+                console.error('Error marking messages as read:', err);
+            }
+        });
+    }
 
     // Remove file handler
     window.removeFile = function() {

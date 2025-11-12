@@ -19,7 +19,7 @@ return new class extends Migration
                     ->comment('verifikator = PPK + Verifikator, pokja = PPK + Pokja1/2/3')
                     ->after('file_path');
             }
-            
+
             // Update index
             if (Schema::hasTable('chat_messages')) {
                 $table->dropIndex(['pengajuan_id', 'created_at']);
@@ -37,7 +37,7 @@ return new class extends Migration
             if (Schema::hasColumn('chat_messages', 'chat_type')) {
                 $table->dropColumn('chat_type');
             }
-            
+
             // Restore old index
             if (Schema::hasTable('chat_messages')) {
                 $table->dropIndex(['pengajuan_id', 'chat_type', 'created_at']);

@@ -14,14 +14,14 @@ class ChatMessage extends Model
         'file_path',
         'chat_type',
     ];
-    
+
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'read_at' => 'datetime',
     ];
 
-   
+
 
     public function user(): BelongsTo
     {
@@ -32,9 +32,9 @@ class ChatMessage extends Model
     public function getFileIcon(): string
     {
         if (!$this->isFile()) return '';
-        
+
         $extension = strtolower(pathinfo($this->file_name, PATHINFO_EXTENSION));
-        
+
         switch ($extension) {
             case 'pdf':
                 return 'mdi-file-pdf-box text-danger';
@@ -60,7 +60,7 @@ class ChatMessage extends Model
     public function getFormattedFileSize(): string
     {
         if (!$this->file_size) return '';
-        
+
         $bytes = intval($this->file_size);
         if ($bytes >= 1048576) {
             return number_format($bytes / 1048576, 2) . ' MB';

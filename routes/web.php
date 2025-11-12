@@ -110,14 +110,15 @@ Route::prefix('verifikator')->middleware(VerifikatorMiddleware::class)->name('ve
     Route::post('/pengajuan/{id}/chat/send', [ChatsController::class, 'sendMessage'])->name('pengajuan.chat.send');
     Route::get('/pengajuan/{id}/chat/get-new', [ChatsController::class, 'getNewMessages'])->name('pengajuan.chat.get-new');
     Route::get('/pengajuan/{id}/chat/get', [ChatsController::class, 'getMessages'])->name('pengajuan.chat.get');
-    
+
     // Chat history routes for Verifikator
     Route::get('/chat-history', [ChatsController::class, 'chatHistory'])->name('chat.history');
     Route::get('/chat-history/{id}/messages', [ChatsController::class, 'chatHistoryMessages'])->name('chat.history.messages');
 
     // API for chat users
     Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
-    Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
+    Route::get('/api/unread-count/{id}', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
+    Route::post('/api/mark-as-read/{id}', [ChatsController::class, 'markAsRead'])->name('api.mark.read');
 });
 
 // =============== KEPALA UKPBJ ===============
@@ -169,7 +170,8 @@ Route::prefix('ppk')->middleware(['auth', PpkMiddleware::class])->name('ppk_')->
 
     // API for chat users
     Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
-    Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
+    Route::get('/api/unread-count/{id}', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
+    Route::post('/api/mark-as-read/{id}', [ChatsController::class, 'markAsRead'])->name('api.mark.read');
 
     Route::get('riwayat_revisi',[RiwayatRevisiController::class,'index'])->name('riwayat_revisi');
     Route::get('download_revision/{id}', [RiwayatRevisiController::class, 'downloadRevision'])->name('download_revision');
@@ -204,7 +206,8 @@ Route::prefix('pokjapemilihan')->middleware(PokjaPemilihanMiddleware::class)->na
 
     // API for chat users
     Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
-    Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
+    Route::get('/api/unread-count/{id}', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
+    Route::post('/api/mark-as-read/{id}', [ChatsController::class, 'markAsRead'])->name('api.mark.read');
     Route::get('riwayat_revisi', [RiwayatRevisiController::class, 'index'])->name('riwayat_revisi');
     Route::get('download_revision/{id}', [RiwayatRevisiController::class, 'downloadRevision'])->name('download_revision');
 
