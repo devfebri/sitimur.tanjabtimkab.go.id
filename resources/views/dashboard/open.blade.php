@@ -744,18 +744,10 @@
             var chatType = $(this).data('chat-type');
             var $badge = $('span.chat-badge[data-pengajuan-id="' + pengajuanId + '"]');
             
-            // Build URL based on user role
+            // Build URL based on current page URL
+            var currentUrl = window.location.pathname;
             var userRole = '{{ auth()->user()->role }}';
-            var routeName = userRole + '_api.unread.count';
-            var url = '';
-            
-            @if(auth()->user()->role == 'ppk')
-                url = '/ppk/api/unread-count/' + pengajuanId;
-            @elseif(auth()->user()->role == 'verifikator')
-                url = '/verifikator/api/unread-count/' + pengajuanId;
-            @elseif(auth()->user()->role == 'pokjapemilihan')
-                url = '/pokjapemilihan/api/unread-count/' + pengajuanId;
-            @endif
+            var url = '/' + userRole + '/api/unread-count/' + pengajuanId;
 
             $.ajax({
                 url: url,
@@ -769,7 +761,7 @@
                     }
                 },
                 error: function(err) {
-                    console.error('Error loading unread count:', err);
+                    console.error('Error loading unread count from ' + url + ':', err);
                 }
             });
         });
