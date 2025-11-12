@@ -337,8 +337,8 @@
                                                         <i class="mdi mdi-chat-multiple me-1"></i>Chat
                                                     </a>
                                                 @endif
-                                                {{-- <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}" class="btn btn-warning btn-sm"> PDF</a> --}}
-                                                <a href="#" class="btn btn-warning btn-sm"> PDF</a>
+                                                <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}" class="btn btn-warning btn-sm"> PDF</a>
+                                                {{-- <a href="#" class="btn btn-warning btn-sm"> PDF</a> --}}
 
                                                 <a href="#" class="btn btn-warning btn-sm"> Excel</a>
 

@@ -274,6 +274,9 @@
             
         });
 
+        // Flag untuk prevent double click upload
+        var uploadingFiles = {};
+        
         // Event upload file satu per satu
        $(document).on('click', '#btnUpload', function(e) {
             e.preventDefault();
@@ -283,9 +286,12 @@
             var input = inputGroup.find('input[type="file"]');
             var files = input[0].files;
             var berkas_id = btn.data('id');
-          
             
-
+            // Prevent double click - jika sedang upload untuk berkas ini, abaikan
+            if (uploadingFiles[berkas_id]) {
+                return false;
+            }
+            
             var pengajuan_id = $('#id').val();
 
             // Hapus notifikasi sebelumnya
@@ -308,6 +314,8 @@
             formData.append('pengajuan_id', pengajuan_id);
             formData.append('_token', '{{ csrf_token() }}');
 
+            // Set flag: sedang upload untuk berkas ini
+            uploadingFiles[berkas_id] = true;
             btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Uploading...');
 
             $.ajax({
@@ -334,6 +342,8 @@
                     inputGroup.after('<small class="text-danger upload-feedback">' + msg + '</small>');
                 },
                 complete: function() {
+                    // Reset flag setelah upload selesai
+                    uploadingFiles[berkas_id] = false;
                     btn.prop('disabled', false).text('Upload');
                      cekKelengkapanUpload();
 
@@ -381,12 +391,37 @@
 </script>
 <script>
 $(function() {
+    // Flag untuk prevent double submit
+    var isSubmitting = false;
+    
     $('#form_pengajuan').on('submit', function(e) {
         e.preventDefault();
+        
+        // Jika sedang submit, abaikan
+        if (isSubmitting) {
+            return false;
+        }
+        
         alertify.confirm(
             'Apakah Anda yakin ingin mengirim pengajuan ini? Pastikan semua data sudah benar.',
-            () => this.submit(),
-            () => alertify.error('Pengajuan dibatalkan')
+            () => {
+                // Set flag sebelum submit
+                isSubmitting = true;
+                
+                // Disable semua button di form
+                $('#form_pengajuan').find('button[type="submit"], button[type="button"]').prop('disabled', true);
+                
+                // Show loading
+                $('#loading_dokumen').show().html('<div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><p class="mt-2">Mengirim pengajuan, mohon tunggu...</p>');
+                
+                // Submit form
+                this.submit();
+            },
+            () => {
+                alertify.error('Pengajuan dibatalkan');
+                // Reset flag jika dibatalkan
+                isSubmitting = false;
+            }
         );
     });
 });
