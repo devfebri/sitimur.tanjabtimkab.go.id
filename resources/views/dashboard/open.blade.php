@@ -305,26 +305,38 @@
                                         <td>
                                             <div class="btn-group w-100" role="group">
 
-                                                @if(auth()->user()->role == 'pokjapemilihan' || auth()->user()->role == 'ppk'||auth()->user()->role == 'verifikator')
-                                                @php
-                                                    $targetUserId = null;
-                                                    if(auth()->user()->role == 'ppk') {
-                                                        // PPK chat dengan Pokja yang pertama dari pengajuan ini
-                                                        $targetUserId = $data->pokja1_id ?? $data->pokja2_id ?? $data->pokja3_id;
-                                                    } elseif(auth()->user()->role == 'pokjapemilihan') {
-                                                        // Pokja chat dengan PPK (user yang membuat pengajuan)
-                                                        $targetUserId = $data->user_id;
-                                                    }
-                                                @endphp
-                                                <a href="{{ route(auth()->user()->role.'_pengajuan.chat',[$data->id]) }}"
-                                                   class="btn btn-success btn-sm me-1">
-                                                    <i class="mdi mdi-chat me-1"></i>Chat
-                                                </a>
+                                                {{-- Chat Buttons untuk PPK --}}
+                                                @if(auth()->user()->role == 'ppk')
+                                                    {{-- Button Chat Verifikator (Status < 20) --}}
+                                                    @if($data->status < 20)
+                                                        <a href="{{ route('ppk_pengajuan.chat', [$data->id]) }}"
+                                                           class="btn btn-info btn-sm me-1" title="Chat dengan Verifikator">
+                                                            <i class="mdi mdi-chat-processing me-1"></i>Chat Verifikator
+                                                        </a>
+                                                    @endif
+
+                                                    {{-- Button Chat Pokja (Status >= 20) --}}
+                                                    @if($data->status >= 20)
+                                                        <a href="{{ route('ppk_pengajuan.chat', [$data->id]) }}"
+                                                           class="btn btn-success btn-sm me-1" title="Chat dengan Pokja Pemilihan">
+                                                            <i class="mdi mdi-chat-multiple me-1"></i>Chat Pokja
+                                                        </a>
+                                                    @endif
+
+                                                {{-- Chat Button untuk Verifikator --}}
+                                                @elseif(auth()->user()->role == 'verifikator')
+                                                    <a href="{{ route('verifikator_pengajuan.chat', [$data->id]) }}"
+                                                       class="btn btn-info btn-sm me-1" title="Chat dengan PPK">
+                                                        <i class="mdi mdi-chat me-1"></i>Chat Verifikator
+                                                    </a>
+
+                                                {{-- Chat Button untuk Pokja Pemilihan --}}
+                                                @elseif(auth()->user()->role == 'pokjapemilihan')
+                                                    <a href="{{ route('pokjapemilihan_pengajuan.chat', [$data->id]) }}"
+                                                       class="btn btn-success btn-sm me-1" title="Chat dengan PPK">
+                                                        <i class="mdi mdi-chat-multiple me-1"></i>Chat Pokja
+                                                    </a>
                                                 @endif
-                                                {{-- <a href="#"
-                                                   class="btn btn-success btn-sm me-1">
-                                                    <i class="mdi mdi-chat me-1"></i>Chat
-                                                </a> --}}
                                                 {{-- <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}" class="btn btn-warning btn-sm"> PDF</a> --}}
                                                 <a href="#" class="btn btn-warning btn-sm"> PDF</a>
 
