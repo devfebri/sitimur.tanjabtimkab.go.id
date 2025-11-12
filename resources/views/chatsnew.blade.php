@@ -370,6 +370,15 @@ $(document).ready(function() {
         }
     });
 
+    // Handle Enter key in textarea (Ctrl+Enter or Shift+Enter to send)
+    $('#messageInput').keydown(function(e) {
+        // Check if Enter is pressed with Ctrl or Shift
+        if ((e.ctrlKey || e.shiftKey) && (e.key === 'Enter' || e.keyCode === 13)) {
+            e.preventDefault();
+            $('#commentForm').submit();
+        }
+    });
+
     // Remove file handler
     window.removeFile = function() {
         $('#fileInput').val('');
