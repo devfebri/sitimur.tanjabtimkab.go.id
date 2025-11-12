@@ -743,9 +743,22 @@
             var pengajuanId = $(this).data('pengajuan-id');
             var chatType = $(this).data('chat-type');
             var $badge = $('span.chat-badge[data-pengajuan-id="' + pengajuanId + '"]');
+            
+            // Build URL based on user role
+            var userRole = '{{ auth()->user()->role }}';
+            var routeName = userRole + '_api.unread.count';
+            var url = '';
+            
+            @if(auth()->user()->role == 'ppk')
+                url = '/ppk/api/unread-count/' + pengajuanId;
+            @elseif(auth()->user()->role == 'verifikator')
+                url = '/verifikator/api/unread-count/' + pengajuanId;
+            @elseif(auth()->user()->role == 'pokjapemilihan')
+                url = '/pokjapemilihan/api/unread-count/' + pengajuanId;
+            @endif
 
             $.ajax({
-                url: "{{ route(auth()->user()->role.'_api.unread.count', ['id' => ':id']) }}".replace(':id', pengajuanId),
+                url: url,
                 type: 'GET',
                 success: function(response) {
                     var unreadCount = response.unread_count;
