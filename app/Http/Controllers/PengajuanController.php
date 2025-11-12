@@ -181,8 +181,8 @@ class PengajuanController extends Controller
                         <br><small class="text-muted">&emsp;Pengajuan Anda tidak disetujui oleh Kepala UKPBJ.</small>';
                 } elseif ($row->status == 31) {
                     $status = '<b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Pokja</b>
-                        <br>&emsp; <i>Selesai</i>
-                        <br><small class="text-muted">&emsp;Proses pengajuan telah selesai. Terima kasih atas partisipasi Anda.</small>';
+                        <br>&emsp; <i>Siap Ditayangkan</i>
+                        <br><small class="text-muted">&emsp;Proses pengajuan telah selesai dan Siap Ditayangkan. Terima kasih atas partisipasi Anda.</small>';
                 } elseif ($row->status == 32) {
                     $status = '<b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Pokja</b>
                         <br>&emsp; <i>Tidak Disetujui Pokja Pemilihan</i>
