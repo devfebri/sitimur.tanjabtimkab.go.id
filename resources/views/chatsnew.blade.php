@@ -350,9 +350,6 @@ $(document).ready(function() {
     // Set up polling for new messages
     setInterval(loadMessages, 5000); // Poll every 5 seconds
 
-    // Mark messages as read when user opens chat
-    markAllAsRead();
-
     // File input change handler
     $('#fileInput').change(function() {
         const file = this.files[0];
@@ -381,23 +378,6 @@ $(document).ready(function() {
             $('#commentForm').submit();
         }
     });
-
-    // Function to mark all messages as read
-    function markAllAsRead() {
-        $.ajax({
-            url: "{{ route(auth()->user()->role.'_api.mark.read', ['id' => $pengajuan->id]) }}",
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                console.log('Messages marked as read');
-            },
-            error: function(err) {
-                console.error('Error marking messages as read:', err);
-            }
-        });
-    }
 
     // Remove file handler
     window.removeFile = function() {

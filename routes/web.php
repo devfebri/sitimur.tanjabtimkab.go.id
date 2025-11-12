@@ -115,9 +115,9 @@ Route::prefix('verifikator')->middleware(VerifikatorMiddleware::class)->name('ve
     Route::get('/chat-history', [ChatsController::class, 'chatHistory'])->name('chat.history');
     Route::get('/chat-history/{id}/messages', [ChatsController::class, 'chatHistoryMessages'])->name('chat.history.messages');
 
-    // Chat unread count endpoints
-    Route::get('/pengajuan/{id}/unread-count', [ChatsController::class, 'getUnreadCount'])->name('unread.count');
-    Route::post('/pengajuan/{id}/mark-as-read', [ChatsController::class, 'markAsRead'])->name('mark.read');
+    // API for chat users
+    Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
+    Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
 });
 
 // =============== KEPALA UKPBJ ===============
@@ -167,9 +167,9 @@ Route::prefix('ppk')->middleware(['auth', PpkMiddleware::class])->name('ppk_')->
     Route::get('/pengajuan/{id}/chat/get-new', [ChatsController::class, 'getNewMessages'])->name('pengajuan.chat.get-new');
     Route::get('/pengajuan/{id}/chat/get', [ChatsController::class, 'getMessages'])->name('pengajuan.chat.get');
 
-    // Chat unread count endpoints
-    Route::get('/pengajuan/{id}/unread-count', [ChatsController::class, 'getUnreadCount'])->name('unread.count');
-    Route::post('/pengajuan/{id}/mark-as-read', [ChatsController::class, 'markAsRead'])->name('mark.read');
+    // API for chat users
+    Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
+    Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
 
     Route::get('riwayat_revisi',[RiwayatRevisiController::class,'index'])->name('riwayat_revisi');
     Route::get('download_revision/{id}', [RiwayatRevisiController::class, 'downloadRevision'])->name('download_revision');
@@ -202,9 +202,9 @@ Route::prefix('pokjapemilihan')->middleware(PokjaPemilihanMiddleware::class)->na
     Route::get('/pengajuan/{id}/chat/get-new', [ChatsController::class, 'getNewMessages'])->name('pengajuan.chat.get-new');
     Route::get('/pengajuan/{id}/chat/get', [ChatsController::class, 'getMessages'])->name('pengajuan.chat.get');
 
-    // Chat unread count endpoints
-    Route::get('/pengajuan/{id}/unread-count', [ChatsController::class, 'getUnreadCount'])->name('unread.count');
-    Route::post('/pengajuan/{id}/mark-as-read', [ChatsController::class, 'markAsRead'])->name('mark.read');
+    // API for chat users
+    Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
+    Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
     Route::get('riwayat_revisi', [RiwayatRevisiController::class, 'index'])->name('riwayat_revisi');
     Route::get('download_revision/{id}', [RiwayatRevisiController::class, 'downloadRevision'])->name('download_revision');
 

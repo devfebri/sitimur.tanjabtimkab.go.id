@@ -307,44 +307,34 @@
 
                                                 {{-- Chat Buttons untuk PPK --}}
                                                 @if(auth()->user()->role == 'ppk')
-                                    {{-- Button Chat Verifikator (Status < 20) --}}
-                                    @if($data->status < 20)
-                                        <a href="{{ route('ppk_pengajuan.chat', [$data->id]) }}"
-                                           class="btn btn-info btn-sm me-1 position-relative chat-button" data-pengajuan-id="{{ $data->id }}" data-chat-type="verifikator" title="Chat dengan Verifikator">
-                                            <i class="mdi mdi-chat-processing me-1"></i>Chat
-                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none chat-badge" data-pengajuan-id="{{ $data->id }}">
-                                                0
-                                            </span>
-                                        </a>
-                                    @endif
+                                                    {{-- Button Chat Verifikator (Status < 20) --}}
+                                                    @if($data->status < 20)
+                                                        <a href="{{ route('ppk_pengajuan.chat', [$data->id]) }}"
+                                                           class="btn btn-info btn-sm me-1" title="Chat dengan Verifikator">
+                                                            <i class="mdi mdi-chat-processing me-1"></i>Chat
+                                                        </a>
+                                                    @endif
 
-                                    {{-- Button Chat Pokja (Status >= 20) --}}
-                                    @if($data->status >= 20)
-                                        <a href="{{ route('ppk_pengajuan.chat', [$data->id]) }}"
-                                           class="btn btn-success btn-sm me-1 position-relative chat-button" data-pengajuan-id="{{ $data->id }}" data-chat-type="pokja" title="Chat dengan Pokja Pemilihan">
-                                            <i class="mdi mdi-chat-multiple me-1"></i>Chat
-                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none chat-badge" data-pengajuan-id="{{ $data->id }}">
-                                                0
-                                            </span>
-                                        </a>
-                                    @endif                                                {{-- Chat Button untuk Verifikator --}}
+                                                    {{-- Button Chat Pokja (Status >= 20) --}}
+                                                    @if($data->status >= 20)
+                                                        <a href="{{ route('ppk_pengajuan.chat', [$data->id]) }}"
+                                                           class="btn btn-success btn-sm me-1" title="Chat dengan Pokja Pemilihan">
+                                                            <i class="mdi mdi-chat-multiple me-1"></i>Chat
+                                                        </a>
+                                                    @endif
+
+                                                {{-- Chat Button untuk Verifikator --}}
                                                 @elseif(auth()->user()->role == 'verifikator')
                                                     <a href="{{ route('verifikator_pengajuan.chat', [$data->id]) }}"
-                                                       class="btn btn-info btn-sm me-1 position-relative chat-button" data-pengajuan-id="{{ $data->id }}" data-chat-type="verifikator" title="Chat dengan PPK">
+                                                       class="btn btn-info btn-sm me-1" title="Chat dengan PPK">
                                                         <i class="mdi mdi-chat me-1"></i>Chat Verifikator
-                                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none chat-badge" data-pengajuan-id="{{ $data->id }}">
-                                                            0
-                                                        </span>
                                                     </a>
 
                                                 {{-- Chat Button untuk Pokja Pemilihan --}}
                                                 @elseif(auth()->user()->role == 'pokjapemilihan')
                                                     <a href="{{ route('pokjapemilihan_pengajuan.chat', [$data->id]) }}"
-                                                       class="btn btn-success btn-sm me-1 position-relative chat-button" data-pengajuan-id="{{ $data->id }}" data-chat-type="pokja" title="Chat dengan PPK">
+                                                       class="btn btn-success btn-sm me-1" title="Chat dengan PPK">
                                                         <i class="mdi mdi-chat-multiple me-1"></i>Chat
-                                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none chat-badge" data-pengajuan-id="{{ $data->id }}">
-                                                            0
-                                                        </span>
                                                     </a>
                                                 @endif
                                                 {{-- <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}" class="btn btn-warning btn-sm"> PDF</a> --}}
@@ -730,43 +720,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-
-        // Load unread message count for chat buttons
-        loadUnreadCounts();
-        // Refresh unread count every 5 seconds
-        setInterval(loadUnreadCounts, 5000);
     });
-
-    // Function to load unread message counts
-    function loadUnreadCounts() {
-        var userRole = '{{ auth()->user()->role }}'; // Get role from server
-        
-        $('.chat-button').each(function() {
-            var pengajuanId = $(this).data('pengajuan-id');
-            var $badge = $(this).find('.chat-badge');
-            
-            // Build URL directly: /ppk/pengajuan/{id}/unread-count
-            var url = '/' + userRole + '/pengajuan/' + pengajuanId + '/unread-count';
-            
-            $.ajax({
-                url: url,
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    var unreadCount = response.unread_count;
-                    if (unreadCount > 0) {
-                        $badge.text(unreadCount).removeClass('d-none');
-                    } else {
-                        $badge.addClass('d-none');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error loading unread count:', error);
-                }
-            });
-        });
-    }
-
     // DataTable untuk File Pengajuan (datatable2) dengan AJAX
     $('#datatable2').DataTable({
         processing: true,
