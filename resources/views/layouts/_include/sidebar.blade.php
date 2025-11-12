@@ -56,12 +56,7 @@
                     <span> Dashboard </span>
                 </a>
             </li>
-            <li>
-                <a href="{{ route('verifikator_chat.history') }}" class="waves-effect">
-                    <i class="mdi mdi-comments"></i>
-                    <span> Chat History </span>
-                </a>
-            </li>
+
 
             @elseif(auth()->user()->role == 'kepalaukpbj')
             <li class="menu-title">Kepala UKPBJ Menu</li>
