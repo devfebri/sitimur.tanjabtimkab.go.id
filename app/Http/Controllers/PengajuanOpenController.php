@@ -60,7 +60,7 @@ class PengajuanOpenController extends Controller
 
 
         $data = Pengajuan::with(['user', 'pokja1', 'pokja2', 'pokja3', 'verifikator', 'kepalaUkpbj', 'metodePengadaan'])->findOrFail($id);
-        
+
 
         $history = Pengajuan::where('user_id', $data->user_id)
             ->where('id', '!=', $id)
@@ -131,7 +131,7 @@ class PengajuanOpenController extends Controller
                     return $nama;
                 })
                 ->addColumn('action', function ($row) {
-                    
+
                     if (Auth::user()->role == 'ppk' && $row->verifikator_status == 3 && ($row->status == 0 || $row->status == 3)) {
                         $button = '<button class="btn btn-warning btn-sm edit-post" data-id="' . $row->id . '">Edit</button> ' ;
                         $button .= '<a href="' . asset($row->file_path) . '" target="_blank" class="btn btn-sm btn-info"><span class="ti-import"></span> Download</a>';
@@ -145,8 +145,8 @@ class PengajuanOpenController extends Controller
                     }else{
                         $button = '<a href="' . asset($row->file_path) . '" target="_blank" class="btn btn-sm btn-info"><span class="ti-import"></span> Download</a>';
                     }
-                    
-                        
+
+
                     return $button;
                 })
                 ->addColumn('checkedd', function ($row) {
@@ -163,11 +163,11 @@ class PengajuanOpenController extends Controller
                         if ($row->pokja1_id == $userId) $pokjaKe = 1;
                         if ($row->pokja2_id == $userId) $pokjaKe = 2;
                         if ($row->pokja3_id == $userId) $pokjaKe = 3;
-                        
+
                         if ($pokjaKe) {
                             $statusField = 'pokja' . $pokjaKe . '_status';
                             $pokjaStatus = $row->$statusField ?? 0;
-                            
+
                             // Tampilkan checkbox hanya jika belum disetujui atau dikembalikan
                             if ($pokjaStatus == 0 && $row->status==0 || $pokjaStatus == 0 && $row->status==1) {
                                 return '<input type="checkbox" name="check_data" class="checkboks" value="' . $row->id . '" id="select' . $row->id . '">';
@@ -270,7 +270,7 @@ class PengajuanOpenController extends Controller
                 ->addColumn('statusnew', function ($row) {
                     $datapengajuan = Pengajuan::findOrFail($row->pengajuan_id);
                    $status = '';
-                   
+
                     // if (Auth::user()->role == 'pokjapemilihan') {
                     //     $pokjaKe = null;
                     //     $userId = Auth::user()->id;
@@ -362,10 +362,10 @@ class PengajuanOpenController extends Controller
                             }
                             }else{
                             $pokjaStatusArr[0]='Sedang menunggu perbaikan dari PPK';
-    
+
                             }
                     }
-                    
+
                     for ($i = 1; $i <= 3; $i++) {
                         $statusVal = $row->{'pokja' . $i . '_status'};
                         $updatedVal = $row->{'pokja' . $i . '_updated'} ?? null;
@@ -400,18 +400,18 @@ class PengajuanOpenController extends Controller
 
                                 $pokjaStatusArr[] = 'Pokja ' . $i . ' <u>'.$row->{'pokja'.$i.'_name'}.'</u> : ' . $html;
                             }else{
-                                
+
                                 $pokjaStatusArr[] = 'Pokja ' . $i . ' : ' . $html;
                             }
                         }
-                        
+
                     }
                     // if ($row->status == 99) {
                     //    return '<div style="line-height:1.5">' . implode('<br>', $pokjaStatusArr) . '</div>';
                     // } else {
                     // }
                     return '<div style="line-height:1.5">' . implode('<br>', $pokjaStatusArr) . '</div>';
-                   
+
                 })
                 ->addColumn('verifikator_status', function ($row) {
                     if ($row->verifikator_status == 0) {
@@ -518,11 +518,15 @@ class PengajuanOpenController extends Controller
         $pengajuanFile->status = 99;
 
         if ($request->hasFile('file_upload')) {
-            // UPLOAD FILE BARU
+            // UPLOAD FILE BARU ke storage
             $uploaded = $request->file('file_upload');
-            $filename = time() . '-' . uniqid() . '-revisi.' . $uploaded->getClientOriginalExtension();
-            $uploadPath = 'pengajuan/' . $pengajuan->created_at->format('d-m-Y') . '/' . Auth::user()->username . '/' . $pengajuan->id . '/' . $pengajuanFile->slug;
-            $uploaded->move(public_path($uploadPath), $filename);
+
+            try {
+                // Use helper to upload file to storage
+                $filePath = \App\Helpers\FileStorageHelper::uploadRevisionFile($uploaded, $pengajuan);
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Gagal upload file: ' . $e->getMessage()], 400);
+            }
 
             // Reset status pokja untuk file yang direvisi jika statusnya 34
             $pokjaResetData = [];
@@ -544,27 +548,27 @@ class PengajuanOpenController extends Controller
                     $pokjaResetData['pokja3_updated'] = null;
                 }
             }
-            
+
             \DB::table('pengajuan_files')->insert([
                 'pengajuan_id' => $pengajuan->id,
                 'nama_file' => $pengajuanFile->nama_file,
                 'revisi_ke' => $pengajuanFile->revisi_ke + 1, // Increment revisi ke
                 'verifikator_status' => 0,
                 'slug' => $pengajuanFile->slug,
-                'file_path' => $uploadPath . '/' . $filename,
+                'file_path' => $filePath,  // Use path from helper
                 'created_at' => now(),
                 'updated_at' => now(),
             ] + $pokjaResetData);
-        
+
             $pengajuanFile->save();
-                    
+
             // Update status pengajuan berdasarkan kondisi
             if ($pengajuan->status == 14) {
                 // Jika status 14 (dikembalikan verifikator) -> reset ke verifikator
                 $pengajuan->verifikator_status_akhir = 0;
                 $pengajuan->verifikator_updated_akhir = Carbon::now();
                 $pengajuan->status = 0;
-                
+
                 // Kirim notifikasi ke verifikator
                 $verifikators = \App\Models\User::where('role', 'verifikator')->get();
                 foreach ($verifikators as $verifikator) {
@@ -577,13 +581,13 @@ class PengajuanOpenController extends Controller
             } elseif ($pengajuan->status == 34) {
                 // Jika status 34 (dikembalikan pokja) -> reset ke pokja
                 $pengajuan->status = 21; // Kembali ke status reviu pokja
-                
+
                 // Kirim notifikasi ke pokja yang terkait
                 $pokjaIds = [];
                 if ($pengajuan->pokja1_id) $pokjaIds[] = $pengajuan->pokja1_id;
                 if ($pengajuan->pokja2_id) $pokjaIds[] = $pengajuan->pokja2_id;
                 if ($pengajuan->pokja3_id) $pokjaIds[] = $pengajuan->pokja3_id;
-                
+
                 foreach ($pokjaIds as $pokjaId) {
                     $pokjaUser = \App\Models\User::find($pokjaId);
                     if ($pokjaUser) {
@@ -595,7 +599,7 @@ class PengajuanOpenController extends Controller
                     }
                 }
             }
-            
+
             $pengajuan->save();
 
             $allFiles = PengajuanFile::where('pengajuan_id', $pengajuanFile->pengajuan_id)->get();
@@ -630,18 +634,18 @@ class PengajuanOpenController extends Controller
                 $pFile = PengajuanFile::find($row);
                 if($pengajuan->status==31){
                     $request->status=1;
-                    
+
                 }
                 // dd($request->status);
                 if ($pFile) {
                     $pFile->verifikator_status = $request->status;
                     $pFile->verifikator_pesan = $request->keterangan;
                     $pFile->verifikator_updated = Carbon::now();
-                    
+
                     // Update status utama file berdasarkan aksi verifikator
                     if ($request->status == 1) {
                         $pFile->status = 1; // Disetujui
-                        
+
                         // Notifikasi ke user bahwa file disetujui oleh verifikator
                         try {
                             if ($pengajuan->user) {
@@ -654,13 +658,13 @@ class PengajuanOpenController extends Controller
                         } catch (\Exception $e) {
                             \Log::error("Error sending notification: " . $e->getMessage());
                         }
-                        
+
                     } elseif ($request->status == 3) {
                         $pFile->status = 3; // Perlu perbaikan
                         // $pFile->pokja1_status=3;
                         // $pFile->pokja2_status=3;
                         // $pFile->pokja3_status=3;
-                        
+
                         // Notifikasi ke user bahwa file perlu diperbaiki
                         try {
                             if ($pengajuan->user) {
@@ -668,7 +672,7 @@ class PengajuanOpenController extends Controller
                                 if ($request->keterangan) {
                                     $pesan .= ' Pesan: ' . $request->keterangan;
                                 }
-                                
+
                                 $pengajuan->user->notify(new \App\Notifications\PengajuanPerbaikanFileNotification(
                                     'File Perlu Diperbaiki - Verifikator',
                                     $pesan,
@@ -679,7 +683,7 @@ class PengajuanOpenController extends Controller
                             \Log::error("Error sending notification: " . $e->getMessage());
                         }
                     }
-                    
+
                     $pFile->save();
                 }
             }
@@ -701,7 +705,7 @@ class PengajuanOpenController extends Controller
                 $pengajuan->verifikator_status_akhir = 1; // Semua file disetujui
                 $pengajuan->verifikator_updated_akhir = Carbon::now();
                 $pengajuan->status = 11;
-                
+
                 // Notifikasi ke user
                 try {
                     if ($pengajuan->user) {
@@ -714,7 +718,7 @@ class PengajuanOpenController extends Controller
                 } catch (\Exception $e) {
                     \Log::error("Error sending notification to user: " . $e->getMessage());
                 }
-                
+
                 // Notifikasi ke Kepala UKPBJ
                 try {
                     $kepalaUKPBJs = \App\Models\User::where('role', 'kepalaukpbj')->get();
@@ -728,13 +732,13 @@ class PengajuanOpenController extends Controller
                 } catch (\Exception $e) {
                     \Log::error("Error sending notification to kepala UKPBJ: " . $e->getMessage());
                 }
-                
+
             } elseif ($anyDikembalikan) {
                 $pengajuan->verifikator_id = Auth::user()->id;
                 $pengajuan->verifikator_status_akhir = 3; // Ada file tidak disetujui
                 $pengajuan->verifikator_updated_akhir = Carbon::now();
                 $pengajuan->status = 14;
-                
+
                 // Kirim notifikasi ke user pengajuan
                 try {
                     if ($pengajuan->user) {
@@ -751,7 +755,7 @@ class PengajuanOpenController extends Controller
                 $pengajuan->verifikator_status_akhir = 0; // Proses/Belum lengkap
             }
             $pengajuan->save();
-            
+
         } elseif (Auth::user()->role == 'pokjapemilihan') {
             // Tentukan pokja ke berapa user ini
             $pokjaKe = null;
@@ -786,7 +790,7 @@ class PengajuanOpenController extends Controller
                     if ($request->status == 1) {
                         // Jika pokja menyetujui, set status file menjadi 1
                         $pFile->status = 1;
-                        
+
                         // Notifikasi ke user bahwa file disetujui oleh pokja
                         try {
                             if ($pengajuan->user) {
@@ -799,11 +803,11 @@ class PengajuanOpenController extends Controller
                         } catch (\Exception $e) {
                             \Log::error("Error sending notification: " . $e->getMessage());
                         }
-                        
+
                     } elseif ($request->status == 3) {
                         // Jika pokja meminta perbaikan, set status file menjadi 3
                         $pFile->status = 3;
-                        
+
                         // Notifikasi ke user bahwa file perlu diperbaiki
                         try {
                             if ($pengajuan->user) {
@@ -811,7 +815,7 @@ class PengajuanOpenController extends Controller
                                 if ($request->keterangan) {
                                     $pesan .= ' Pesan: ' . $request->keterangan;
                                 }
-                                
+
                                 $pengajuan->user->notify(new \App\Notifications\PengajuanPerbaikanFileNotification(
                                     'File Perlu Diperbaiki - Pokja ' . $pokjaKe,
                                     $pesan,
@@ -822,20 +826,20 @@ class PengajuanOpenController extends Controller
                             \Log::error("Error sending notification: " . $e->getMessage());
                         }
                     }
-                    
+
                     // Pastikan save berhasil dengan error handling
                     try {
                         $saved = $pFile->save();
                         if (!$saved) {
                             \Log::error("Failed to save file ID: {$pFile->id}");
                         }
-                        
+
                         // Refresh data dari database untuk memastikan update berhasil
                         $pFile->refresh();
-                        
+
                         // Log untuk debugging (opsional - bisa dihapus nanti)
                         \Log::info("File ID: {$pFile->id}, Pokja: {$pokjaKe}, Status Field: {$statusField}, New Status: {$pFile->{$statusField}}, File Status: {$pFile->status}");
-                        
+
                     } catch (\Exception $e) {
                         \Log::error("Error saving file ID {$pFile->id}: " . $e->getMessage());
                         return response()->json(['success' => false, 'message' => 'Gagal menyimpan perubahan']);
@@ -858,7 +862,7 @@ class PengajuanOpenController extends Controller
                 $pokja1_ok = true;
                 $pokja2_ok = true;
                 $pokja3_ok = true;
-                
+
                 if ($pengajuan->pokja1_id) {
                     $pokja1_ok = ($file->pokja1_status == 1);
                 }
@@ -868,7 +872,7 @@ class PengajuanOpenController extends Controller
                 if ($pengajuan->pokja3_id) {
                     $pokja3_ok = ($file->pokja3_status == 1);
                 }
-                
+
                 return $pokja1_ok && $pokja2_ok && $pokja3_ok;
             });
 
@@ -876,7 +880,7 @@ class PengajuanOpenController extends Controller
             if ($anyPokjaNeedsFix) {
                 // Jika ada pokja yang meminta perbaikan
                 $pengajuan->status = 34; // Ada file dikembalikan pokja
-                
+
                 // Notifikasi ke user pengajuan
                 try {
                     if ($pengajuan->user) {
@@ -911,12 +915,12 @@ class PengajuanOpenController extends Controller
                 // Untuk file yang sudah disetujui pokja lain, status tetap 1 (disetujui)
                 foreach ($allFiles as $file) {
                     $shouldKeepApproved = false;
-                    
+
                     // Cek apakah ada pokja lain yang sudah menyetujui file ini
                     if ($file->pokja1_status == 1 && $pokjaKe != 1) $shouldKeepApproved = true;
                     if ($file->pokja2_status == 1 && $pokjaKe != 2) $shouldKeepApproved = true;
                     if ($file->pokja3_status == 1 && $pokjaKe != 3) $shouldKeepApproved = true;
-                    
+
                     // Jika ada pokja lain yang sudah menyetujui dan file ini tidak diminta perbaikan oleh pokja yang sedang login
                     if ($shouldKeepApproved && $request->status != 3) {
                         $file->status = 1; // Tetap disetujui
@@ -927,7 +931,7 @@ class PengajuanOpenController extends Controller
             } elseif ($allPokjaApproved && $allFiles->count() > 0) {
                 // Jika semua pokja menyetujui
                 $pengajuan->status = 31; // Semua file disetujui pokja
-                
+
                 // Notifikasi ke user pengajuan
                 try {
                     if ($pengajuan->user) {
@@ -977,7 +981,7 @@ class PengajuanOpenController extends Controller
                 // Notifikasi ke pokja lain tentang progress
                 $approvedCount = 0;
                 $totalPokja = 0;
-                
+
                 for ($i = 1; $i <= 3; $i++) {
                     if ($pengajuan->{'pokja' . $i . '_id'}) {
                         $totalPokja++;
@@ -987,7 +991,7 @@ class PengajuanOpenController extends Controller
                         if ($pokjaApprovedAll) $approvedCount++;
                     }
                 }
-                
+
                 // Notifikasi progress ke pokja lain
                 try {
                     for ($i = 1; $i <= 3; $i++) {
@@ -1006,12 +1010,12 @@ class PengajuanOpenController extends Controller
                     \Log::error("Error sending progress notification to pokja: " . $e->getMessage());
                 }
             }
-            
+
             $pengajuan->save();
         }
 
         return response()->json([
-            'success' => true, 
+            'success' => true,
             'message' => 'Status berhasil diupdate',
             'debug_info' => [
                 'pokja' => $pokjaKe ?? 'unknown',
@@ -1117,7 +1121,7 @@ class PengajuanOpenController extends Controller
 
         return response()->json($pokja);
     }
-    
+
     public function kirimPokja(Request $request)
     {
         $request->validate([
@@ -1165,7 +1169,7 @@ class PengajuanOpenController extends Controller
     public function selesaiReviu(Request $request, $id)
     {
         $pengajuan = Pengajuan::with(['user', 'pokja1', 'pokja2', 'pokja3'])->findOrFail($id);
-        
+
         // Pastikan user adalah pokja yang ter-assign
         $pokjaKe = null;
         if ($pengajuan->pokja1_id == Auth::user()->id) {
@@ -1191,7 +1195,7 @@ class PengajuanOpenController extends Controller
 
         if (!$allApprovedByThisPokja) {
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Masih ada file yang belum Anda setujui. Silakan setujui semua file terlebih dahulu.'
             ]);
         }
@@ -1238,7 +1242,7 @@ class PengajuanOpenController extends Controller
         for ($i = 1; $i <= 3; $i++) {
             $pokjaIdField = 'pokja' . $i . '_id';
             $pokjaStatusAkhirField = 'pokja' . $i . '_status_akhir';
-            
+
             if ($pengajuan->$pokjaIdField && $pengajuan->$pokjaStatusAkhirField != 2) {
                 $allPokjaSelesai = false;
                 break;
@@ -1279,7 +1283,7 @@ class PengajuanOpenController extends Controller
         }
 
         return response()->json([
-            'success' => true, 
+            'success' => true,
             'message' => 'Reviu Anda telah selesai dan berhasil disimpan.',
             'all_pokja_selesai' => $allPokjaSelesai
         ]);
@@ -1290,20 +1294,20 @@ class PengajuanOpenController extends Controller
     {
         $pengajuan = Pengajuan::findOrFail($id);
         $userId = auth()->user()->id;
-        
+
         // Tentukan pokja yang sedang login
         $pokjaKe = null;
         if ($pengajuan->pokja1_id == $userId) $pokjaKe = 1;
         elseif ($pengajuan->pokja2_id == $userId) $pokjaKe = 2;
         elseif ($pengajuan->pokja3_id == $userId) $pokjaKe = 3;
-        
+
         if (!$pokjaKe) {
             return response()->json([
                 'can_complete' => false,
                 'message' => 'Anda bukan pokja yang ditugaskan untuk pengajuan ini.'
             ]);
         }
-        
+
         // Cek apakah pokja ini sudah selesai reviu
         $statusAkhirField = 'pokja' . $pokjaKe . '_status_akhir';
         if ($pengajuan->$statusAkhirField == 2) {
@@ -1314,23 +1318,23 @@ class PengajuanOpenController extends Controller
                 'button_class' => 'btn-success'
             ]);
         }
-        
+
         // Ambil semua file pengajuan yang aktif (status != 99)
         $files = PengajuanFile::where('pengajuan_id', $id)
             ->where('status', '!=', 99)
             ->get();
-            
+
         // Cek apakah semua file sudah disetujui oleh pokja ini (status == 1)
         $pokjaStatusField = 'pokja' . $pokjaKe . '_status';
         $allApproved = true;
-        
+
         foreach ($files as $file) {
             if ($file->$pokjaStatusField != 1) {
                 $allApproved = false;
                 break;
             }
         }
-        
+
         return response()->json([
             'can_complete' => $allApproved,
             'message' => $allApproved ? 'Semua file sudah disetujui, Anda dapat menandai reviu sebagai selesai.' : 'Masih ada file yang belum disetujui.',
@@ -1349,7 +1353,7 @@ class PengajuanOpenController extends Controller
     {
         try {
             $threeDaysAgo = now()->subDays(3);
-            
+
             // Cari pengajuan dengan status 14 atau 34 yang sudah lebih dari 3 hari
             $expiredPengajuans = Pengajuan::where(function($query) {
                     $query->where('status', 14)->orWhere('status', 34);
@@ -1403,7 +1407,7 @@ class PengajuanOpenController extends Controller
                 $updatedAt = \Carbon\Carbon::parse($pengajuan->updated_at);
                 $daysSinceUpdate = $updatedAt->diffInDays($now);
                 $willExpireIn = 3 - $daysSinceUpdate;
-                
+
                 $result[] = [
                     'id' => $pengajuan->id,
                     'nama_paket' => $pengajuan->nama_paket,

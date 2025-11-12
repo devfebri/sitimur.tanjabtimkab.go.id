@@ -27,17 +27,7 @@
                         <span> Data Pengajuan </span>
                     </a>
                 </li>             
-                {{-- <li>
-                    <a href="{{ route('ppk_chats') }}" class="waves-effect">
-                        <i class="mdi mdi-forum"></i>
-                        <span> Chat </span>
-                        @if(isset($unreadChatCount) && $unreadChatCount > 0)
-                            <span class="badge badge-pill badge-danger float-right chat-badge">{{ $unreadChatCount }}</span>
-                        @else
-                            <span class="badge badge-pill badge-danger float-right chat-badge" style="display: none;"></span>
-                        @endif
-                    </a>
-                </li> --}}
+               
             @elseif(auth()->user()->role == 'admin')
                 <li class="menu-title">Admin Menu</li>
                 <li>
@@ -64,6 +54,12 @@
                 <a href="{{ route('verifikator_dashboard') }}" class="waves-effect">
                     <i class="mdi mdi-check"></i>
                     <span> Dashboard </span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('verifikator_chat.history') }}" class="waves-effect">
+                    <i class="mdi mdi-comments"></i>
+                    <span> Chat History </span>
                 </a>
             </li>
             

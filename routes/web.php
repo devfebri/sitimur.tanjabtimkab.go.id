@@ -104,6 +104,20 @@ Route::prefix('verifikator')->middleware(VerifikatorMiddleware::class)->name('ve
     Route::get('riwayat_revisi', [RiwayatRevisiController::class, 'index'])->name('riwayat_revisi');
     Route::get('download_revision/{id}', [RiwayatRevisiController::class, 'downloadRevision'])->name('download_revision');
     Route::post('/pengajuan/{id}/tolak', [PengajuanOpenController::class, 'tolakPengajuan'])->name('pengajuan_tolak');
+
+    // Chat routes for Verifikator
+    Route::get('/pengajuan/{id}/chat', [ChatsController::class, 'index'])->name('pengajuan.chat');
+    Route::post('/pengajuan/{id}/chat/send', [ChatsController::class, 'sendMessage'])->name('pengajuan.chat.send');
+    Route::get('/pengajuan/{id}/chat/get-new', [ChatsController::class, 'getNewMessages'])->name('pengajuan.chat.get-new');
+    Route::get('/pengajuan/{id}/chat/get', [ChatsController::class, 'getMessages'])->name('pengajuan.chat.get');
+    
+    // Chat history routes for Verifikator
+    Route::get('/chat-history', [ChatsController::class, 'chatHistory'])->name('chat.history');
+    Route::get('/chat-history/{id}/messages', [ChatsController::class, 'chatHistoryMessages'])->name('chat.history.messages');
+
+    // API for chat users
+    Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
+    Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
 });
 
 // =============== KEPALA UKPBJ ===============
@@ -142,7 +156,7 @@ Route::prefix('ppk')->middleware(['auth', PpkMiddleware::class])->name('ppk_')->
     Route::get('pengajuan/{id}/files', [PengajuanOpenController::class, 'getFiles'])->name('pengajuan_files');
     Route::post('/pengajuan/upload-berkas', [PengajuanController::class, 'uploadBerkasAjax'])->name('upload_berkas_ajax');
     Route::post('/pengajuan/cek-upload-berkas', [PengajuanController::class, 'cekUploadBerkas'])->name('cek_upload_berkas');
-    
+
     Route::get('pengajuan/{id}/open/edit', [PengajuanOpenController::class, 'pengajuan_open_edit'])->name('pengajuan_open_edit');
     Route::post('pengajuan/{id}/open/update', [PengajuanOpenController::class, 'pengajuan_open_update'])->name('pengajuan_open_update');
     Route::get('pengajuan/{id}/open/downloadpdf', [PengajuanOpenController::class, 'downloadpdf'])->name('pengajuan_open_downloadpdf');
@@ -151,7 +165,8 @@ Route::prefix('ppk')->middleware(['auth', PpkMiddleware::class])->name('ppk_')->
     Route::get('/pengajuan/{id}/chat', [ChatsController::class, 'index'])->name('pengajuan.chat');
     Route::post('/pengajuan/{id}/chat/send', [ChatsController::class, 'sendMessage'])->name('pengajuan.chat.send');
     Route::get('/pengajuan/{id}/chat/get-new', [ChatsController::class, 'getNewMessages'])->name('pengajuan.chat.get-new');
-    
+    Route::get('/pengajuan/{id}/chat/get', [ChatsController::class, 'getMessages'])->name('pengajuan.chat.get');
+
     // API for chat users
     Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
     Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
@@ -180,12 +195,13 @@ Route::prefix('pokjapemilihan')->middleware(PokjaPemilihanMiddleware::class)->na
     Route::post('/pengajuan/kirim-pokja', [PengajuanOpenController::class, 'kirimPokja'])->name('kirimPokja');
 
     Route::post('/selesai-reviu/{id}', [PengajuanOpenController::class, 'selesaiReviu'])->name('selesai_reviu');
-    
+
     // Chat routes for Pokja Pemilihan
     Route::get('/pengajuan/{id}/chat', [ChatsController::class, 'index'])->name('pengajuan.chat');
     Route::post('/pengajuan/{id}/chat/send', [ChatsController::class, 'sendMessage'])->name('pengajuan.chat.send');
     Route::get('/pengajuan/{id}/chat/get-new', [ChatsController::class, 'getNewMessages'])->name('pengajuan.chat.get-new');
-    
+    Route::get('/pengajuan/{id}/chat/get', [ChatsController::class, 'getMessages'])->name('pengajuan.chat.get');
+
     // API for chat users
     Route::get('/api/chat-users', [ChatsController::class, 'getChatUsers'])->name('api.chat.users');
     Route::get('/api/unread-count', [ChatsController::class, 'getUnreadCount'])->name('api.unread.count');
@@ -251,13 +267,13 @@ Route::get('/test/auto-expire-pengajuan', function () {
     try {
         $controller = new PengajuanOpenController();
         $result = $controller->autoChangeExpiredStatus();
-        
+
         return response()->json([
             'success' => true,
             'result' => $result,
             'message' => 'Auto-expire test completed'
         ]);
-        
+
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,
@@ -271,9 +287,9 @@ Route::get('/test/pengajuan-status-14-34', function () {
     try {
         $controller = new PengajuanOpenController();
         $result = $controller->getPengajuanWithStatus14And34();
-        
+
         return response()->json($result);
-        
+
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,

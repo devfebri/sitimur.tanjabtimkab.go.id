@@ -54,7 +54,7 @@
                     </div>
                     @elseif(auth()->user()->role=='verifikator' && $data->status==0)
                     <div>
-                        
+
                         <button id="tolakPengajuan" class="btn btn-danger btn-lg shadow-sm">
                             <i class="fa fa-times-circle"></i> Tolak Pengajuan
                         </button>
@@ -66,11 +66,11 @@
         </div>
 
 
-        
-      
+
+
 
         <div class="row">
-            
+
             {{-- @if($data->pokja1_id || $data->pokja2_id || $data->pokja3_id)
                 <div class="col-12">
                     <table class="table text-center  table-responsive-sm table-sm">
@@ -89,7 +89,7 @@
                             @endif
                                 <a class="waves-effect mo-mb-2" data-container="body" data-toggle="popover" data-placement="top" data-content="Nama : {{ $data->pokja1->name }} <br> NIP : {{ $data->pokja1->nip }} <br> Jabatan: {{ $data->pokja1->jabatan }}" data-html="true">
                                     <b>{{ $data->pokja1->name }}</b>
-                                
+
                                     @if($data->pokja1_status_akhir==0)
                                         <p><i>Belum Direviu</i></p>
                                     @elseif($data->pokja1_status_akhir==1)
@@ -112,7 +112,7 @@
                                 @endif
                                     <a class="waves-effect mo-mb-2" data-container="body" data-toggle="popover" data-placement="top" data-content="Nama : {{ $data->pokja2->name }} <br> NIP : {{ $data->pokja2->nip }} <br> Jabatan: {{ $data->pokja2->jabatan }}" data-html="true">
                                         <b>{{ $data->pokja2->name }}</b>
-                                    
+
                                         @if($data->pokja2_status_akhir==0)
                                             <p><i>Belum Direviu</i></p>
                                         @elseif($data->pokja2_status_akhir==1)
@@ -148,7 +148,7 @@
                                 </a>
                             </td>
 
-                           
+
                         </tr>
                     </table>
                 </div>
@@ -200,7 +200,7 @@
                                 <td width="3%">:</td>
                                 <td>{{ $data->metodePengadaan->nama_metode_pengadaan }}</td>
                             </tr>
-                            
+
 
                         </table>
                     </div>
@@ -242,7 +242,7 @@
                                                 Verifikator
                                                 @elseif($data->status==14)
                                                 PPK
-                                                
+
                                                 @elseif($data->status==21)
                                                 Pokja Pemilihan
                                                 @elseif($data->status==22)
@@ -262,7 +262,7 @@
                                                 @else
                                                 Error
                                                 @endif
-                                              
+
 
                                             </i>
                                         </td>
@@ -300,12 +300,12 @@
                                         @else
                                         <td><b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b> <br>&emsp; <i>Status Error</i></td>
                                         @endif
-                                    </tr>                                    
+                                    </tr>
                                     <tr>
-                                        <td>                                            
+                                        <td>
                                             <div class="btn-group w-100" role="group">
-                                                                                            
-                                                @if(auth()->user()->role == 'pokjapemilihan' || auth()->user()->role == 'ppk')
+
+                                                @if(auth()->user()->role == 'pokjapemilihan' || auth()->user()->role == 'ppk'||auth()->user()->role == 'verifikator')
                                                 @php
                                                     $targetUserId = null;
                                                     if(auth()->user()->role == 'ppk') {
@@ -315,17 +315,18 @@
                                                         // Pokja chat dengan PPK (user yang membuat pengajuan)
                                                         $targetUserId = $data->user_id;
                                                     }
-                                                @endphp                                                
-                                                <a href="{{ route(auth()->user()->role.'_pengajuan.chat',[$data->id]) }}" 
+                                                @endphp
+                                                <a href="{{ route(auth()->user()->role.'_pengajuan.chat',[$data->id]) }}"
                                                    class="btn btn-success btn-sm me-1">
                                                     <i class="mdi mdi-chat me-1"></i>Chat
-                                                </a>             
+                                                </a>
                                                 @endif
-                                                {{-- <a href="#" 
+                                                {{-- <a href="#"
                                                    class="btn btn-success btn-sm me-1">
                                                     <i class="mdi mdi-chat me-1"></i>Chat
                                                 </a> --}}
-                                                <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}" class="btn btn-warning btn-sm"> PDF</a>
+                                                {{-- <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}" class="btn btn-warning btn-sm"> PDF</a> --}}
+                                                <a href="#" class="btn btn-warning btn-sm"> PDF</a>
 
                                                 <a href="#" class="btn btn-warning btn-sm"> Excel</a>
 
@@ -377,7 +378,7 @@
                                         <td>Perlu Perbaikan</td>
 
                                     </tr>
-                    
+
                                 </tbody>
                             </table>
                         </div>
@@ -386,31 +387,31 @@
 
 
 
-             
+
             </div> <!-- end col -->
         </div> <!-- end row -->
-        
+
         <div class="row">
             <div class="col-12">
                 <div class="card m-b-20">
                     <div class="card-body">
                         <h4 class="mt-0 header-title"> File Pengajuan
                             @if(auth()->user()->role=='verifikator' || auth()->user()->role=='pokjapemilihan')
-                            
+
                             <button type="submit" class="btn btn-warning mb-2 ml-2  float-right btn-sm update-status col-12 col-lg-2" disabled data-status="3" >
                                 Perlu Perbaikan
                             </button>
                             <button type="submit" class="btn btn-success mb-2 ml-2  float-right btn-sm update-status col-12 col-lg-2" disabled data-status="1" >
                                 Sesuai
                             </button>
-                            
+
                             <textarea name="keterangan" id="keterangan" cols="30" rows="1" class="float-right col-sm-12 col-lg-3 form-control" placeholder="Pesan Status"></textarea>
                             @endif
                         </h4>
 
                         <div class="table-rep-plugin">
                             <div class="table-responsive b-0" data-pattern="priority-columns">
-                        
+
                                 <table id="datatable2" class="table table-striped table-bordered table-sm text-center" style="font-size: 13px" cellspacing="0" width="100%">
                                     <thead>
                                         <tr>
@@ -429,7 +430,7 @@
                                             <th>Action</th>
                                         </tr>
                                     </thead>
-                                    
+
 
                                 </table>
                             </div>
@@ -443,10 +444,10 @@
                             if($data->pokja1_id == auth()->user()->id) $pokjaKe = 1;
                             elseif($data->pokja2_id == auth()->user()->id) $pokjaKe = 2;
                             elseif($data->pokja3_id == auth()->user()->id) $pokjaKe = 3;
-                            
+
                             $statusAkhir = $pokjaKe ? $data->{'pokja' . $pokjaKe . '_status_akhir'} : 0;
                         @endphp
-                        
+
                         @if($statusAkhir == 2)
                             <a href="#" id="tandai-selesai-reviu" class="btn btn-success btn-sm btn-block disabled" tabindex="-1" aria-disabled="true" disabled>Reviu Telah Selesai</a>
                         @else
@@ -456,7 +457,7 @@
                     @endif
                 </div>
 
-            </div>  
+            </div>
             @if(auth()->user()->role!='pokjapemilihan')
             <div class="col-12">
                 <div class="card shadow-sm border-0 mb-4">
@@ -561,7 +562,7 @@
                         <label for="nama_file">Nama File</label>
                         <input type="text" class="form-control" id="nama_file" name="nama_file" readonly>
                     </div>
-                   
+
                     {{-- <div class="form-group">
                         <label for="pesan">Pesan</label>
                         <textarea class="form-control" id="pesan" name="pesan" readonly></textarea>
@@ -597,7 +598,7 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        
+
         <div class="modal-body">
           <div id="pokja-alert" class="alert alert-danger d-none"></div>
           <div class="mb-2">
@@ -716,7 +717,7 @@
         ajax: "{{ route(auth()->user()->role.'_pengajuan_files', $data->id) }}",
         columns: [
             @if(auth()->user()->role=='verifikator' || auth()->user()->role=='pokjapemilihan')
-            
+
             {
                 data: 'checkedd',
                 name: 'checkedd'
@@ -738,13 +739,13 @@
         ],
         createdRow: function(row, data, dataIndex) {
         },
-        
+
     });
 
     // DataTable untuk Riwayat Pengajuan (datatable1) tetap bisa pakai AJAX juga jika ingin
     $('#datatable1').DataTable();
 
-    
+
     @if(auth()->user()->role=='ppk')
 
     // Edit File Pengajuan
@@ -797,7 +798,7 @@
         });
     });
     @endif
-    
+
     // Tolak Pengajuan
     @if(auth()->user()->role=='verifikator' || auth()->user()->role=='kepalaukpbj')
      $('#tolakPengajuan').on('click', function(e) {
@@ -826,17 +827,17 @@
         ).set('labels', {ok:'Tolak', cancel:'Batal'});
     });
     @endif
-    
+
     window.routeGetPokja = "{{ route('kepalaukpbj_getPokja') }}";
     window.routeKirimPokja = "{{ route('kepalaukpbj_kirimPokja') }}";
     window.pengajuanId = "{{ $data->id }}";
     window.csrfToken = "{{ csrf_token() }}";
 
-    
+
 </script>
 
 <script src="{{ asset('js/disposisipokja.js') }}"></script>
-<script>    
+<script>
 @if(auth()->user()->role=='pokjapemilihan')
     // Fungsi untuk mengecek apakah tombol dapat diklik
     function checkCanMarkComplete() {
@@ -845,9 +846,9 @@
             type: 'GET',
             success: function(response) {
                 console.log('Response from server:', response);
-                
+
                 const button = $('#tandai-selesai-reviu');
-                
+
                 if (response.can_complete) {
                     // Button dapat diklik
                     button.removeClass('disabled btn-success')
@@ -897,16 +898,16 @@
             e.preventDefault();
             return false;
         }
-        
+
         e.preventDefault();
-        
+
         // Konfirmasi sebelum menandai selesai reviu
         alertify.confirm(
             'Apakah Anda yakin ingin menandai reviu sebagai selesai?<br><small class="text-muted">Setelah dikonfirmasi, Anda tidak dapat mengubah status file lagi.</small>',
             function() {
                 // Disable tombol untuk mencegah double click
                 $('#tandai-selesai-reviu').addClass('disabled').prop('disabled', true).text('Memproses...');
-                
+
                 $.ajax({
                     url: "{{ route('pokjapemilihan_selesai_reviu', $data->id) }}",
                     type: 'POST',
@@ -916,10 +917,10 @@
                     success: function(response) {
                         if (response.success) {
                             alertify.success(response.message);
-                            
+
                             // Reload DataTable
                             $('#datatable2').DataTable().ajax.reload();
-                            
+
                             // Jika semua pokja sudah selesai, reload halaman
                             if (response.all_pokja_selesai) {
                                 setTimeout(function() {
@@ -941,7 +942,7 @@
                             errorMessage = xhr.responseJSON.message;
                         }
                         alertify.error(errorMessage);
-                        
+
                         // Re-enable tombol jika ada error
                         $('#tandai-selesai-reviu').removeClass('disabled').prop('disabled', false).text('Tandai Selesai Reviu');
                     }
@@ -952,7 +953,7 @@
             }        ).set('labels', {ok:'Ya, Selesai', cancel:'Batal'});
     });
 
-    
+
 </script>
 
 @stop

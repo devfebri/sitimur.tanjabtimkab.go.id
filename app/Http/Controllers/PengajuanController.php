@@ -17,9 +17,9 @@ class PengajuanController extends Controller
     // INI DATA INDEX
     public function index()
     {
-        
+
         $metodepengadaan = MetodePengadaan::selectRaw('id,nama_metode_pengadaan')->where('status',1)->pluck('nama_metode_pengadaan','id');
-        
+
 
         return view('dashboard.index',compact('metodepengadaan'));
     }
@@ -47,7 +47,7 @@ class PengajuanController extends Controller
             $query = \DB::table('pengajuans')
                 ->select('id', 'kode_rup', 'nama_paket', 'perangkat_daerah', 'rekening_kegiatan', 'sumber_dana', 'pagu_anggaran', 'pagu_hps', 'jenis_pengadaan','verifikator_status_akhir','verifikator_updated_akhir','kepalaukpbj_updated','created_at')
                  ->where('status', '!=', 9)
-                ->orderBy('created_at', 'desc'); 
+                ->orderBy('created_at', 'desc');
         } elseif (Auth::user()->role == 'kepalaukpbj') {
             $query = \DB::table('pengajuans')
                 ->select('id', 'kode_rup', 'nama_paket', 'perangkat_daerah', 'rekening_kegiatan', 'sumber_dana', 'pagu_anggaran', 'pagu_hps', 'jenis_pengadaan', 'kepalaukpbj_status','verifikator_updated_akhir','kepalaukpbj_updated','created_at')
@@ -56,7 +56,7 @@ class PengajuanController extends Controller
                 ->orderBy('created_at', 'desc');
         } elseif(Auth::user()->role == 'pokjapemilihan'){
             $userId = Auth::user()->id;
-            
+
             $query = \DB::table('pengajuans')
                 ->select('id', 'kode_rup', 'nama_paket', 'perangkat_daerah', 'rekening_kegiatan', 'sumber_dana', 'pagu_anggaran', 'pagu_hps', 'jenis_pengadaan', 'kepalaukpbj_status', 'verifikator_updated_akhir', 'kepalaukpbj_updated', 'created_at','status','pokja1_status_akhir', 'pokja2_status_akhir', 'pokja3_status_akhir', 'pokja1_id', 'pokja2_id', 'pokja3_id')
                 ->where('verifikator_status_akhir', 1)
@@ -67,7 +67,7 @@ class PengajuanController extends Controller
                       ->orWhere('pokja3_id', $userId);
                 })
                 ->orderBy('created_at', 'desc');
-                
+
         } else{
             $query = \DB::table('pengajuans')
                 ->select(
@@ -100,8 +100,8 @@ class PengajuanController extends Controller
                 // })
                 ->orderBy('created_at', 'desc');
         }
-        
-        
+
+
 
         // Search
         $search = $request->input('search.value');
@@ -295,7 +295,7 @@ class PengajuanController extends Controller
                     $status = '<span class="badge badge-pill badge-primary">Error</span>';
                 }
             }
-            
+
             $result[] = [
                 'no' => $no++,
                 'kode_rup' => $row->kode_rup,
@@ -397,7 +397,7 @@ class PengajuanController extends Controller
     {
         $data = Pengajuan::findOrFail($request->id);
         $data->status = 0; // Update status to indicate step 2 is complete
-        $data->created_at = Carbon::now(); 
+        $data->created_at = Carbon::now();
         $data->save();
 
         $verifikators = \App\Models\User::where('role', 'verifikator')->get();
@@ -434,7 +434,7 @@ class PengajuanController extends Controller
         $metode = $request->query('metode');
 
         $data = DB::select("
-            SELECT 
+            SELECT
                 mpb.id,
                 mpb.slug,
                 mpb.nama_berkas,
@@ -501,58 +501,68 @@ class PengajuanController extends Controller
         $berkas = MetodePengadaanBerkas::findOrFail($request->berkas_id);
         $slug = $berkas->slug;
 
-        $folderPath = 'pengajuan/' . now()->format('d-m-Y') . '/' . Auth::user()->username . '/' . $pengajuan->id . '/' . $slug;
-
         // Jika single file, hapus file lama
         if ($berkas->multiple != 1) {
             $existing = PengajuanFile::where('pengajuan_id', $pengajuan->id)
                 ->where('slug', $slug)
                 ->first();
             if ($existing) {
-                $oldPath = public_path($existing->file_path);
-                if (file_exists($oldPath)) {
-                    @unlink($oldPath);
-                }
+                // Delete from storage instead of public_path
+                \App\Helpers\FileStorageHelper::deleteFile($existing->file_path);
                 $existing->delete();
             }
         }
 
         // Proses upload
         $files = $request->file('file');
-        if (is_array($files)) {
-            // Multiple file
-            foreach ($files as $file) {
-                $filename = time() . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path($folderPath), $filename);
+
+        try {
+            if (is_array($files)) {
+                // Multiple file
+                foreach ($files as $file) {
+                    // Upload ke storage dengan slug sebagai subfolder
+                    $filePath = \App\Helpers\FileStorageHelper::uploadPengajuanFile(
+                        $file,
+                        $pengajuan,
+                        $slug  // Slug sebagai category/subfolder
+                    );
+
+                    PengajuanFile::create([
+                        'pengajuan_id' => $pengajuan->id,
+                        'nama_file' => $berkas->nama_berkas,
+                        'slug' => $slug,
+                        'file_path' => $filePath,
+                    ]);
+                }
+            } else {
+                // Single file
+                $file = $files;
+                // Upload ke storage dengan slug sebagai subfolder
+                $filePath = \App\Helpers\FileStorageHelper::uploadPengajuanFile(
+                    $file,
+                    $pengajuan,
+                    $slug  // Slug sebagai category/subfolder
+                );
 
                 PengajuanFile::create([
                     'pengajuan_id' => $pengajuan->id,
                     'nama_file' => $berkas->nama_berkas,
                     'slug' => $slug,
-                    'file_path' => $folderPath . '/' . $filename,
+                    'file_path' => $filePath,
                 ]);
             }
-        } else {
-            // Single file
-            $file = $files;
-            $filename = time() . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path($folderPath), $filename);
 
-            PengajuanFile::create([
-                'pengajuan_id' => $pengajuan->id,
-                'nama_file' => $berkas->nama_berkas,
-                'slug' => $slug,
-                'file_path' => $folderPath . '/' . $filename,
-            ]);
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Upload gagal: ' . $e->getMessage()], 400);
         }
-
-        return response()->json(['success' => true]);
     }
 
-    
-    
 
-    
+
+
+
 
 
 

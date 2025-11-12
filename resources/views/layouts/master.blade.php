@@ -83,8 +83,8 @@
     <!-- Alertify css -->
     <link href="{{ asset('template/assets/plugins/alertify/css/alertify.css') }}" rel="stylesheet" type="text/css">    <link href="{{ asset('template/assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('template/assets/css/icons.css') }}" rel="stylesheet" type="text/css">    <link href="{{ asset('template/assets/css/style.css') }}" rel="stylesheet" type="text/css">    <!-- Vite Assets for Laravel Echo & Reverb -->
-    @vite(['resources/js/app.js'])
-
+    {{-- @vite(['resources/js/app.js']) --}}
+    
     <style>
         .modal-backdrop {
             opacity: 0 !important;
