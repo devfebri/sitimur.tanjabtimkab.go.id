@@ -740,22 +740,21 @@
     // Function to load unread message counts
     function loadUnreadCounts() {
         var userRole = '{{ auth()->user()->role }}'; // Get role from server
+        var routePrefix = userRole + '_'; // Build route prefix: ppk_, verifikator_, pokjapemilihan_
         
         $('.chat-button').each(function() {
             var pengajuanId = $(this).data('pengajuan-id');
             var $badge = $(this).find('.chat-badge');
             
-            // Construct URL directly without route helper
-            var url = '/' + userRole + '/api/unread-count/' + pengajuanId;
-
-            console.log('Loading unread count from: ' + url);
-
+            // Build URL using Laravel route with dynamic prefix
+            var baseUrl = "{{ route('ppk_unread.count', ['id' => 'PLACEHOLDER']) }}";
+            var url = baseUrl.replace('ppk_', userRole + '_').replace('PLACEHOLDER', pengajuanId);
+            
             $.ajax({
                 url: url,
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    console.log('Unread count response:', response);
                     var unreadCount = response.unread_count;
                     if (unreadCount > 0) {
                         $badge.text(unreadCount).removeClass('d-none');
@@ -764,12 +763,7 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('Error loading unread count:', {
-                        url: url,
-                        status: status,
-                        error: error,
-                        response: xhr.responseText
-                    });
+                    console.error('Error loading unread count:', error);
                 }
             });
         });
