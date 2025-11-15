@@ -1475,28 +1475,29 @@ class PengajuanOpenController extends Controller
                     $data = [];
                     
                     // Title
-                    $data[] = ['LAPORAN PENGAJUAN PAKET TENDER'];
-                    $data[] = [];
+                    $data[] = ['LAPORAN PENGAJUAN PAKET TENDER', '', '', ''];
+                    $data[] = ['', '', '', ''];
                     
                     // Detail Section
-                    $data[] = ['DETAIL PENGAJUAN'];
-                    $data[] = ['Kode RUP', $this->pengajuan->kode_rup];
-                    $data[] = ['Nama Paket', $this->pengajuan->perangkat_daerah];
-                    $data[] = ['Perangkat Daerah', $this->pengajuan->perangkat_daerah];
-                    $data[] = ['Rekening Kegiatan', $this->pengajuan->rekening_kegiatan];
-                    $data[] = ['Sumber Dana', $this->pengajuan->sumber_dana];
-                    $data[] = ['Pagu Anggaran', 'Rp ' . number_format($this->pengajuan->pagu_anggaran, 0, ',', '.')];
-                    $data[] = ['Pagu HPS', 'Rp ' . number_format($this->pengajuan->pagu_hps, 0, ',', '.')];
-                    $data[] = ['Jenis Pengadaan', $this->pengajuan->jenis_pengadaan];
-                    $data[] = ['Metode Pengadaan', $this->pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-'];
-                    $data[] = ['Tanggal Pengajuan', $this->pengajuan->created_at->format('d/m/Y H:i:s')];
-                    $data[] = ['Status', $this->statusText];
+                    $data[] = ['DETAIL PENGAJUAN', '', '', ''];
+                    $data[] = ['Kode RUP', $this->pengajuan->kode_rup, '', ''];
+                    $data[] = ['Nama Paket', $this->pengajuan->perangkat_daerah, '', ''];
+                    $data[] = ['Perangkat Daerah', $this->pengajuan->perangkat_daerah, '', ''];
+                    $data[] = ['Rekening Kegiatan', $this->pengajuan->rekening_kegiatan, '', ''];
+                    $data[] = ['Sumber Dana', $this->pengajuan->sumber_dana, '', ''];
+                    $data[] = ['Pagu Anggaran', 'Rp ' . number_format($this->pengajuan->pagu_anggaran, 0, ',', '.'), '', ''];
+                    $data[] = ['Pagu HPS', 'Rp ' . number_format($this->pengajuan->pagu_hps, 0, ',', '.'), '', ''];
+                    $data[] = ['Jenis Pengadaan', $this->pengajuan->jenis_pengadaan, '', ''];
+                    $data[] = ['Metode Pengadaan', $this->pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-', '', ''];
+                    $data[] = ['Tanggal Pengajuan', $this->pengajuan->created_at->format('d/m/Y H:i:s'), '', ''];
+                    $data[] = ['Status', $this->statusText, '', ''];
                     
-                    $data[] = [];
-                    $data[] = [];
+                    $data[] = ['', '', '', ''];
+                    $data[] = ['', '', '', ''];
                     
                     // Files Section
-                    $data[] = ['DAFTAR BERKAS'];
+                    $data[] = ['DAFTAR BERKAS', '', '', ''];
+                    $data[] = ['', '', '', ''];
                     $data[] = ['No', 'Nama File', 'Status', 'Tanggal Upload'];
                     
                     if ($this->files->isNotEmpty()) {
@@ -1511,7 +1512,7 @@ class PengajuanOpenController extends Controller
                             ];
                         }
                     } else {
-                        $data[] = ['Tidak ada berkas'];
+                        $data[] = ['Tidak ada berkas', '', '', ''];
                     }
                     
                     return $data;
@@ -1586,8 +1587,8 @@ class PengajuanOpenController extends Controller
                     // Rows 4-14: Detail Data (with borders)
                     $sheet->getStyle('A4:D14')->applyFromArray($border);
                     
-                    // Row 17: Daftar Berkas Header
-                    $sheet->getStyle('A17:D17')->applyFromArray($sectionStyle);
+                    // Row 16: Daftar Berkas Header
+                    $sheet->getStyle('A16:D16')->applyFromArray($sectionStyle);
                     
                     // Row 18: Table Headers
                     $sheet->getStyle('A18:D18')->applyFromArray($headerStyle);
