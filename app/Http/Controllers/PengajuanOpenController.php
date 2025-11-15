@@ -1453,63 +1453,49 @@ class PengajuanOpenController extends Controller
             ->where('status', '!=', 99)
             ->get();
 
-        // Create Excel file directly as TSV format
-        $filename = 'pengajuan_' . $pengajuan->id . '.xlsx';
+        // Create Excel file using simple approach
+        $filename = 'pengajuan_' . $pengajuan->id . '.csv';
         
-        // Build the data array
-        $spreadsheet = [];
-        $spreadsheet[] = ['LAPORAN PENGAJUAN PAKET TENDER'];
-        $spreadsheet[] = [];
+        // Build the data
+        $output = "";
         
-        $spreadsheet[] = ['DETAIL PENGAJUAN'];
+        // Add title
+        $output .= "LAPORAN PENGAJUAN PAKET TENDER\n\n";
+        
+        // Add detail section
+        $output .= "DETAIL PENGAJUAN\n";
         $statusText = $this->getStatusText($pengajuan->status);
-        $spreadsheet[] = ['Kode RUP', $pengajuan->kode_rup];
-        $spreadsheet[] = ['Nama Paket', $pengajuan->perangkat_daerah];
-        $spreadsheet[] = ['Perangkat Daerah', $pengajuan->perangkat_daerah];
-        $spreadsheet[] = ['Rekening Kegiatan', $pengajuan->rekening_kegiatan];
-        $spreadsheet[] = ['Sumber Dana', $pengajuan->sumber_dana];
-        $spreadsheet[] = ['Pagu Anggaran', 'Rp ' . number_format($pengajuan->pagu_anggaran, 0, ',', '.')];
-        $spreadsheet[] = ['Pagu HPS', 'Rp ' . number_format($pengajuan->pagu_hps, 0, ',', '.')];
-        $spreadsheet[] = ['Jenis Pengadaan', $pengajuan->jenis_pengadaan];
-        $spreadsheet[] = ['Metode Pengadaan', $pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-'];
-        $spreadsheet[] = ['Tanggal Pengajuan', $pengajuan->created_at->format('d/m/Y H:i:s')];
-        $spreadsheet[] = ['Status', $statusText];
         
-        $spreadsheet[] = [];
-        $spreadsheet[] = [];
-        $spreadsheet[] = ['DAFTAR BERKAS'];
-        $spreadsheet[] = ['No', 'Nama File', 'Status', 'Tanggal Upload'];
+        $output .= "Kode RUP," . $pengajuan->kode_rup . "\n";
+        $output .= "Nama Paket," . $pengajuan->perangkat_daerah . "\n";
+        $output .= "Perangkat Daerah," . $pengajuan->perangkat_daerah . "\n";
+        $output .= "Rekening Kegiatan," . $pengajuan->rekening_kegiatan . "\n";
+        $output .= "Sumber Dana," . $pengajuan->sumber_dana . "\n";
+        $output .= "Pagu Anggaran,Rp " . number_format($pengajuan->pagu_anggaran, 0, ',', '.') . "\n";
+        $output .= "Pagu HPS,Rp " . number_format($pengajuan->pagu_hps, 0, ',', '.') . "\n";
+        $output .= "Jenis Pengadaan," . $pengajuan->jenis_pengadaan . "\n";
+        $output .= "Metode Pengadaan," . ($pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-') . "\n";
+        $output .= "Tanggal Pengajuan," . $pengajuan->created_at->format('d/m/Y H:i:s') . "\n";
+        $output .= "Status," . $statusText . "\n";
+        
+        $output .= "\n\n";
+        
+        // Add files section
+        $output .= "DAFTAR BERKAS\n";
+        $output .= "No,Nama File,Status,Tanggal Upload\n";
         
         if ($files->isNotEmpty()) {
             $no = 1;
             foreach ($files as $file) {
                 $fileStatus = $this->getFileStatusText($file->status);
-                $spreadsheet[] = [
-                    $no++,
-                    $file->nama_file,
-                    $fileStatus,
-                    $file->created_at->format('d/m/Y H:i:s')
-                ];
+                $output .= $no++ . "," . $file->nama_file . "," . $fileStatus . "," . $file->created_at->format('d/m/Y H:i:s') . "\n";
             }
         } else {
-            $spreadsheet[] = ['Tidak ada berkas'];
+            $output .= "Tidak ada berkas\n";
         }
         
-        // Convert to CSV with proper encoding
-        $output = "\xEF\xBB\xBF"; // UTF-8 BOM
-        foreach ($spreadsheet as $row) {
-            $line = [];
-            foreach ($row as $cell) {
-                // Escape quotes and wrap in quotes
-                $cell = str_replace('"', '""', (string)$cell);
-                $line[] = '"' . $cell . '"';
-            }
-            $output .= implode(',', $line) . "\r\n";
-        }
-        
-        return response($output)
-            ->header('Content-Encoding', 'UTF-8')
-            ->header('Content-Type', 'application/vnd.ms-excel; charset=UTF-8')
+        return response($output, 200)
+            ->header('Content-Type', 'text/csv; charset=utf-8')
             ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
