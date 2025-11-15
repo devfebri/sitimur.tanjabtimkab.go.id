@@ -327,7 +327,7 @@
                                                 @elseif(auth()->user()->role == 'verifikator')
                                                     <a href="{{ route('verifikator_pengajuan.chat', [$data->id]) }}"
                                                        class="btn btn-info btn-sm me-1" title="Chat dengan PPK">
-                                                        <i class="mdi mdi-chat me-1"></i>Chat Verifikator
+                                                        <i class="mdi mdi-chat me-1"></i>Chat
                                                     </a>
 
                                                 {{-- Chat Button untuk Pokja Pemilihan --}}
@@ -337,7 +337,7 @@
                                                         <i class="mdi mdi-chat-multiple me-1"></i>Chat
                                                     </a>
                                                 @endif
-                                                <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}" class="btn btn-warning btn-sm"> PDF</a>
+                                                <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}" class="btn btn-primary btn-sm"> PDF</a>
                                                 {{-- <a href="#" class="btn btn-warning btn-sm"> PDF</a> --}}
 
                                                 <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadexcel',[$data->id]) }}" class="btn btn-info btn-sm"> Excel</a>

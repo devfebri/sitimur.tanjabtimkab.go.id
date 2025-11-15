@@ -1577,24 +1577,29 @@ class PengajuanOpenController extends Controller
                         ],
                     ];
                     
-                    // Apply title style
-                    $sheet->getStyle('A1')->applyFromArray($titleStyle);
+                    // Row 1: Title
+                    $sheet->getStyle('A1:D1')->applyFromArray($titleStyle);
                     
-                    // Apply section headers and borders
-                    $sheet->getStyle('A3')->applyFromArray($sectionStyle);
+                    // Row 3: Detail Section Header
+                    $sheet->getStyle('A3:D3')->applyFromArray($sectionStyle);
                     
-                    $detailStart = 4;
-                    $detailEnd = 14;
-                    $sheet->getStyle("A{$detailStart}:B{$detailEnd}")->applyFromArray($border);
+                    // Rows 4-14: Detail Data (with borders)
+                    $sheet->getStyle('A4:D14')->applyFromArray($border);
                     
-                    // Files section
-                    $filesHeaderRow = 19;
-                    $sheet->getStyle("A{$filesHeaderRow}:D{$filesHeaderRow}")->applyFromArray($headerStyle);
+                    // Row 18: Daftar Berkas Header
+                    $sheet->getStyle('A18:D18')->applyFromArray($sectionStyle);
                     
+                    // Row 19: Table Headers
+                    $sheet->getStyle('A19:D19')->applyFromArray($headerStyle);
+                    
+                    // Files data rows
                     if ($this->files->isNotEmpty()) {
-                        $filesStart = $filesHeaderRow + 1;
-                        $filesEnd = $filesStart + $this->files->count() - 1;
+                        $filesStart = 20;
+                        $filesEnd = 19 + $this->files->count();
                         $sheet->getStyle("A{$filesStart}:D{$filesEnd}")->applyFromArray($border);
+                    } else {
+                        // "Tidak ada berkas" row
+                        $sheet->getStyle('A20:D20')->applyFromArray($border);
                     }
                     
                     return [];
