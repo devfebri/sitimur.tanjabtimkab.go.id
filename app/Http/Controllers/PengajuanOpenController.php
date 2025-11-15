@@ -10,7 +10,9 @@ use App\Models\PengajuanFile;
 use App\Models\User;
 use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
- use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class PengajuanOpenController extends Controller
 {
@@ -1453,52 +1455,164 @@ class PengajuanOpenController extends Controller
             ->where('status', '!=', 99)
             ->get();
 
-        // Create Excel file using simple approach
-        $filename = 'pengajuan_' . $pengajuan->id . '.csv';
-        
-        // Build the data
-        $output = "";
-        
-        // Add title
-        $output .= "LAPORAN PENGAJUAN PAKET TENDER\n\n";
-        
-        // Add detail section
-        $output .= "DETAIL PENGAJUAN\n";
         $statusText = $this->getStatusText($pengajuan->status);
         
-        $output .= "Kode RUP," . $pengajuan->kode_rup . "\n";
-        $output .= "Nama Paket," . $pengajuan->perangkat_daerah . "\n";
-        $output .= "Perangkat Daerah," . $pengajuan->perangkat_daerah . "\n";
-        $output .= "Rekening Kegiatan," . $pengajuan->rekening_kegiatan . "\n";
-        $output .= "Sumber Dana," . $pengajuan->sumber_dana . "\n";
-        $output .= "Pagu Anggaran,Rp " . number_format($pengajuan->pagu_anggaran, 0, ',', '.') . "\n";
-        $output .= "Pagu HPS,Rp " . number_format($pengajuan->pagu_hps, 0, ',', '.') . "\n";
-        $output .= "Jenis Pengadaan," . $pengajuan->jenis_pengadaan . "\n";
-        $output .= "Metode Pengadaan," . ($pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-') . "\n";
-        $output .= "Tanggal Pengajuan," . $pengajuan->created_at->format('d/m/Y H:i:s') . "\n";
-        $output .= "Status," . $statusText . "\n";
-        
-        $output .= "\n\n";
-        
-        // Add files section
-        $output .= "DAFTAR BERKAS\n";
-        $output .= "No,Nama File,Status,Tanggal Upload\n";
-        
-        if ($files->isNotEmpty()) {
-            $no = 1;
-            foreach ($files as $file) {
-                $fileStatus = $this->getFileStatusText($file->status);
-                $output .= $no++ . "," . $file->nama_file . "," . $fileStatus . "," . $file->created_at->format('d/m/Y H:i:s') . "\n";
-            }
-        } else {
-            $output .= "Tidak ada berkas\n";
-        }
-        
-        return response($output, 200)
-            ->header('Content-Type', 'text/csv; charset=utf-8')
-            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
-            ->header('Pragma', 'no-cache')
-            ->header('Expires', '0');
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new class($pengajuan, $files, $statusText) implements \Maatwebsite\Excel\Concerns\FromArray, \Maatwebsite\Excel\Concerns\WithStyles, \Maatwebsite\Excel\Concerns\ShouldAutoSize {
+                private $pengajuan;
+                private $files;
+                private $statusText;
+                
+                public function __construct($pengajuan, $files, $statusText)
+                {
+                    $this->pengajuan = $pengajuan;
+                    $this->files = $files;
+                    $this->statusText = $statusText;
+                }
+                
+                public function array(): array
+                {
+                    $data = [];
+                    
+                    // Title
+                    $data[] = ['LAPORAN PENGAJUAN PAKET TENDER'];
+                    $data[] = [];
+                    
+                    // Detail Section
+                    $data[] = ['DETAIL PENGAJUAN'];
+                    $data[] = ['Kode RUP', $this->pengajuan->kode_rup];
+                    $data[] = ['Nama Paket', $this->pengajuan->perangkat_daerah];
+                    $data[] = ['Perangkat Daerah', $this->pengajuan->perangkat_daerah];
+                    $data[] = ['Rekening Kegiatan', $this->pengajuan->rekening_kegiatan];
+                    $data[] = ['Sumber Dana', $this->pengajuan->sumber_dana];
+                    $data[] = ['Pagu Anggaran', 'Rp ' . number_format($this->pengajuan->pagu_anggaran, 0, ',', '.')];
+                    $data[] = ['Pagu HPS', 'Rp ' . number_format($this->pengajuan->pagu_hps, 0, ',', '.')];
+                    $data[] = ['Jenis Pengadaan', $this->pengajuan->jenis_pengadaan];
+                    $data[] = ['Metode Pengadaan', $this->pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-'];
+                    $data[] = ['Tanggal Pengajuan', $this->pengajuan->created_at->format('d/m/Y H:i:s')];
+                    $data[] = ['Status', $this->statusText];
+                    
+                    $data[] = [];
+                    $data[] = [];
+                    
+                    // Files Section
+                    $data[] = ['DAFTAR BERKAS'];
+                    $data[] = ['No', 'Nama File', 'Status', 'Tanggal Upload'];
+                    
+                    if ($this->files->isNotEmpty()) {
+                        $no = 1;
+                        foreach ($this->files as $file) {
+                            $fileStatus = $this->getFileStatusText($file->status);
+                            $data[] = [
+                                $no++,
+                                $file->nama_file,
+                                $fileStatus,
+                                $file->created_at->format('d/m/Y H:i:s')
+                            ];
+                        }
+                    } else {
+                        $data[] = ['Tidak ada berkas'];
+                    }
+                    
+                    return $data;
+                }
+                
+                public function styles($sheet)
+                {
+                    $border = [
+                        'borders' => [
+                            'allBorders' => [
+                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                        ],
+                    ];
+                    
+                    $headerStyle = [
+                        'font' => [
+                            'bold' => true,
+                            'size' => 12,
+                        ],
+                        'alignment' => [
+                            'horizontal' => 'center',
+                            'vertical' => 'center',
+                        ],
+                        'fill' => [
+                            'fillType' => 'solid',
+                            'startColor' => ['argb' => 'FFD9D9D9'],
+                        ],
+                        'borders' => [
+                            'allBorders' => [
+                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                        ],
+                    ];
+                    
+                    $titleStyle = [
+                        'font' => [
+                            'bold' => true,
+                            'size' => 14,
+                        ],
+                        'alignment' => [
+                            'horizontal' => 'center',
+                            'vertical' => 'center',
+                        ],
+                    ];
+                    
+                    $sectionStyle = [
+                        'font' => [
+                            'bold' => true,
+                            'size' => 11,
+                        ],
+                        'fill' => [
+                            'fillType' => 'solid',
+                            'startColor' => ['argb' => 'FFE8E8E8'],
+                        ],
+                        'borders' => [
+                            'allBorders' => [
+                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                        ],
+                    ];
+                    
+                    // Apply title style
+                    $sheet->getStyle('A1')->applyFromArray($titleStyle);
+                    
+                    // Apply section headers and borders
+                    $sheet->getStyle('A3')->applyFromArray($sectionStyle);
+                    
+                    $detailStart = 4;
+                    $detailEnd = 14;
+                    $sheet->getStyle("A{$detailStart}:B{$detailEnd}")->applyFromArray($border);
+                    
+                    // Files section
+                    $filesHeaderRow = 19;
+                    $sheet->getStyle("A{$filesHeaderRow}:D{$filesHeaderRow}")->applyFromArray($headerStyle);
+                    
+                    if ($this->files->isNotEmpty()) {
+                        $filesStart = $filesHeaderRow + 1;
+                        $filesEnd = $filesStart + $this->files->count() - 1;
+                        $sheet->getStyle("A{$filesStart}:D{$filesEnd}")->applyFromArray($border);
+                    }
+                    
+                    return [];
+                }
+                
+                private function getFileStatusText($status)
+                {
+                    $statuses = [
+                        0 => 'Belum Direviu',
+                        1 => 'Sesuai',
+                        2 => 'Perlu Perbaikan',
+                        3 => 'Tidak Diterima'
+                    ];
+                    return $statuses[$status] ?? 'Unknown Status';
+                }
+            },
+            'pengajuan_' . $pengajuan->id . '.xlsx'
+        );
     }
 
     private function getStatusText($status)

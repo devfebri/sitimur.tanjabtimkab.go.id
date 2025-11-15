@@ -15,6 +15,7 @@
         "laravel/reverb": "^1.5",
         "laravel/tinker": "^2.10.1",
         "livewire/livewire": "^3.6",
+        "maatwebsite/excel": "^3.1",
         "phpseclib/phpseclib": "~3.0",
         "yajra/laravel-datatables-oracle": "12.0"
     },
