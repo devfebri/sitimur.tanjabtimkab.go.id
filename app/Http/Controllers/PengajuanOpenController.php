@@ -1453,51 +1453,43 @@ class PengajuanOpenController extends Controller
             ->where('status', '!=', 99)
             ->get();
 
-        // Create spreadsheet headers and data
+        // Create spreadsheet in proper Excel format
         $filename = 'pengajuan_' . $pengajuan->id . '.csv';
         $handle = fopen('php://memory', 'r+');
 
-        // Header row
-        $headers = [
-            'LAPORAN PENGAJUAN PAKET TENDER',
-            '',
-            'Kode RUP',
-            'Nama Paket',
-            'Perangkat Daerah',
-            'Rekening Kegiatan',
-            'Sumber Dana',
-            'Pagu Anggaran',
-            'Pagu HPS',
-            'Jenis Pengadaan',
-            'Metode Pengadaan',
-            'Tanggal Pengajuan',
-            'Status'
-        ];
-        fputcsv($handle, $headers, ';');
+        // Add BOM for UTF-8 (helps with Excel encoding)
+        fwrite($handle, "\xEF\xBB\xBF");
 
-        // Detail row
-        $statusText = $this->getStatusText($pengajuan->status);
-        $details = [
-            '',
-            '',
-            $pengajuan->kode_rup,
-            $pengajuan->perangkat_daerah,
-            $pengajuan->perangkat_daerah,
-            $pengajuan->rekening_kegiatan,
-            $pengajuan->sumber_dana,
-            number_format($pengajuan->pagu_anggaran, 0, ',', '.'),
-            number_format($pengajuan->pagu_hps, 0, ',', '.'),
-            $pengajuan->jenis_pengadaan,
-            $pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-',
-            $pengajuan->created_at->format('d/m/Y H:i:s'),
-            $statusText
-        ];
-        fputcsv($handle, $details, ';');
-
-        // Empty row
+        // Title
+        fputcsv($handle, ['LAPORAN PENGAJUAN PAKET TENDER'], ';');
         fputcsv($handle, [], ';');
 
-        // Files header
+        // Section 1: Detail Pengajuan
+        fputcsv($handle, ['DETAIL PENGAJUAN'], ';');
+        
+        $statusText = $this->getStatusText($pengajuan->status);
+        $pengajuanData = [
+            ['Kode RUP', $pengajuan->kode_rup],
+            ['Nama Paket', $pengajuan->perangkat_daerah],
+            ['Perangkat Daerah', $pengajuan->perangkat_daerah],
+            ['Rekening Kegiatan', $pengajuan->rekening_kegiatan],
+            ['Sumber Dana', $pengajuan->sumber_dana],
+            ['Pagu Anggaran', 'Rp ' . number_format($pengajuan->pagu_anggaran, 0, ',', '.')],
+            ['Pagu HPS', 'Rp ' . number_format($pengajuan->pagu_hps, 0, ',', '.')],
+            ['Jenis Pengadaan', $pengajuan->jenis_pengadaan],
+            ['Metode Pengadaan', $pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-'],
+            ['Tanggal Pengajuan', $pengajuan->created_at->format('d/m/Y H:i:s')],
+            ['Status', $statusText],
+        ];
+
+        foreach ($pengajuanData as $row) {
+            fputcsv($handle, $row, ';');
+        }
+
+        fputcsv($handle, [], ';');
+        fputcsv($handle, [], ';');
+
+        // Section 2: Daftar Berkas
         fputcsv($handle, ['DAFTAR BERKAS'], ';');
         fputcsv($handle, ['No', 'Nama File', 'Status', 'Tanggal Upload'], ';');
 
@@ -1511,6 +1503,11 @@ class PengajuanOpenController extends Controller
                 $fileStatus,
                 $file->created_at->format('d/m/Y H:i:s')
             ], ';');
+        }
+
+        // Add empty row if no files
+        if ($files->isEmpty()) {
+            fputcsv($handle, ['Tidak ada berkas'], ';');
         }
 
         // Rewind and return
