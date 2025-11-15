@@ -59,7 +59,12 @@
                             <i class="fa fa-times-circle"></i> Tolak Pengajuan
                         </button>
                     </div>
-
+                    @elseif(auth()->user()->role=='admin' && in_array($data->status, [12, 22, 32]))
+                    <div>
+                        <button id="resetStatus" class="btn btn-warning btn-lg shadow-sm">
+                            <i class="fa fa-undo"></i> Reset Status Pengajuan
+                        </button>
+                    </div>
                     @endif
                 </div>
             </div>
@@ -837,6 +842,44 @@
                 alertify.error('Aksi dibatalkan');
             }
         ).set('labels', {ok:'Tolak', cancel:'Batal'});
+    });
+    @endif
+
+    @if(auth()->user()->role=='admin')
+    $('#resetStatus').on('click', function(e) {
+        e.preventDefault();
+        alertify.confirm(
+            'Apakah Anda yakin ingin mereset status pengajuan ini? Status akan dikembalikan ke tahap sebelumnya untuk diproses ulang.',
+            function() {
+                $.ajax({
+                    url: "{{ route('admin_pengajuan_reset_status', $data->id) }}",
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(res) {
+                        if (res.success) {
+                            alertify.success(res.message);
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            alertify.error(res.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        var errorMsg = 'Gagal mereset status pengajuan.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+                        alertify.error(errorMsg);
+                    }
+                });
+            },
+            function() {
+                alertify.error('Aksi dibatalkan');
+            }
+        ).set('labels', {ok:'Ya, Reset', cancel:'Batal'});
     });
     @endif
 

@@ -1657,4 +1657,73 @@ class PengajuanOpenController extends Controller
         ];
         return $statuses[$status] ?? 'Unknown Status';
     }
+
+    public function resetStatus($id)
+    {
+        try {
+            $pengajuan = Pengajuan::findOrFail($id);
+            
+            // Hanya admin yang bisa reset
+            if (Auth::user()->role !== 'admin') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access'
+                ], 403);
+            }
+
+            // Status yang bisa direset
+            $allowedStatuses = [12, 22, 32];
+            
+            if (!in_array($pengajuan->status, $allowedStatuses)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Status pengajuan tidak bisa direset'
+                ], 400);
+            }
+
+            // Reset status berdasarkan status saat ini
+            $newStatus = 0;
+            $message = '';
+            
+            if ($pengajuan->status == 12) {
+                // Tidak disetujui verifikator -> kembali ke status 0 (menunggu verifikator)
+                $newStatus = 0;
+                $pengajuan->verifikator_status_akhir = 0;
+                $message = 'Status berhasil direset ke Menunggu Verifikator';
+            } elseif ($pengajuan->status == 22) {
+                // Tidak disetujui kepala UKPBJ -> kembali ke status 11 (menunggu kepala UKPBJ)
+                $newStatus = 11;
+                $pengajuan->kepalaukpbj_status = 0;
+                $message = 'Status berhasil direset ke Menunggu Kepala UKPBJ';
+            } elseif ($pengajuan->status == 32) {
+                // Tidak disetujui pokja -> kembali ke status 21 (menunggu pokja)
+                $newStatus = 21;
+                // Reset status pokja yang ada
+                if ($pengajuan->pokja1_id) {
+                    $pengajuan->pokja1_status_akhir = 0;
+                }
+                if ($pengajuan->pokja2_id) {
+                    $pengajuan->pokja2_status_akhir = 0;
+                }
+                if ($pengajuan->pokja3_id) {
+                    $pengajuan->pokja3_status_akhir = 0;
+                }
+                $message = 'Status berhasil direset ke Menunggu Reviu Pokja';
+            }
+
+            $pengajuan->status = $newStatus;
+            $pengajuan->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

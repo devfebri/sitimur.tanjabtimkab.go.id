@@ -77,6 +77,7 @@ Route::prefix('admin')->middleware(AdminMiddleware::class)->name('admin_')->grou
     Route::delete('/user/{id}', [UserController::class, 'delete'])->name('userdelete');
     Route::get('pengajuan/{id}/open/downloadpdf', [PengajuanOpenController::class, 'downloadpdf'])->name('pengajuan_open_downloadpdf');
     Route::get('pengajuan/{id}/open/downloadexcel', [PengajuanOpenController::class, 'downloadexcel'])->name('pengajuan_open_downloadexcel');
+    Route::post('pengajuan/{id}/reset-status', [PengajuanOpenController::class, 'resetStatus'])->name('pengajuan_reset_status');
 
     Route::get('/persyaratan', [PersyaratanController::class, 'index'])->name('persyaratan');
     Route::post('/persyaratan/store', [PersyaratanController::class, 'store'])->name('persyaratancreate');
