@@ -1460,54 +1460,53 @@ class PengajuanOpenController extends Controller
         // Add BOM for UTF-8 (helps with Excel encoding)
         fwrite($handle, "\xEF\xBB\xBF");
 
-        // Title
-        fputcsv($handle, ['LAPORAN PENGAJUAN PAKET TENDER'], ';');
-        fputcsv($handle, [], ';');
+        // Title - centered across columns
+        fputcsv($handle, ['LAPORAN PENGAJUAN PAKET TENDER', '', '', ''], ';');
+        fputcsv($handle, ['', '', '', ''], ';');
 
         // Section 1: Detail Pengajuan
-        fputcsv($handle, ['DETAIL PENGAJUAN'], ';');
+        fputcsv($handle, ['DETAIL PENGAJUAN', '', '', ''], ';');
         
         $statusText = $this->getStatusText($pengajuan->status);
         $pengajuanData = [
-            ['Kode RUP', $pengajuan->kode_rup],
-            ['Nama Paket', $pengajuan->perangkat_daerah],
-            ['Perangkat Daerah', $pengajuan->perangkat_daerah],
-            ['Rekening Kegiatan', $pengajuan->rekening_kegiatan],
-            ['Sumber Dana', $pengajuan->sumber_dana],
-            ['Pagu Anggaran', 'Rp ' . number_format($pengajuan->pagu_anggaran, 0, ',', '.')],
-            ['Pagu HPS', 'Rp ' . number_format($pengajuan->pagu_hps, 0, ',', '.')],
-            ['Jenis Pengadaan', $pengajuan->jenis_pengadaan],
-            ['Metode Pengadaan', $pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-'],
-            ['Tanggal Pengajuan', $pengajuan->created_at->format('d/m/Y H:i:s')],
-            ['Status', $statusText],
+            ['Kode RUP:', $pengajuan->kode_rup, '', ''],
+            ['Nama Paket:', $pengajuan->perangkat_daerah, '', ''],
+            ['Perangkat Daerah:', $pengajuan->perangkat_daerah, '', ''],
+            ['Rekening Kegiatan:', $pengajuan->rekening_kegiatan, '', ''],
+            ['Sumber Dana:', $pengajuan->sumber_dana, '', ''],
+            ['Pagu Anggaran:', 'Rp ' . number_format($pengajuan->pagu_anggaran, 0, ',', '.'), '', ''],
+            ['Pagu HPS:', 'Rp ' . number_format($pengajuan->pagu_hps, 0, ',', '.'), '', ''],
+            ['Jenis Pengadaan:', $pengajuan->jenis_pengadaan, '', ''],
+            ['Metode Pengadaan:', $pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-', '', ''],
+            ['Tanggal Pengajuan:', $pengajuan->created_at->format('d/m/Y H:i:s'), '', ''],
+            ['Status:', $statusText, '', ''],
         ];
 
         foreach ($pengajuanData as $row) {
             fputcsv($handle, $row, ';');
         }
 
-        fputcsv($handle, [], ';');
-        fputcsv($handle, [], ';');
+        fputcsv($handle, ['', '', '', ''], ';');
+        fputcsv($handle, ['', '', '', ''], ';');
 
-        // Section 2: Daftar Berkas
-        fputcsv($handle, ['DAFTAR BERKAS'], ';');
+        // Section 2: Daftar Berkas (Files Table)
+        fputcsv($handle, ['DAFTAR BERKAS', '', '', ''], ';');
         fputcsv($handle, ['No', 'Nama File', 'Status', 'Tanggal Upload'], ';');
 
         // Files data
-        $no = 1;
-        foreach ($files as $file) {
-            $fileStatus = $this->getFileStatusText($file->status);
-            fputcsv($handle, [
-                $no++,
-                $file->nama_file,
-                $fileStatus,
-                $file->created_at->format('d/m/Y H:i:s')
-            ], ';');
-        }
-
-        // Add empty row if no files
-        if ($files->isEmpty()) {
-            fputcsv($handle, ['Tidak ada berkas'], ';');
+        if ($files->isNotEmpty()) {
+            $no = 1;
+            foreach ($files as $file) {
+                $fileStatus = $this->getFileStatusText($file->status);
+                fputcsv($handle, [
+                    $no++,
+                    $file->nama_file,
+                    $fileStatus,
+                    $file->created_at->format('d/m/Y H:i:s')
+                ], ';');
+            }
+        } else {
+            fputcsv($handle, ['Tidak ada berkas', '', '', ''], ';');
         }
 
         // Rewind and return
