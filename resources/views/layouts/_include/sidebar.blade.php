@@ -48,12 +48,12 @@
                         <span> Data Pengajuan </span>
                     </a>
                 </li>
-                <li>
+                {{-- <li>
                     <a href="{{ route(auth()->user()->role.'_laporan') }}" class="waves-effect">
                         <i class="mdi mdi-chart-line"></i>
                         <span> Laporan </span>
                     </a>
-                </li>
+                </li> --}}
             @elseif(auth()->user()->role == 'verifikator')
             <li class="menu-title">Verifikator Menu</li>
             <li>
