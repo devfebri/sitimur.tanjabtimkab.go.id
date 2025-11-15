@@ -1662,7 +1662,7 @@ class PengajuanOpenController extends Controller
     {
         try {
             $pengajuan = Pengajuan::findOrFail($id);
-            
+
             // Hanya admin yang bisa reset
             if (Auth::user()->role !== 'admin') {
                 return response()->json([
@@ -1673,7 +1673,7 @@ class PengajuanOpenController extends Controller
 
             // Status yang bisa direset
             $allowedStatuses = [12, 22, 32];
-            
+
             if (!in_array($pengajuan->status, $allowedStatuses)) {
                 return response()->json([
                     'success' => false,
@@ -1684,7 +1684,7 @@ class PengajuanOpenController extends Controller
             // Reset status berdasarkan status saat ini
             $newStatus = 0;
             $message = '';
-            
+
             if ($pengajuan->status == 12) {
                 // Tidak disetujui verifikator -> kembali ke status 0 (menunggu verifikator)
                 $newStatus = 0;

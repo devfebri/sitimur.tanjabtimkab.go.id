@@ -10,6 +10,7 @@ use App\Http\Controllers\PersyaratanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatRevisiController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\KepalaukpbjMiddleware;
 use App\Http\Middleware\PokjaPemilihanMiddleware;
@@ -89,6 +90,10 @@ Route::prefix('admin')->middleware(AdminMiddleware::class)->name('admin_')->grou
     Route::delete('/persyaratan/berkas/{id}', [PersyaratanController::class, 'berkasDestroy'])->name('persyaratan_berkas_delete');
     Route::get('riwayat_revisi', [RiwayatRevisiController::class, 'index'])->name('riwayat_revisi');
     Route::get('download_revision/{id}', [RiwayatRevisiController::class, 'downloadRevision'])->name('download_revision');
+    
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
+    Route::get('/laporan/data', [LaporanController::class, 'getLaporan'])->name('laporan_data');
+    Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan_export_pdf');
 });
 
 // =============== VERIFIKATOR ===============
