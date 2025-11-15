@@ -1475,29 +1475,29 @@ class PengajuanOpenController extends Controller
                     $data = [];
 
                     // Title
-                    $data[] = ['LAPORAN PENGAJUAN PAKET TENDER', '', '', ''];
+                    $data[] = ['LAPORAN PENGAJUAN PAKET TENDER', ''];
                     $data[] = ['', '', '', ''];
 
                     // Detail Section
-                    $data[] = ['DETAIL PENGAJUAN', '', '', ''];
-                    $data[] = ['Kode RUP', $this->pengajuan->kode_rup, '', ''];
-                    $data[] = ['Nama Paket', $this->pengajuan->perangkat_daerah, '', ''];
-                    $data[] = ['Perangkat Daerah', $this->pengajuan->perangkat_daerah, '', ''];
-                    $data[] = ['Rekening Kegiatan', $this->pengajuan->rekening_kegiatan, '', ''];
-                    $data[] = ['Sumber Dana', $this->pengajuan->sumber_dana, '', ''];
-                    $data[] = ['Pagu Anggaran', 'Rp ' . number_format($this->pengajuan->pagu_anggaran, 0, ',', '.'), '', ''];
-                    $data[] = ['Pagu HPS', 'Rp ' . number_format($this->pengajuan->pagu_hps, 0, ',', '.'), '', ''];
-                    $data[] = ['Jenis Pengadaan', $this->pengajuan->jenis_pengadaan, '', ''];
-                    $data[] = ['Metode Pengadaan', $this->pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-', '', ''];
-                    $data[] = ['Tanggal Pengajuan', $this->pengajuan->created_at->format('d/m/Y H:i:s'), '', ''];
+                    $data[] = ['DETAIL PENGAJUAN', ''];
+                    $data[] = ['Kode RUP', $this->pengajuan->kode_rup];
+                    $data[] = ['Nama Paket', $this->pengajuan->perangkat_daerah];
+                    $data[] = ['Perangkat Daerah', $this->pengajuan->perangkat_daerah];
+                    $data[] = ['Rekening Kegiatan', $this->pengajuan->rekening_kegiatan];
+                    $data[] = ['Sumber Dana', $this->pengajuan->sumber_dana];
+                    $data[] = ['Pagu Anggaran', 'Rp ' . number_format($this->pengajuan->pagu_anggaran, 0, ',', '.')];
+                    $data[] = ['Pagu HPS', 'Rp ' . number_format($this->pengajuan->pagu_hps, 0, ',', '.')];
+                    $data[] = ['Jenis Pengadaan', $this->pengajuan->jenis_pengadaan];
+                    $data[] = ['Metode Pengadaan', $this->pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-'];
+                    $data[] = ['Tanggal Pengajuan', $this->pengajuan->created_at->format('d/m/Y H:i:s')];
                     $data[] = ['Status', $this->statusText, '', ''];
 
                     $data[] = ['', '', '', ''];
 
                     // Files Section
-                    $data[] = ['DAFTAR BERKAS', '', '', '', '', '', '', '', ''];
-                    $data[] = ['', '', '', '', '', '', '', '', ''];
-                    $data[] = ['No', 'Nama File', 'Status', 'Verifikator', 'Pokja 1', 'Pokja 2', 'Pokja 3', 'Tanggal Upload', ''];
+                    $data[] = ['DAFTAR BERKAS', '', '', '', '', '', '', ''];
+                    $data[] = ['', '', '', '', '', '', '', ''];
+                    $data[] = ['No', 'Nama File', 'Verifikator', 'Pokja 1', 'Pokja 2', 'Pokja 3', 'Status', 'Tanggal Upload'];
 
                     if ($this->files->isNotEmpty()) {
                         $no = 1;
@@ -1510,17 +1510,16 @@ class PengajuanOpenController extends Controller
                             $data[] = [
                                 $no++,
                                 $file->nama_file,
-                                $fileStatus,
                                 $verifikatorStatus,
                                 $pokja1Status,
                                 $pokja2Status,
                                 $pokja3Status,
-                                $file->created_at->format('d/m/Y H:i:s'),
-                                ''
+                                $fileStatus,
+                                $file->created_at->format('d/m/Y H:i:s')
                             ];
                         }
                     } else {
-                        $data[] = ['Tidak ada berkas', '', '', '', '', '', '', '', ''];
+                        $data[] = ['Tidak ada berkas', '', '', '', '', '', '', ''];
                     }
 
                     return $data;

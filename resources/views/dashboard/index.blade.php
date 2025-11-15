@@ -44,7 +44,7 @@
 
                         <h4 class="mt-0 header-title">Pengajuan Tender
                             {{-- @if(auth()->user()->role=='ppk')
-                         
+
                             <a href="{{ route('ppk_pengajuan_create') }}" class="btn btn-primary mb-2  float-right btn-sm" >
                                 Buat Pengajuan
                             </a>
@@ -72,6 +72,7 @@
                                             @else
                                             <th>Status</th>
                                             @endif
+
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -111,7 +112,7 @@
                         <div class="col-sm-8">
                             <select name="metode_pengadaan" id="metode_pengadaan" class="form-control">
                                 <option value="">-Pilih-</option>
-                                @foreach ($metodepengadaan as $id=>$mp) 
+                                @foreach ($metodepengadaan as $id=>$mp)
                                 <option value="{{ $id }}">{{ $mp }}</option>
                                 @endforeach
                             </select>
@@ -236,8 +237,8 @@
                 , keyboard: false
             });
         });
-        
-       
+
+
         $('body').on('click', '.open-post', function(e) {
             var data_id = $(this).data('id');
             var data_status = $(this).data('status');
@@ -283,7 +284,7 @@
                 });
             }
         });
-       
+
 
         // Tampilkan dokumen sesuai metode dan disable input file yang tidak aktif
         $('#metode_pengadaan').change(function() {
@@ -318,7 +319,7 @@
                 $('#dokumen_berkas').hide().empty();
             }
         }).trigger('change'); // trigger agar kondisi awal sesuai
-        
+
 
         // Validasi dan submit form via AJAX
         $("#form-tambah-edit").validate({
