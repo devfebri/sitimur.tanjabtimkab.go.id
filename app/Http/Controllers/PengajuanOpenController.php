@@ -1453,70 +1453,63 @@ class PengajuanOpenController extends Controller
             ->where('status', '!=', 99)
             ->get();
 
-        // Create spreadsheet in proper Excel format
-        $filename = 'pengajuan_' . $pengajuan->id . '.csv';
-        $handle = fopen('php://memory', 'r+');
-
-        // Add BOM for UTF-8 (helps with Excel encoding)
-        fwrite($handle, "\xEF\xBB\xBF");
-
-        // Title - centered across columns
-        fputcsv($handle, ['LAPORAN PENGAJUAN PAKET TENDER', '', '', ''], ';');
-        fputcsv($handle, ['', '', '', ''], ';');
-
-        // Section 1: Detail Pengajuan
-        fputcsv($handle, ['DETAIL PENGAJUAN', '', '', ''], ';');
+        // Create Excel file directly as TSV format
+        $filename = 'pengajuan_' . $pengajuan->id . '.xlsx';
         
+        // Build the data array
+        $spreadsheet = [];
+        $spreadsheet[] = ['LAPORAN PENGAJUAN PAKET TENDER'];
+        $spreadsheet[] = [];
+        
+        $spreadsheet[] = ['DETAIL PENGAJUAN'];
         $statusText = $this->getStatusText($pengajuan->status);
-        $pengajuanData = [
-            ['Kode RUP:', $pengajuan->kode_rup, '', ''],
-            ['Nama Paket:', $pengajuan->perangkat_daerah, '', ''],
-            ['Perangkat Daerah:', $pengajuan->perangkat_daerah, '', ''],
-            ['Rekening Kegiatan:', $pengajuan->rekening_kegiatan, '', ''],
-            ['Sumber Dana:', $pengajuan->sumber_dana, '', ''],
-            ['Pagu Anggaran:', 'Rp ' . number_format($pengajuan->pagu_anggaran, 0, ',', '.'), '', ''],
-            ['Pagu HPS:', 'Rp ' . number_format($pengajuan->pagu_hps, 0, ',', '.'), '', ''],
-            ['Jenis Pengadaan:', $pengajuan->jenis_pengadaan, '', ''],
-            ['Metode Pengadaan:', $pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-', '', ''],
-            ['Tanggal Pengajuan:', $pengajuan->created_at->format('d/m/Y H:i:s'), '', ''],
-            ['Status:', $statusText, '', ''],
-        ];
-
-        foreach ($pengajuanData as $row) {
-            fputcsv($handle, $row, ';');
-        }
-
-        fputcsv($handle, ['', '', '', ''], ';');
-        fputcsv($handle, ['', '', '', ''], ';');
-
-        // Section 2: Daftar Berkas (Files Table)
-        fputcsv($handle, ['DAFTAR BERKAS', '', '', ''], ';');
-        fputcsv($handle, ['No', 'Nama File', 'Status', 'Tanggal Upload'], ';');
-
-        // Files data
+        $spreadsheet[] = ['Kode RUP', $pengajuan->kode_rup];
+        $spreadsheet[] = ['Nama Paket', $pengajuan->perangkat_daerah];
+        $spreadsheet[] = ['Perangkat Daerah', $pengajuan->perangkat_daerah];
+        $spreadsheet[] = ['Rekening Kegiatan', $pengajuan->rekening_kegiatan];
+        $spreadsheet[] = ['Sumber Dana', $pengajuan->sumber_dana];
+        $spreadsheet[] = ['Pagu Anggaran', 'Rp ' . number_format($pengajuan->pagu_anggaran, 0, ',', '.')];
+        $spreadsheet[] = ['Pagu HPS', 'Rp ' . number_format($pengajuan->pagu_hps, 0, ',', '.')];
+        $spreadsheet[] = ['Jenis Pengadaan', $pengajuan->jenis_pengadaan];
+        $spreadsheet[] = ['Metode Pengadaan', $pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-'];
+        $spreadsheet[] = ['Tanggal Pengajuan', $pengajuan->created_at->format('d/m/Y H:i:s')];
+        $spreadsheet[] = ['Status', $statusText];
+        
+        $spreadsheet[] = [];
+        $spreadsheet[] = [];
+        $spreadsheet[] = ['DAFTAR BERKAS'];
+        $spreadsheet[] = ['No', 'Nama File', 'Status', 'Tanggal Upload'];
+        
         if ($files->isNotEmpty()) {
             $no = 1;
             foreach ($files as $file) {
                 $fileStatus = $this->getFileStatusText($file->status);
-                fputcsv($handle, [
+                $spreadsheet[] = [
                     $no++,
                     $file->nama_file,
                     $fileStatus,
                     $file->created_at->format('d/m/Y H:i:s')
-                ], ';');
+                ];
             }
         } else {
-            fputcsv($handle, ['Tidak ada berkas', '', '', ''], ';');
+            $spreadsheet[] = ['Tidak ada berkas'];
         }
-
-        // Rewind and return
-        rewind($handle);
-        $csv = stream_get_contents($handle);
-        fclose($handle);
-
-        return response($csv)
+        
+        // Convert to CSV with proper encoding
+        $output = "\xEF\xBB\xBF"; // UTF-8 BOM
+        foreach ($spreadsheet as $row) {
+            $line = [];
+            foreach ($row as $cell) {
+                // Escape quotes and wrap in quotes
+                $cell = str_replace('"', '""', (string)$cell);
+                $line[] = '"' . $cell . '"';
+            }
+            $output .= implode(',', $line) . "\r\n";
+        }
+        
+        return response($output)
             ->header('Content-Encoding', 'UTF-8')
-            ->header('Content-Type', 'text/csv; charset=UTF-8')
+            ->header('Content-Type', 'application/vnd.ms-excel; charset=UTF-8')
             ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
