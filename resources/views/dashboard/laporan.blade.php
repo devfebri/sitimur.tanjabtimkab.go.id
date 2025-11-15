@@ -51,7 +51,7 @@
                                 <div class="col-md-4" id="datePickerWrapper">
                                     <div class="form-group">
                                         <label>Pilih Tanggal</label>
-                                        <input type="text" class="form-control" id="datePicker" name="date" readonly>
+                                        <input type="text" class="form-control" id="datePicker" name="date" autocomplete="off">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
