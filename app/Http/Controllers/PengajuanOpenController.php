@@ -1586,20 +1586,20 @@ class PengajuanOpenController extends Controller
                     // Rows 4-14: Detail Data (with borders)
                     $sheet->getStyle('A4:D14')->applyFromArray($border);
                     
-                    // Row 18: Daftar Berkas Header
-                    $sheet->getStyle('A18:D18')->applyFromArray($sectionStyle);
+                    // Row 17: Daftar Berkas Header
+                    $sheet->getStyle('A17:D17')->applyFromArray($sectionStyle);
                     
-                    // Row 19: Table Headers
-                    $sheet->getStyle('A19:D19')->applyFromArray($headerStyle);
+                    // Row 18: Table Headers
+                    $sheet->getStyle('A18:D18')->applyFromArray($headerStyle);
                     
                     // Files data rows
                     if ($this->files->isNotEmpty()) {
-                        $filesStart = 20;
-                        $filesEnd = 19 + $this->files->count();
+                        $filesStart = 19;
+                        $filesEnd = 18 + $this->files->count();
                         $sheet->getStyle("A{$filesStart}:D{$filesEnd}")->applyFromArray($border);
                     } else {
                         // "Tidak ada berkas" row
-                        $sheet->getStyle('A20:D20')->applyFromArray($border);
+                        $sheet->getStyle('A19:D19')->applyFromArray($border);
                     }
                     
                     return [];
