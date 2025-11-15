@@ -1,7 +1,6 @@
 @extends('layouts.master')
 
 @section('css')
-<link href="{{ asset('template/assets/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
 <style>
     .stat-card {
         border-left: 4px solid;
@@ -41,13 +40,13 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Tanggal Awal</label>
-                                        <input type="text" class="form-control" id="startDate" name="start_date" autocomplete="off" placeholder="Pilih tanggal awal">
+                                        <input type="date" class="form-control" id="startDate" name="start_date" autocomplete="off" placeholder="Pilih tanggal awal">
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Tanggal Akhir</label>
-                                        <input type="text" class="form-control" id="endDate" name="end_date" autocomplete="off" placeholder="Pilih tanggal akhir">
+                                        <input type="date" class="form-control" id="endDate" name="end_date" autocomplete="off" placeholder="Pilih tanggal akhir">
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -206,63 +205,41 @@
 @endsection
 
 @section('script')
-<script src="{{ asset('template/assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script>
 $(document).ready(function() {
-    let startDate = '{{ now()->format("Y-m-d") }}';
-    let endDate = '{{ now()->format("Y-m-d") }}';
-
-    // Initialize datepickers
-    $('#startDate, #endDate').datepicker({
-        format: 'dd/mm/yyyy',
-        autoclose: true,
-        todayHighlight: true
-    });
-
-    // Set default dates
-    $('#startDate').datepicker('setDate', new Date());
-    $('#endDate').datepicker('setDate', new Date());
-
-    // Start date change handler
-    $('#startDate').on('changeDate', function(e) {
-        const date = e.date;
-        startDate = date.getFullYear() + '-' + 
-                   String(date.getMonth() + 1).padStart(2, '0') + '-' + 
-                   String(date.getDate()).padStart(2, '0');
-        
-        // Set minimum date for end date
-        $('#endDate').datepicker('setStartDate', date);
-    });
-
-    // End date change handler
-    $('#endDate').on('changeDate', function(e) {
-        const date = e.date;
-        endDate = date.getFullYear() + '-' + 
-                 String(date.getMonth() + 1).padStart(2, '0') + '-' + 
-                 String(date.getDate()).padStart(2, '0');
-        
-        // Set maximum date for start date
-        $('#startDate').datepicker('setEndDate', date);
-    });
+    // Set default dates to today
+    const today = new Date().toISOString().split('T')[0];
+    $('#startDate').val(today);
+    $('#endDate').val(today);
 
     // Submit form
     $('#filterForm').on('submit', function(e) {
         e.preventDefault();
-        
+
+        const startDate = $('#startDate').val();
+        const endDate = $('#endDate').val();
+
         if (!startDate || !endDate) {
             alertify.error('Silakan pilih tanggal awal dan akhir');
             return;
         }
-        
-        loadLaporan();
+
+        if (startDate > endDate) {
+            alertify.error('Tanggal awal tidak boleh lebih besar dari tanggal akhir');
+            return;
+        }
+
+        loadLaporan(startDate, endDate);
     });
 
     // Export PDF
     $('#exportPdfBtn').on('click', function() {
+        const startDate = $('#startDate').val();
+        const endDate = $('#endDate').val();
         window.location.href = '{{ route("admin_laporan_export_pdf") }}?start_date=' + startDate + '&end_date=' + endDate;
     });
 
-    function loadLaporan() {
+    function loadLaporan(startDate, endDate) {
         $.ajax({
             url: '{{ route("admin_laporan_data") }}',
             type: 'GET',
