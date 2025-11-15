@@ -340,7 +340,7 @@
                                                 <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}" class="btn btn-warning btn-sm"> PDF</a>
                                                 {{-- <a href="#" class="btn btn-warning btn-sm"> PDF</a> --}}
 
-                                                <a href="#" class="btn btn-warning btn-sm"> Excel</a>
+                                                <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadexcel',[$data->id]) }}" class="btn btn-info btn-sm"> Excel</a>
 
 
 

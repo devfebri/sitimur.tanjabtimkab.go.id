@@ -75,6 +75,8 @@ Route::prefix('admin')->middleware(AdminMiddleware::class)->name('admin_')->grou
     Route::get('/user/{id}/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::post('/user/create', [UserController::class, 'create'])->name('usercreate');
     Route::delete('/user/{id}', [UserController::class, 'delete'])->name('userdelete');
+    Route::get('pengajuan/{id}/open/downloadpdf', [PengajuanOpenController::class, 'downloadpdf'])->name('pengajuan_open_downloadpdf');
+    Route::get('pengajuan/{id}/open/downloadexcel', [PengajuanOpenController::class, 'downloadexcel'])->name('pengajuan_open_downloadexcel');
 
     Route::get('/persyaratan', [PersyaratanController::class, 'index'])->name('persyaratan');
     Route::post('/persyaratan/store', [PersyaratanController::class, 'store'])->name('persyaratancreate');
@@ -104,6 +106,8 @@ Route::prefix('verifikator')->middleware(VerifikatorMiddleware::class)->name('ve
     Route::get('riwayat_revisi', [RiwayatRevisiController::class, 'index'])->name('riwayat_revisi');
     Route::get('download_revision/{id}', [RiwayatRevisiController::class, 'downloadRevision'])->name('download_revision');
     Route::post('/pengajuan/{id}/tolak', [PengajuanOpenController::class, 'tolakPengajuan'])->name('pengajuan_tolak');
+    Route::get('pengajuan/{id}/open/downloadpdf', [PengajuanOpenController::class, 'downloadpdf'])->name('pengajuan_open_downloadpdf');
+    Route::get('pengajuan/{id}/open/downloadexcel', [PengajuanOpenController::class, 'downloadexcel'])->name('pengajuan_open_downloadexcel');
 
     // Chat routes for Verifikator
     Route::get('/pengajuan/{id}/chat', [ChatsController::class, 'index'])->name('pengajuan.chat');
@@ -130,6 +134,8 @@ Route::prefix('kepalaukpbj')->middleware(KepalaukpbjMiddleware::class)->name('ke
     Route::get('pengajuan/{id}/files', [PengajuanOpenController::class, 'getFiles'])->name('pengajuan_files');
     Route::post('/pengajuan/{id}/disposisi', [PengajuanOpenController::class, 'disposisiPokja'])->name('pengajuan_disposisi');
     Route::post('/pengajuan/{id}/tolak', [PengajuanOpenController::class, 'tolakPengajuan'])->name('pengajuan_tolak');
+    Route::get('pengajuan/{id}/open/downloadpdf', [PengajuanOpenController::class, 'downloadpdf'])->name('pengajuan_open_downloadpdf');
+    Route::get('pengajuan/{id}/open/downloadexcel', [PengajuanOpenController::class, 'downloadexcel'])->name('pengajuan_open_downloadexcel');
 
     Route::get('/getPokja', [PengajuanOpenController::class, 'getPokja'])->name('getPokja');
     Route::post('/kirim_pokja', [PengajuanOpenController::class, 'kirimPokja'])->name('kirimPokja');
@@ -160,6 +166,7 @@ Route::prefix('ppk')->middleware(['auth', PpkMiddleware::class])->name('ppk_')->
     Route::get('pengajuan/{id}/open/edit', [PengajuanOpenController::class, 'pengajuan_open_edit'])->name('pengajuan_open_edit');
     Route::post('pengajuan/{id}/open/update', [PengajuanOpenController::class, 'pengajuan_open_update'])->name('pengajuan_open_update');
     Route::get('pengajuan/{id}/open/downloadpdf', [PengajuanOpenController::class, 'downloadpdf'])->name('pengajuan_open_downloadpdf');
+    Route::get('pengajuan/{id}/open/downloadexcel', [PengajuanOpenController::class, 'downloadexcel'])->name('pengajuan_open_downloadexcel');
 
     // Chat routes for PPK
     Route::get('/pengajuan/{id}/chat', [ChatsController::class, 'index'])->name('pengajuan.chat');
@@ -185,6 +192,8 @@ Route::prefix('pokjapemilihan')->middleware(PokjaPemilihanMiddleware::class)->na
     Route::post('/pengajuan/create', [PengajuanController::class, 'kirim_pengajuan'])->name('kirim_pengajuan');
     Route::post('/pengajuan/{id}/update', [PengajuanController::class, 'update_pengajuan'])->name('update_pengajuan');
     Route::delete('/pengajuan/{id}', [PengajuanController::class, 'destroy'])->name('pengajuandelete');
+    Route::get('pengajuan/{id}/open/downloadpdf', [PengajuanOpenController::class, 'downloadpdf'])->name('pengajuan_open_downloadpdf');
+    Route::get('pengajuan/{id}/open/downloadexcel', [PengajuanOpenController::class, 'downloadexcel'])->name('pengajuan_open_downloadexcel');
 
     Route::get('/pengajuan/{id}/open', [PengajuanOpenController::class, 'open'])->name('pengajuanopen');
     Route::get('/metode_pengadaan_berkas/{id}', [PengajuanController::class, 'metodePengadaanBerkas'])->name('metode_pengadaan_berkas');
@@ -262,38 +271,3 @@ Route::post('/test-send-message', function (\Illuminate\Http\Request $request) {
     }
 })->name('test.send.message');
 
-// Route untuk testing auto-expire pengajuan status
-Route::get('/test/auto-expire-pengajuan', function () {
-    try {
-        $controller = new PengajuanOpenController();
-        $result = $controller->autoChangeExpiredStatus();
-
-        return response()->json([
-            'success' => true,
-            'result' => $result,
-            'message' => 'Auto-expire test completed'
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
-})->name('test.auto.expire');
-
-// Route untuk melihat pengajuan dengan status 14/34
-Route::get('/test/pengajuan-status-14-34', function () {
-    try {
-        $controller = new PengajuanOpenController();
-        $result = $controller->getPengajuanWithStatus14And34();
-
-        return response()->json($result);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
-})->name('test.pengajuan.status');

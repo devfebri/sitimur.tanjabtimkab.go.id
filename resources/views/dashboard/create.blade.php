@@ -112,7 +112,7 @@
 
                     <div id="dokumen_berkas">
                     </div>
-                    
+
 
                     <button type="button" class="btn btn-secondary prev-step">Kembali</button>
                     <button type="submit" class="btn btn-success float-right">Ajukan Paket</button>
@@ -150,7 +150,7 @@
         });
     // Ketika tombol "Lanjut Step 2" diklik
 
-    
+
 
         $('.next-step').click(function() {
             var valid = true;
@@ -203,7 +203,7 @@
                          url1 += '?metode=' + res.metode;
 
 
-                        
+
 
                         $.ajax({
                             url: url1,
@@ -237,8 +237,8 @@
                                     `;
                                     $('#dokumen_berkas').append(html);
                                 });
-                                
-                                
+
+
 
                                 // Setelah semua siap, tampilkan dokumen & Step 2, sembunyikan loading
                                 $('#loading_dokumen').hide();
@@ -262,7 +262,7 @@
                 }
             });
 
-            
+
 
         });
 
@@ -271,12 +271,12 @@
         $('.prev-step').click(function(){
             $('.step-2').hide();
             $('.step-1').show();
-            
+
         });
 
         // Flag untuk prevent double click upload
         var uploadingFiles = {};
-        
+
         // Event upload file satu per satu
        $(document).on('click', '#btnUpload', function(e) {
             e.preventDefault();
@@ -286,12 +286,12 @@
             var input = inputGroup.find('input[type="file"]');
             var files = input[0].files;
             var berkas_id = btn.data('id');
-            
+
             // Prevent double click - jika sedang upload untuk berkas ini, abaikan
             if (uploadingFiles[berkas_id]) {
                 return false;
             }
-            
+
             var pengajuan_id = $('#id').val();
 
             // Hapus notifikasi sebelumnya
@@ -393,27 +393,27 @@
 $(function() {
     // Flag untuk prevent double submit
     var isSubmitting = false;
-    
+
     $('#form_pengajuan').on('submit', function(e) {
         e.preventDefault();
-        
+
         // Jika sedang submit, abaikan
         if (isSubmitting) {
             return false;
         }
-        
+
         alertify.confirm(
             'Apakah Anda yakin ingin mengirim pengajuan ini? Pastikan semua data sudah benar.',
             () => {
                 // Set flag sebelum submit
                 isSubmitting = true;
-                
+
                 // Disable semua button di form
                 $('#form_pengajuan').find('button[type="submit"], button[type="button"]').prop('disabled', true);
-                
+
                 // Show loading
                 $('#loading_dokumen').show().html('<div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><p class="mt-2">Mengirim pengajuan, mohon tunggu...</p>');
-                
+
                 // Submit form
                 this.submit();
             },

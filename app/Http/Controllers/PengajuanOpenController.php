@@ -1445,4 +1445,114 @@ class PengajuanOpenController extends Controller
         $pdf = PDF::loadView('dashboard.pdf', compact('pengajuan','files'));
         return $pdf->download('pengajuan_'.$pengajuan->id.'.pdf');
     }
+
+    public function downloadexcel($id)
+    {
+        $pengajuan = Pengajuan::findOrFail($id);
+        $files = PengajuanFile::where('pengajuan_id', $id)
+            ->where('status', '!=', 99)
+            ->get();
+
+        // Create spreadsheet headers and data
+        $filename = 'pengajuan_' . $pengajuan->id . '.csv';
+        $handle = fopen('php://memory', 'r+');
+
+        // Header row
+        $headers = [
+            'LAPORAN PENGAJUAN PAKET TENDER',
+            '',
+            'Kode RUP',
+            'Nama Paket',
+            'Perangkat Daerah',
+            'Rekening Kegiatan',
+            'Sumber Dana',
+            'Pagu Anggaran',
+            'Pagu HPS',
+            'Jenis Pengadaan',
+            'Metode Pengadaan',
+            'Tanggal Pengajuan',
+            'Status'
+        ];
+        fputcsv($handle, $headers, ';');
+
+        // Detail row
+        $statusText = $this->getStatusText($pengajuan->status);
+        $details = [
+            '',
+            '',
+            $pengajuan->kode_rup,
+            $pengajuan->perangkat_daerah,
+            $pengajuan->perangkat_daerah,
+            $pengajuan->rekening_kegiatan,
+            $pengajuan->sumber_dana,
+            number_format($pengajuan->pagu_anggaran, 0, ',', '.'),
+            number_format($pengajuan->pagu_hps, 0, ',', '.'),
+            $pengajuan->jenis_pengadaan,
+            $pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-',
+            $pengajuan->created_at->format('d/m/Y H:i:s'),
+            $statusText
+        ];
+        fputcsv($handle, $details, ';');
+
+        // Empty row
+        fputcsv($handle, [], ';');
+
+        // Files header
+        fputcsv($handle, ['DAFTAR BERKAS'], ';');
+        fputcsv($handle, ['No', 'Nama File', 'Status', 'Tanggal Upload'], ';');
+
+        // Files data
+        $no = 1;
+        foreach ($files as $file) {
+            $fileStatus = $this->getFileStatusText($file->status);
+            fputcsv($handle, [
+                $no++,
+                $file->nama_file,
+                $fileStatus,
+                $file->created_at->format('d/m/Y H:i:s')
+            ], ';');
+        }
+
+        // Rewind and return
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return response($csv)
+            ->header('Content-Encoding', 'UTF-8')
+            ->header('Content-Type', 'text/csv; charset=UTF-8')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
+    }
+
+    private function getStatusText($status)
+    {
+        $statuses = [
+            0 => 'Menunggu Verifikator',
+            11 => 'Menunggu Kepala UKPBJ',
+            12 => 'Tidak Disetujui Verifikator',
+            13 => 'Menunggu Verifikasi Ulang',
+            14 => 'File dikembalikan ke PPK',
+            21 => 'Menunggu Reviu Pokja',
+            22 => 'Tidak Disetujui Kepala UKPBJ',
+            31 => 'Siap Ditayangkan',
+            32 => 'Tidak Disetujui Pokja Pemilihan',
+            33 => 'Menunggu Verifikasi Ulang',
+            34 => 'File dikembalikan ke PPK',
+            88 => 'System stops - No updates for 3 days'
+        ];
+        return $statuses[$status] ?? 'Unknown Status';
+    }
+
+    private function getFileStatusText($status)
+    {
+        $statuses = [
+            0 => 'Belum Direviu',
+            1 => 'Sesuai',
+            2 => 'Perlu Perbaikan',
+            3 => 'Tidak Diterima'
+        ];
+        return $statuses[$status] ?? 'Unknown Status';
+    }
 }
