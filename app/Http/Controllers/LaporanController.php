@@ -16,37 +16,26 @@ class LaporanController extends Controller
 
     public function getLaporan(Request $request)
     {
-        $type = $request->input('type', 'harian'); // harian, bulanan, tahunan
-        $date = $request->input('date', now()->format('Y-m-d'));
+        $startDate = $request->input('start_date', now()->format('Y-m-d'));
+        $endDate = $request->input('end_date', now()->format('Y-m-d'));
         
-        $query = Pengajuan::with(['user', 'metodePengadaan']);
-
-        switch ($type) {
-            case 'harian':
-                $carbonDate = Carbon::parse($date);
-                $query->whereDate('created_at', $carbonDate->format('Y-m-d'));
-                $title = 'Laporan Harian - ' . $carbonDate->format('d F Y');
-                break;
-
-            case 'bulanan':
-                $carbonDate = Carbon::parse($date);
-                $query->whereYear('created_at', $carbonDate->year)
-                      ->whereMonth('created_at', $carbonDate->month);
-                $title = 'Laporan Bulanan - ' . $carbonDate->format('F Y');
-                break;
-
-            case 'tahunan':
-                $carbonDate = Carbon::parse($date);
-                $query->whereYear('created_at', $carbonDate->year);
-                $title = 'Laporan Tahunan - ' . $carbonDate->year;
-                break;
-
-            default:
-                $query->whereDate('created_at', now()->format('Y-m-d'));
-                $title = 'Laporan Harian - ' . now()->format('d F Y');
-        }
+        $carbonStart = Carbon::parse($startDate);
+        $carbonEnd = Carbon::parse($endDate);
+        
+        $query = Pengajuan::with(['user', 'metodePengadaan'])
+            ->whereBetween('created_at', [
+                $carbonStart->startOfDay(), 
+                $carbonEnd->endOfDay()
+            ]);
 
         $pengajuans = $query->orderBy('created_at', 'desc')->get();
+
+        // Generate title
+        if ($carbonStart->format('Y-m-d') === $carbonEnd->format('Y-m-d')) {
+            $title = 'Laporan Tanggal ' . $carbonStart->format('d F Y');
+        } else {
+            $title = 'Laporan Periode ' . $carbonStart->format('d F Y') . ' s/d ' . $carbonEnd->format('d F Y');
+        }
 
         // Statistik
         $stats = [
@@ -69,33 +58,26 @@ class LaporanController extends Controller
 
     public function exportPdf(Request $request)
     {
-        $type = $request->input('type', 'harian');
-        $date = $request->input('date', now()->format('Y-m-d'));
+        $startDate = $request->input('start_date', now()->format('Y-m-d'));
+        $endDate = $request->input('end_date', now()->format('Y-m-d'));
         
-        $query = Pengajuan::with(['user', 'metodePengadaan']);
-
-        switch ($type) {
-            case 'harian':
-                $carbonDate = Carbon::parse($date);
-                $query->whereDate('created_at', $carbonDate->format('Y-m-d'));
-                $title = 'Laporan Harian - ' . $carbonDate->format('d F Y');
-                break;
-
-            case 'bulanan':
-                $carbonDate = Carbon::parse($date);
-                $query->whereYear('created_at', $carbonDate->year)
-                      ->whereMonth('created_at', $carbonDate->month);
-                $title = 'Laporan Bulanan - ' . $carbonDate->format('F Y');
-                break;
-
-            case 'tahunan':
-                $carbonDate = Carbon::parse($date);
-                $query->whereYear('created_at', $carbonDate->year);
-                $title = 'Laporan Tahunan - ' . $carbonDate->year;
-                break;
-        }
+        $carbonStart = Carbon::parse($startDate);
+        $carbonEnd = Carbon::parse($endDate);
+        
+        $query = Pengajuan::with(['user', 'metodePengadaan'])
+            ->whereBetween('created_at', [
+                $carbonStart->startOfDay(), 
+                $carbonEnd->endOfDay()
+            ]);
 
         $pengajuans = $query->orderBy('created_at', 'desc')->get();
+
+        // Generate title
+        if ($carbonStart->format('Y-m-d') === $carbonEnd->format('Y-m-d')) {
+            $title = 'Laporan Tanggal ' . $carbonStart->format('d F Y');
+        } else {
+            $title = 'Laporan Periode ' . $carbonStart->format('d F Y') . ' s/d ' . $carbonEnd->format('d F Y');
+        }
 
         $stats = [
             'total' => $pengajuans->count(),
@@ -107,9 +89,9 @@ class LaporanController extends Controller
             'total_pagu' => $pengajuans->sum('pagu_anggaran'),
         ];
 
-        $pdf = \PDF::loadView('dashboard.laporan_pdf', compact('pengajuans', 'stats', 'title', 'type'));
+        $pdf = \PDF::loadView('dashboard.laporan_pdf', compact('pengajuans', 'stats', 'title'));
         
-        $filename = 'laporan_' . $type . '_' . str_replace('-', '', $date) . '.pdf';
+        $filename = 'laporan_' . str_replace('-', '', $startDate) . '_' . str_replace('-', '', $endDate) . '.pdf';
         
         return $pdf->download($filename);
     }

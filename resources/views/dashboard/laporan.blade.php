@@ -38,28 +38,34 @@
                         <h5 class="mt-0 header-title mb-4">Filter Laporan</h5>
                         <form id="filterForm">
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>Tipe Laporan</label>
-                                        <select class="form-control" id="laporanType" name="type">
-                                            <option value="harian">Harian</option>
-                                            <option value="bulanan">Bulanan</option>
-                                            <option value="tahunan">Tahunan</option>
-                                        </select>
+                                        <label>Tanggal Awal</label>
+                                        <input type="text" class="form-control" id="startDate" name="start_date" autocomplete="off" placeholder="Pilih tanggal awal">
                                     </div>
                                 </div>
-                                <div class="col-md-4" id="datePickerWrapper">
+                                <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>Pilih Tanggal</label>
-                                        <input type="text" class="form-control" id="datePicker" name="date" autocomplete="off">
+                                        <label>Tanggal Akhir</label>
+                                        <input type="text" class="form-control" id="endDate" name="end_date" autocomplete="off" placeholder="Pilih tanggal akhir">
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>&nbsp;</label>
                                         <div>
                                             <button type="submit" class="btn btn-primary btn-block">
                                                 <i class="fa fa-search"></i> Tampilkan Laporan
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>&nbsp;</label>
+                                        <div>
+                                            <button type="button" class="btn btn-danger btn-block" id="exportPdfBtn" style="display:none;">
+                                                <i class="fa fa-file-pdf"></i> Export PDF
                                             </button>
                                         </div>
                                     </div>
@@ -172,9 +178,6 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="mt-0 header-title" id="tableTitle">Laporan Pengajuan</h5>
-                            <button type="button" class="btn btn-danger btn-sm" id="exportPdfBtn">
-                                <i class="fa fa-file-pdf"></i> Export PDF
-                            </button>
                         </div>
                         <div class="table-responsive">
                             <table id="laporanTable" class="table table-striped table-bordered table-sm" style="font-size: 12px;">
@@ -206,68 +209,57 @@
 <script src="{{ asset('template/assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script>
 $(document).ready(function() {
-    let currentType = 'harian';
-    let currentDate = '{{ now()->format("Y-m-d") }}';
+    let startDate = '{{ now()->format("Y-m-d") }}';
+    let endDate = '{{ now()->format("Y-m-d") }}';
 
-    // Initialize datepicker
-    function initDatePicker(type) {
-        $('#datePicker').datepicker('destroy');
-        
-        if (type === 'harian') {
-            $('#datePicker').datepicker({
-                format: 'dd/mm/yyyy',
-                autoclose: true,
-                todayHighlight: true
-            }).datepicker('setDate', new Date());
-        } else if (type === 'bulanan') {
-            $('#datePicker').datepicker({
-                format: 'mm/yyyy',
-                viewMode: 'months',
-                minViewMode: 'months',
-                autoclose: true
-            }).datepicker('setDate', new Date());
-        } else if (type === 'tahunan') {
-            $('#datePicker').datepicker({
-                format: 'yyyy',
-                viewMode: 'years',
-                minViewMode: 'years',
-                autoclose: true
-            }).datepicker('setDate', new Date());
-        }
-    }
-
-    initDatePicker('harian');
-
-    // Change type handler
-    $('#laporanType').on('change', function() {
-        currentType = $(this).val();
-        initDatePicker(currentType);
+    // Initialize datepickers
+    $('#startDate, #endDate').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        todayHighlight: true
     });
 
-    // Date change handler
-    $('#datePicker').on('changeDate', function(e) {
+    // Set default dates
+    $('#startDate').datepicker('setDate', new Date());
+    $('#endDate').datepicker('setDate', new Date());
+
+    // Start date change handler
+    $('#startDate').on('changeDate', function(e) {
         const date = e.date;
-        if (currentType === 'harian') {
-            currentDate = date.getFullYear() + '-' + 
-                         String(date.getMonth() + 1).padStart(2, '0') + '-' + 
-                         String(date.getDate()).padStart(2, '0');
-        } else if (currentType === 'bulanan') {
-            currentDate = date.getFullYear() + '-' + 
-                         String(date.getMonth() + 1).padStart(2, '0') + '-01';
-        } else {
-            currentDate = date.getFullYear() + '-01-01';
-        }
+        startDate = date.getFullYear() + '-' + 
+                   String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(date.getDate()).padStart(2, '0');
+        
+        // Set minimum date for end date
+        $('#endDate').datepicker('setStartDate', date);
+    });
+
+    // End date change handler
+    $('#endDate').on('changeDate', function(e) {
+        const date = e.date;
+        endDate = date.getFullYear() + '-' + 
+                 String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                 String(date.getDate()).padStart(2, '0');
+        
+        // Set maximum date for start date
+        $('#startDate').datepicker('setEndDate', date);
     });
 
     // Submit form
     $('#filterForm').on('submit', function(e) {
         e.preventDefault();
+        
+        if (!startDate || !endDate) {
+            alertify.error('Silakan pilih tanggal awal dan akhir');
+            return;
+        }
+        
         loadLaporan();
     });
 
     // Export PDF
     $('#exportPdfBtn').on('click', function() {
-        window.location.href = '{{ route("admin_laporan_export_pdf") }}?type=' + currentType + '&date=' + currentDate;
+        window.location.href = '{{ route("admin_laporan_export_pdf") }}?start_date=' + startDate + '&end_date=' + endDate;
     });
 
     function loadLaporan() {
@@ -275,12 +267,13 @@ $(document).ready(function() {
             url: '{{ route("admin_laporan_data") }}',
             type: 'GET',
             data: {
-                type: currentType,
-                date: currentDate
+                start_date: startDate,
+                end_date: endDate
             },
             beforeSend: function() {
                 $('#statsSection').hide();
                 $('#tableSection').hide();
+                $('#exportPdfBtn').hide();
             },
             success: function(response) {
                 if (response.success) {
@@ -318,6 +311,7 @@ $(document).ready(function() {
                     // Show sections
                     $('#statsSection').fadeIn();
                     $('#tableSection').fadeIn();
+                    $('#exportPdfBtn').fadeIn();
                 }
             },
             error: function() {
