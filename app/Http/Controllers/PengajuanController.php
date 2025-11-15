@@ -152,29 +152,53 @@ class PengajuanController extends Controller
             // Status HTML untuk PPK
             if (Auth::user()->role == 'ppk') {
                 if ($row->status == 0) {
-                    $status = '<span class="badge badge-pill badge-primary">Verifikator</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-primary"></i> Verifikator</b>
+                        <br>&emsp; <i>Menunggu Verifikator</i>
+                        <br><small class="text-muted">&emsp;Pengajuan Anda sedang menunggu proses verifikasi oleh verifikator.</small>';
                 } elseif ($row->status == 11) {
-                    $status = '<span class="badge badge-pill badge-primary">Kepala UKPBJ</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Kepala UKPBJ</b>
+                        <br>&emsp; <i>Menunggu Kepala UKPBJ</i>
+                        <br><small class="text-muted">&emsp;Pengajuan telah disetujui verifikator dan menunggu persetujuan Kepala UKPBJ.</small>';
                 } elseif ($row->status == 12) {
-                    $status = '<span class="badge badge-pill badge-primary">Verifikator</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Verifikator</b>
+                        <br>&emsp; <i>Tidak Disetujui Verifikator</i>
+                        <br><small class="text-muted">&emsp;Pengajuan Anda tidak disetujui oleh verifikator. Silakan cek kembali dokumen Anda.</small>';
                 } elseif ($row->status == 13) {
-                    $status = '<span class="badge badge-pill badge-primary">Verifikator</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-warning"></i> Verifikator</b>
+                        <br>&emsp; <i>Menunggu Verifikasi Ulang</i>
+                        <br><small class="text-muted">&emsp;Pengajuan Anda perlu diverifikasi ulang oleh verifikator.</small>';
                 } elseif ($row->status == 14) {
-                    $status = '<span class="badge badge-pill badge-warning">PPK</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-warning"></i> PPK</b>
+                        <br>&emsp; <small><i>File dikembalikan pada PPK</i></small>
+                        <br><small class="text-muted">&emsp;Beberapa file perlu diperbaiki oleh PPK sebelum proses dilanjutkan.</small>';
                 } elseif ($row->status == 21) {
-                    $status = '<span class="badge badge-pill badge-primary">Pokja Pemilihan</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Pokja</b>
+                        <br>&emsp; <i>Menunggu Reviu Pokja</i>
+                        <br><small class="text-muted">&emsp;Pengajuan Anda sedang direviu oleh Pokja.</small>';
                 } elseif ($row->status == 22) {
-                    $status = '<span class="badge badge-pill badge-primary">Kepala UKPBJ</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Kepala UKPBJ</b>
+                        <br>&emsp; <i>Tidak Disetujui Kepala UKPBJ</i>
+                        <br><small class="text-muted">&emsp;Pengajuan Anda tidak disetujui oleh Kepala UKPBJ.</small>';
                 } elseif ($row->status == 31) {
-                    $status = '<span class="badge badge-pill badge-primary">Pokja Pemilihan</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Pokja</b>
+                        <br>&emsp; <i>Siap Ditayangkan</i>
+                        <br><small class="text-muted">&emsp;Proses pengajuan telah selesai dan Siap Ditayangkan. Terima kasih atas partisipasi Anda.</small>';
                 } elseif ($row->status == 32) {
-                    $status = '<span class="badge badge-pill badge-primary">Pokja Pemilihan</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Pokja</b>
+                        <br>&emsp; <i>Tidak Disetujui Pokja Pemilihan</i>
+                        <br><small class="text-muted">&emsp;Pengajuan Anda tidak disetujui oleh Pokja.</small>';
                 } elseif ($row->status == 33) {
-                    $status = '<span class="badge badge-pill badge-primary">Pokja Pemilihan</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-warning"></i> PPK</b>
+                        <br>&emsp; <i>Menunggu Verifikasi Ulang</i>
+                        <br><small class="text-muted">&emsp;Pengajuan Anda perlu diverifikasi ulang .</small>';
                 } elseif ($row->status == 34) {
-                    $status = '<span class="badge badge-pill badge-warning">PPK</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-warning"></i> PPK</b>
+                        <br>&emsp; <small><i>File dikembalikan pada PPK</i></small>
+                        <br><small class="text-muted">&emsp;Beberapa file perlu diperbaiki oleh PPK sebelum proses dilanjutkan.</small>';
                 } else {
-                    $status = '<span class="badge badge-pill badge-primary">Error</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b>
+                        <br>&emsp; <i>Status Error</i>
+                        <br><small class="text-muted">&emsp;Terjadi kesalahan status. Silakan hubungi admin.</small>';
                 }
             } elseif(Auth::user()->role=="verifikator"){
                 $button = '<button class="btn btn-primary btn-sm open-post" data-id="' . $row->id . '">Open</button>';
@@ -237,38 +261,57 @@ class PengajuanController extends Controller
             } else{
                 $button = '<button class="btn btn-primary btn-sm open-post" data-id="' . $row->id . '">Open</button>';
                 if ($row->status == 0) {
-                    $status = '<span class="badge badge-pill badge-primary">Verifikator</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-primary"></i> Verifikator</b>
+                        <br>&emsp; <i>Menunggu Verifikator</i>
+                        <br><small class="text-muted">&emsp;Pengajuan sedang menunggu proses verifikasi oleh verifikator.</small>';
                 } elseif ($row->status == 11) {
-                    $status = '<span class="badge badge-pill badge-primary">Kepala UKPBJ</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Kepala UKPBJ</b>
+                        <br>&emsp; <i>Menunggu Kepala UKPBJ</i>
+                        <br><small class="text-muted">&emsp;Pengajuan telah disetujui verifikator dan menunggu persetujuan Kepala UKPBJ.</small>';
                 } elseif ($row->status == 12) {
-                    $status = '<span class="badge badge-pill badge-primary">Verifikator</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Verifikator</b>
+                        <br>&emsp; <i>Tidak Disetujui Verifikator</i>
+                        <br><small class="text-muted">&emsp;Pengajuan tidak disetujui oleh verifikator. Silakan cek kembali dokumen.</small>';
                 } elseif ($row->status == 13) {
-                    $status = '<span class="badge badge-pill badge-primary">Verifikator</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-warning"></i> Verifikator</b>
+                        <br>&emsp; <i>Menunggu Verifikasi Ulang</i>
+                        <br><small class="text-muted">&emsp;Pengajuan perlu diverifikasi ulang oleh verifikator.</small>';
                 } elseif ($row->status == 14) {
-                    $status = '<span class="badge badge-pill badge-warning">PPK</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-warning"></i> PPK</b>
+                        <br>&emsp; <small><i>File dikembalikan pada PPK</i></small>
+                        <br><small class="text-muted">&emsp;Beberapa file perlu diperbaiki oleh PPK sebelum proses dilanjutkan.</small>';
                 } elseif ($row->status == 21) {
-                    $status = '<span class="badge badge-pill badge-primary">Pokja Pemilihan</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Pokja</b>
+                        <br>&emsp; <i>Menunggu Reviu Pokja</i>
+                        <br><small class="text-muted">&emsp;Pengajuan sedang direviu oleh Pokja Pemilihan.</small>';
                 } elseif ($row->status == 22) {
-
-                    $status = '<span class="badge badge-pill badge-primary">Kepala UKPBJ</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Kepala UKPBJ</b>
+                        <br>&emsp; <i>Tidak Disetujui Kepala UKPBJ</i>
+                        <br><small class="text-muted">&emsp;Pengajuan tidak disetujui oleh Kepala UKPBJ.</small>';
                 } elseif ($row->status == 31) {
-
-                    $status = '<span class="badge badge-pill badge-primary">Pokja Pemilihan</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-success"></i> Pokja</b>
+                        <br>&emsp; <i>Siap Ditayangkan</i>
+                        <br><small class="text-muted">&emsp;Proses pengajuan telah selesai dan Siap Ditayangkan.</small>';
                 } elseif ($row->status == 32) {
-
-                    $status = '<span class="badge badge-pill badge-primary">Pokja Pemilihan</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Pokja</b>
+                        <br>&emsp; <i>Tidak Disetujui Pokja Pemilihan</i>
+                        <br><small class="text-muted">&emsp;Pengajuan tidak disetujui oleh Pokja Pemilihan.</small>';
                 } elseif ($row->status == 33) {
-
-                    $status = '<span class="badge badge-pill badge-primary">Pokja Pemilihan</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-warning"></i> Pokja</b>
+                        <br>&emsp; <i>Menunggu Verifikasi Ulang</i>
+                        <br><small class="text-muted">&emsp;Pengajuan perlu diverifikasi ulang oleh Pokja Pemilihan.</small>';
                 } elseif ($row->status == 34) {
-
-                    $status = '<span class="badge badge-pill badge-warning">PPK</span>';
-                }elseif ($row->status == 88) {
-
-                    $status = '<span class="badge badge-pill badge-danger">PPK</span><br><small><i>System stops auto-submission, no updates for 3 days</i></small>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-warning"></i> PPK</b>
+                        <br>&emsp; <small><i>File dikembalikan pada PPK</i></small>
+                        <br><small class="text-muted">&emsp;Beberapa file perlu diperbaiki oleh PPK sebelum proses dilanjutkan.</small>';
+                } elseif ($row->status == 88) {
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> System</b>
+                        <br>&emsp; <i>Sistem Berhenti</i>
+                        <br><small class="text-muted">&emsp;System stops auto-submission, no updates for 3 days</small>';
                 } else {
-
-                    $status = '<span class="badge badge-pill badge-primary">Error</span>';
+                    $status = '<b><i class="mdi mdi-checkbox-blank-circle text-danger"></i> Status Terakhir</b>
+                        <br>&emsp; <i>Status Error</i>
+                        <br><small class="text-muted">&emsp;Terjadi kesalahan status. Silakan hubungi admin.</small>';
                 }
             }
 
