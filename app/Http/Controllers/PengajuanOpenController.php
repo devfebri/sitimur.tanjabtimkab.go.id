@@ -1456,28 +1456,28 @@ class PengajuanOpenController extends Controller
             ->get();
 
         $statusText = $this->getStatusText($pengajuan->status);
-        
+
         return \Maatwebsite\Excel\Facades\Excel::download(
             new class($pengajuan, $files, $statusText) implements \Maatwebsite\Excel\Concerns\FromArray, \Maatwebsite\Excel\Concerns\WithStyles, \Maatwebsite\Excel\Concerns\ShouldAutoSize {
                 private $pengajuan;
                 private $files;
                 private $statusText;
-                
+
                 public function __construct($pengajuan, $files, $statusText)
                 {
                     $this->pengajuan = $pengajuan;
                     $this->files = $files;
                     $this->statusText = $statusText;
                 }
-                
+
                 public function array(): array
                 {
                     $data = [];
-                    
+
                     // Title
                     $data[] = ['LAPORAN PENGAJUAN PAKET TENDER', '', '', ''];
                     $data[] = ['', '', '', ''];
-                    
+
                     // Detail Section
                     $data[] = ['DETAIL PENGAJUAN', '', '', ''];
                     $data[] = ['Kode RUP', $this->pengajuan->kode_rup, '', ''];
@@ -1491,33 +1491,41 @@ class PengajuanOpenController extends Controller
                     $data[] = ['Metode Pengadaan', $this->pengajuan->metodePengadaan->nama_metode_pengadaan ?? '-', '', ''];
                     $data[] = ['Tanggal Pengajuan', $this->pengajuan->created_at->format('d/m/Y H:i:s'), '', ''];
                     $data[] = ['Status', $this->statusText, '', ''];
-                    
+
                     $data[] = ['', '', '', ''];
-                    $data[] = ['', '', '', ''];
-                    
+
                     // Files Section
-                    $data[] = ['DAFTAR BERKAS', '', '', ''];
-                    $data[] = ['', '', '', ''];
-                    $data[] = ['No', 'Nama File', 'Status', 'Tanggal Upload'];
-                    
+                    $data[] = ['DAFTAR BERKAS', '', '', '', '', '', '', '', ''];
+                    $data[] = ['', '', '', '', '', '', '', '', ''];
+                    $data[] = ['No', 'Nama File', 'Status', 'Verifikator', 'Pokja 1', 'Pokja 2', 'Pokja 3', 'Tanggal Upload', ''];
+
                     if ($this->files->isNotEmpty()) {
                         $no = 1;
                         foreach ($this->files as $file) {
                             $fileStatus = $this->getFileStatusText($file->status);
+                            $verifikatorStatus = $file->verifikator_status !== null ? $this->getFileStatusText($file->verifikator_status) : '-';
+                            $pokja1Status = $file->pokja1_status !== null ? $this->getFileStatusText($file->pokja1_status) : '-';
+                            $pokja2Status = $file->pokja2_status !== null ? $this->getFileStatusText($file->pokja2_status) : '-';
+                            $pokja3Status = $file->pokja3_status !== null ? $this->getFileStatusText($file->pokja3_status) : '-';
                             $data[] = [
                                 $no++,
                                 $file->nama_file,
                                 $fileStatus,
-                                $file->created_at->format('d/m/Y H:i:s')
+                                $verifikatorStatus,
+                                $pokja1Status,
+                                $pokja2Status,
+                                $pokja3Status,
+                                $file->created_at->format('d/m/Y H:i:s'),
+                                ''
                             ];
                         }
                     } else {
-                        $data[] = ['Tidak ada berkas', '', '', ''];
+                        $data[] = ['Tidak ada berkas', '', '', '', '', '', '', '', ''];
                     }
-                    
+
                     return $data;
                 }
-                
+
                 public function styles($sheet)
                 {
                     $border = [
@@ -1528,7 +1536,7 @@ class PengajuanOpenController extends Controller
                             ],
                         ],
                     ];
-                    
+
                     $headerStyle = [
                         'font' => [
                             'bold' => true,
@@ -1549,7 +1557,7 @@ class PengajuanOpenController extends Controller
                             ],
                         ],
                     ];
-                    
+
                     $titleStyle = [
                         'font' => [
                             'bold' => true,
@@ -1560,7 +1568,7 @@ class PengajuanOpenController extends Controller
                             'vertical' => 'center',
                         ],
                     ];
-                    
+
                     $sectionStyle = [
                         'font' => [
                             'bold' => true,
@@ -1577,35 +1585,35 @@ class PengajuanOpenController extends Controller
                             ],
                         ],
                     ];
-                    
+
                     // Row 1: Title
-                    $sheet->getStyle('A1:D1')->applyFromArray($titleStyle);
-                    
+                    $sheet->getStyle('A1:I1')->applyFromArray($titleStyle);
+
                     // Row 3: Detail Section Header
                     $sheet->getStyle('A3:D3')->applyFromArray($sectionStyle);
-                    
+
                     // Rows 4-14: Detail Data (with borders)
                     $sheet->getStyle('A4:D14')->applyFromArray($border);
-                    
+
                     // Row 16: Daftar Berkas Header
-                    $sheet->getStyle('A16:D16')->applyFromArray($sectionStyle);
-                    
+                    $sheet->getStyle('A16:I16')->applyFromArray($sectionStyle);
+
                     // Row 18: Table Headers
-                    $sheet->getStyle('A18:D18')->applyFromArray($headerStyle);
-                    
+                    $sheet->getStyle('A18:I18')->applyFromArray($headerStyle);
+
                     // Files data rows
                     if ($this->files->isNotEmpty()) {
                         $filesStart = 19;
                         $filesEnd = 18 + $this->files->count();
-                        $sheet->getStyle("A{$filesStart}:D{$filesEnd}")->applyFromArray($border);
+                        $sheet->getStyle("A{$filesStart}:I{$filesEnd}")->applyFromArray($border);
                     } else {
                         // "Tidak ada berkas" row
-                        $sheet->getStyle('A19:D19')->applyFromArray($border);
+                        $sheet->getStyle('A19:I19')->applyFromArray($border);
                     }
-                    
+
                     return [];
                 }
-                
+
                 private function getFileStatusText($status)
                 {
                     $statuses = [
