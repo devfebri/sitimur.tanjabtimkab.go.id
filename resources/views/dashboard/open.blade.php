@@ -26,85 +26,54 @@
         color: #555;
     }
 
-    /* Badge notifikasi chat - Enhanced Version */
-    .position-relative {
-        position: relative !important;
-    }
-
-    .position-absolute {
-        position: absolute !important;
-    }
-
-    .top-0 {
-        top: -8px !important;
-    }
-
-    .start-100 {
-        left: calc(100% - 10px) !important;
-    }
-
-    .translate-middle {
-        transform: translate(-50%, -50%) !important;
-    }
-
-    .visually-hidden {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
-    }
-
-    .badge.rounded-pill {
-        border-radius: 10rem !important;
-        padding: 0.4em 0.7em;
-        font-size: 0.75em;
-        font-weight: 700;
-        line-height: 1;
-        min-width: 24px;
-        height: 24px;
-        text-align: center;
+    /* Badge notifikasi chat - Inline Style */
+    .chat-badge-inline {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 3px 8px rgba(220, 53, 69, 0.5);
-        border: 2.5px solid #fff;
-        animation: pulse-badge 2s infinite;
-        z-index: 10;
+        min-width: 22px;
+        height: 22px;
+        padding: 0.25em 0.6em;
+        margin-left: 8px;
+        font-size: 0.7em;
+        font-weight: 700;
+        line-height: 1;
+        color: #fff;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 10rem;
+        background-color: #fff;
+        color: #dc3545;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px #dc3545, 0 2px 8px rgba(220, 53, 69, 0.5);
+        animation: pulse-inline-badge 2s infinite;
     }
 
-    .bg-danger {
-        background-color: #dc3545 !important;
-        color: #fff !important;
-    }
-
-    @keyframes pulse-badge {
+    @keyframes pulse-inline-badge {
         0% {
-            box-shadow: 0 3px 8px rgba(220, 53, 69, 0.5);
+            box-shadow: 0 0 0 2px #dc3545, 0 2px 8px rgba(220, 53, 69, 0.5);
         }
         50% {
-            box-shadow: 0 3px 12px rgba(220, 53, 69, 0.8), 0 0 0 4px rgba(220, 53, 69, 0.3);
+            box-shadow: 0 0 0 3px #dc3545, 0 3px 12px rgba(220, 53, 69, 0.8);
+            transform: scale(1.1);
         }
         100% {
-            box-shadow: 0 3px 8px rgba(220, 53, 69, 0.5);
+            box-shadow: 0 0 0 2px #dc3545, 0 2px 8px rgba(220, 53, 69, 0.5);
         }
     }
 
-    /* Hover effect pada button chat dengan badge */
-    .btn.position-relative:hover .badge {
-        animation: bounce-badge 0.5s;
+    /* Hover effect untuk badge inline */
+    .btn-chat-modern:hover .chat-badge-inline {
+        animation: bounce-inline-badge 0.5s;
     }
 
-    @keyframes bounce-badge {
+    @keyframes bounce-inline-badge {
         0%, 100% {
-            transform: translate(-50%, -50%) scale(1);
+            transform: scale(1);
         }
         50% {
-            transform: translate(-50%, -50%) scale(1.3);
+            transform: scale(1.15);
         }
     }
 
@@ -475,67 +444,55 @@
                                                     {{-- Button Chat Verifikator (Status < 20) --}}
                                                     @if($data->status < 20)
                                                         <a href="{{ route('ppk_pengajuan.chat', [$data->id]) }}"
-                                                           class="btn btn-sm me-1 position-relative btn-chat-modern btn-chat-verifikator"
+                                                           class="btn btn-sm me-1 btn-chat-modern btn-chat-verifikator"
                                                            title="Chat dengan Verifikator">
                                                             <span>
                                                                 <i class="mdi mdi-chat-processing"></i>Chat Verifikator
+                                                                @if($unreadCount > 0)
+                                                                    <span class="chat-badge-inline">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
+                                                                @endif
                                                             </span>
-                                                            @if($unreadCount > 0)
-                                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                                                    {{ $unreadCount > 99 ? '99+' : $unreadCount }}
-                                                                    <span class="visually-hidden">pesan belum dibaca</span>
-                                                                </span>
-                                                            @endif
                                                         </a>
                                                     @endif
 
                                                     {{-- Button Chat Pokja (Status >= 20) --}}
                                                     @if($data->status >= 20)
                                                         <a href="{{ route('ppk_pengajuan.chat', [$data->id]) }}"
-                                                           class="btn btn-sm me-1 position-relative btn-chat-modern btn-chat-pokja"
+                                                           class="btn btn-sm me-1 btn-chat-modern btn-chat-pokja"
                                                            title="Chat dengan Pokja Pemilihan">
                                                             <span>
                                                                 <i class="mdi mdi-forum"></i>Chat Pokja
+                                                                @if($unreadCount > 0)
+                                                                    <span class="chat-badge-inline">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
+                                                                @endif
                                                             </span>
-                                                            @if($unreadCount > 0)
-                                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                                                    {{ $unreadCount > 99 ? '99+' : $unreadCount }}
-                                                                    <span class="visually-hidden">pesan belum dibaca</span>
-                                                                </span>
-                                                            @endif
                                                         </a>
                                                     @endif
 
                                                 {{-- Chat Button untuk Verifikator --}}
                                                 @elseif(auth()->user()->role == 'verifikator')
                                                     <a href="{{ route('verifikator_pengajuan.chat', [$data->id]) }}"
-                                                       class="btn btn-sm me-1 position-relative btn-chat-modern btn-chat-verifikator"
+                                                       class="btn btn-sm me-1 btn-chat-modern btn-chat-verifikator"
                                                        title="Chat dengan PPK">
                                                         <span>
                                                             <i class="mdi mdi-message-text"></i>Chat PPK
+                                                            @if($unreadCount > 0)
+                                                                <span class="chat-badge-inline">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
+                                                            @endif
                                                         </span>
-                                                        @if($unreadCount > 0)
-                                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                                                {{ $unreadCount > 99 ? '99+' : $unreadCount }}
-                                                                <span class="visually-hidden">pesan belum dibaca</span>
-                                                            </span>
-                                                        @endif
                                                     </a>
 
                                                 {{-- Chat Button untuk Pokja Pemilihan --}}
                                                 @elseif(auth()->user()->role == 'pokjapemilihan')
                                                     <a href="{{ route('pokjapemilihan_pengajuan.chat', [$data->id]) }}"
-                                                       class="btn btn-sm me-1 position-relative btn-chat-modern btn-chat-pokja"
+                                                       class="btn btn-sm me-1 btn-chat-modern btn-chat-pokja"
                                                        title="Chat dengan PPK">
                                                         <span>
                                                             <i class="mdi mdi-message-reply-text"></i>Chat PPK
+                                                            @if($unreadCount > 0)
+                                                                <span class="chat-badge-inline">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
+                                                            @endif
                                                         </span>
-                                                        @if($unreadCount > 0)
-                                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                                                {{ $unreadCount > 99 ? '99+' : $unreadCount }}
-                                                                <span class="visually-hidden">pesan belum dibaca</span>
-                                                            </span>
-                                                        @endif
                                                     </a>
                                                 @endif
                                                 <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}"
