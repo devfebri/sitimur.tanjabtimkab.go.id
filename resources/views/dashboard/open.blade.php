@@ -36,11 +36,11 @@
     }
 
     .top-0 {
-        top: -5px !important;
+        top: -8px !important;
     }
 
     .start-100 {
-        left: 100% !important;
+        left: calc(100% - 10px) !important;
     }
 
     .translate-middle {
@@ -61,19 +61,20 @@
 
     .badge.rounded-pill {
         border-radius: 10rem !important;
-        padding: 0.35em 0.65em;
-        font-size: 0.7em;
+        padding: 0.4em 0.7em;
+        font-size: 0.75em;
         font-weight: 700;
         line-height: 1;
-        min-width: 22px;
-        height: 22px;
+        min-width: 24px;
+        height: 24px;
         text-align: center;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 5px rgba(220, 53, 69, 0.4);
-        border: 2px solid #fff;
+        box-shadow: 0 3px 8px rgba(220, 53, 69, 0.5);
+        border: 2.5px solid #fff;
         animation: pulse-badge 2s infinite;
+        z-index: 10;
     }
 
     .bg-danger {
@@ -83,13 +84,13 @@
 
     @keyframes pulse-badge {
         0% {
-            box-shadow: 0 2px 5px rgba(220, 53, 69, 0.4);
+            box-shadow: 0 3px 8px rgba(220, 53, 69, 0.5);
         }
         50% {
-            box-shadow: 0 2px 10px rgba(220, 53, 69, 0.7), 0 0 0 3px rgba(220, 53, 69, 0.2);
+            box-shadow: 0 3px 12px rgba(220, 53, 69, 0.8), 0 0 0 4px rgba(220, 53, 69, 0.3);
         }
         100% {
-            box-shadow: 0 2px 5px rgba(220, 53, 69, 0.4);
+            box-shadow: 0 3px 8px rgba(220, 53, 69, 0.5);
         }
     }
 
@@ -103,7 +104,7 @@
             transform: translate(-50%, -50%) scale(1);
         }
         50% {
-            transform: translate(-50%, -50%) scale(1.2);
+            transform: translate(-50%, -50%) scale(1.3);
         }
     }
 
