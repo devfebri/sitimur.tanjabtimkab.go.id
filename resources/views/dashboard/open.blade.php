@@ -26,7 +26,7 @@
         color: #555;
     }
 
-    /* Badge notifikasi chat */
+    /* Badge notifikasi chat - Enhanced Version */
     .position-relative {
         position: relative !important;
     }
@@ -36,7 +36,7 @@
     }
 
     .top-0 {
-        top: 0 !important;
+        top: -5px !important;
     }
 
     .start-100 {
@@ -61,16 +61,50 @@
 
     .badge.rounded-pill {
         border-radius: 10rem !important;
-        padding: 0.25em 0.5em;
-        font-size: 0.75em;
+        padding: 0.35em 0.65em;
+        font-size: 0.7em;
         font-weight: 700;
         line-height: 1;
-        min-width: 20px;
+        min-width: 22px;
+        height: 22px;
         text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(220, 53, 69, 0.4);
+        border: 2px solid #fff;
+        animation: pulse-badge 2s infinite;
     }
 
     .bg-danger {
         background-color: #dc3545 !important;
+        color: #fff !important;
+    }
+
+    @keyframes pulse-badge {
+        0% {
+            box-shadow: 0 2px 5px rgba(220, 53, 69, 0.4);
+        }
+        50% {
+            box-shadow: 0 2px 10px rgba(220, 53, 69, 0.7), 0 0 0 3px rgba(220, 53, 69, 0.2);
+        }
+        100% {
+            box-shadow: 0 2px 5px rgba(220, 53, 69, 0.4);
+        }
+    }
+
+    /* Hover effect pada button chat dengan badge */
+    .btn.position-relative:hover .badge {
+        animation: bounce-badge 0.5s;
+    }
+
+    @keyframes bounce-badge {
+        0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
     }
 
 </style>
