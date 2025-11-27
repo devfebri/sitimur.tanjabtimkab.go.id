@@ -447,7 +447,7 @@
                                                            class="btn btn-sm me-1 btn-chat-modern btn-chat-verifikator"
                                                            title="Chat dengan Verifikator">
                                                             <span>
-                                                                <i class="mdi mdi-chat-processing"></i>Chat Verifikator
+                                                                <i class="mdi mdi-chat-processing"></i>Chat
                                                                 @if($unreadCount > 0)
                                                                     <span class="chat-badge-inline">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
                                                                 @endif
@@ -461,7 +461,7 @@
                                                            class="btn btn-sm me-1 btn-chat-modern btn-chat-pokja"
                                                            title="Chat dengan Pokja Pemilihan">
                                                             <span>
-                                                                <i class="mdi mdi-forum"></i>Chat Pokja
+                                                                <i class="mdi mdi-forum"></i>Chat
                                                                 @if($unreadCount > 0)
                                                                     <span class="chat-badge-inline">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
                                                                 @endif
@@ -475,7 +475,7 @@
                                                        class="btn btn-sm me-1 btn-chat-modern btn-chat-verifikator"
                                                        title="Chat dengan PPK">
                                                         <span>
-                                                            <i class="mdi mdi-message-text"></i>Chat PPK
+                                                            <i class="mdi mdi-message-text"></i>Chat
                                                             @if($unreadCount > 0)
                                                                 <span class="chat-badge-inline">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
                                                             @endif
@@ -488,7 +488,7 @@
                                                        class="btn btn-sm me-1 btn-chat-modern btn-chat-pokja"
                                                        title="Chat dengan PPK">
                                                         <span>
-                                                            <i class="mdi mdi-message-reply-text"></i>Chat PPK
+                                                            <i class="mdi mdi-message-reply-text"></i>Chat
                                                             @if($unreadCount > 0)
                                                                 <span class="chat-badge-inline">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
                                                             @endif
