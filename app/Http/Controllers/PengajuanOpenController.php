@@ -133,19 +133,21 @@ class PengajuanOpenController extends Controller
                     return $nama;
                 })
                 ->addColumn('action', function ($row) {
+                    // Generate proper file URL - support both old (public/) and new (storage/) paths
+                    $fileUrl = \App\Helpers\FileStorageHelper::getPublicUrl($row->file_path);
 
                     if (Auth::user()->role == 'ppk' && $row->verifikator_status == 3 && ($row->status == 0 || $row->status == 3)) {
                         $button = '<button class="btn btn-warning btn-sm edit-post" data-id="' . $row->id . '">Edit</button> ' ;
-                        $button .= '<a href="' . asset($row->file_path) . '" target="_blank" class="btn btn-sm btn-info"><span class="ti-import"></span> Download</a>';
+                        $button .= '<a href="' . $fileUrl . '" target="_blank" class="btn btn-sm btn-info"><span class="ti-import"></span> Download</a>';
                     }elseif((
                         (Auth::user()->role=='ppk' && $row->pokja1_status == 3) ||
                         (Auth::user()->role=='ppk' && $row->pokja2_status == 3) ||
                         (Auth::user()->role=='ppk' && $row->pokja3_status == 3)
                     ) && ($row->status == 0 || $row->status == 3)){
                         $button = '<button class="btn btn-warning btn-sm edit-post" data-id="' . $row->id . '">Edit</button> ';
-                        $button .= '<a href="' . asset($row->file_path) . '" target="_blank" class="btn btn-sm btn-info"><span class="ti-import"></span> Download</a>';
+                        $button .= '<a href="' . $fileUrl . '" target="_blank" class="btn btn-sm btn-info"><span class="ti-import"></span> Download</a>';
                     }else{
-                        $button = '<a href="' . asset($row->file_path) . '" target="_blank" class="btn btn-sm btn-info"><span class="ti-import"></span> Download</a>';
+                        $button = '<a href="' . $fileUrl . '" target="_blank" class="btn btn-sm btn-info"><span class="ti-import"></span> Download</a>';
                     }
 
 
