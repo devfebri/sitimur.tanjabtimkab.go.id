@@ -26,6 +26,53 @@
         color: #555;
     }
 
+    /* Badge notifikasi chat */
+    .position-relative {
+        position: relative !important;
+    }
+
+    .position-absolute {
+        position: absolute !important;
+    }
+
+    .top-0 {
+        top: 0 !important;
+    }
+
+    .start-100 {
+        left: 100% !important;
+    }
+
+    .translate-middle {
+        transform: translate(-50%, -50%) !important;
+    }
+
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .badge.rounded-pill {
+        border-radius: 10rem !important;
+        padding: 0.25em 0.5em;
+        font-size: 0.75em;
+        font-weight: 700;
+        line-height: 1;
+        min-width: 20px;
+        text-align: center;
+    }
+
+    .bg-danger {
+        background-color: #dc3545 !important;
+    }
+
 </style>
 @endsection
 
@@ -315,31 +362,55 @@
                                                     {{-- Button Chat Verifikator (Status < 20) --}}
                                                     @if($data->status < 20)
                                                         <a href="{{ route('ppk_pengajuan.chat', [$data->id]) }}"
-                                                           class="btn btn-info btn-sm me-1" title="Chat dengan Verifikator">
+                                                           class="btn btn-info btn-sm me-1 position-relative" title="Chat dengan Verifikator">
                                                             <i class="mdi mdi-chat-processing me-1"></i>Chat
+                                                            @if($unreadCount > 0)
+                                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                                    {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                                                                    <span class="visually-hidden">pesan belum dibaca</span>
+                                                                </span>
+                                                            @endif
                                                         </a>
                                                     @endif
 
                                                     {{-- Button Chat Pokja (Status >= 20) --}}
                                                     @if($data->status >= 20)
                                                         <a href="{{ route('ppk_pengajuan.chat', [$data->id]) }}"
-                                                           class="btn btn-success btn-sm me-1" title="Chat dengan Pokja Pemilihan">
+                                                           class="btn btn-success btn-sm me-1 position-relative" title="Chat dengan Pokja Pemilihan">
                                                             <i class="mdi mdi-chat-multiple me-1"></i>Chat
+                                                            @if($unreadCount > 0)
+                                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                                    {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                                                                    <span class="visually-hidden">pesan belum dibaca</span>
+                                                                </span>
+                                                            @endif
                                                         </a>
                                                     @endif
 
                                                 {{-- Chat Button untuk Verifikator --}}
                                                 @elseif(auth()->user()->role == 'verifikator')
                                                     <a href="{{ route('verifikator_pengajuan.chat', [$data->id]) }}"
-                                                       class="btn btn-info btn-sm me-1" title="Chat dengan PPK">
+                                                       class="btn btn-info btn-sm me-1 position-relative" title="Chat dengan PPK">
                                                         <i class="mdi mdi-chat me-1"></i>Chat
+                                                        @if($unreadCount > 0)
+                                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                                {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                                                                <span class="visually-hidden">pesan belum dibaca</span>
+                                                            </span>
+                                                        @endif
                                                     </a>
 
                                                 {{-- Chat Button untuk Pokja Pemilihan --}}
                                                 @elseif(auth()->user()->role == 'pokjapemilihan')
                                                     <a href="{{ route('pokjapemilihan_pengajuan.chat', [$data->id]) }}"
-                                                       class="btn btn-success btn-sm me-1" title="Chat dengan PPK">
+                                                       class="btn btn-success btn-sm me-1 position-relative" title="Chat dengan PPK">
                                                         <i class="mdi mdi-chat-multiple me-1"></i>Chat
+                                                        @if($unreadCount > 0)
+                                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                                {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                                                                <span class="visually-hidden">pesan belum dibaca</span>
+                                                            </span>
+                                                        @endif
                                                     </a>
                                                 @endif
                                                 <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}" class="btn btn-info btn-sm"> PDF</a>

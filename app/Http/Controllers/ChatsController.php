@@ -36,6 +36,13 @@ class ChatsController extends Controller
             $chatType = $pengajuan->status < 20 ? 'verifikator' : 'pokja';
         }
 
+        // Mark all unread messages as read for current user when opening chat
+        \App\Models\ChatMessage::where('pengajuan_id', $pengajuanId)
+            ->where('chat_type', $chatType)
+            ->where('user_id', '!=', $user->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
         $chatMessages = \App\Models\ChatMessage::where('pengajuan_id', $pengajuanId)
             ->where('chat_type', $chatType)
             ->with('user')

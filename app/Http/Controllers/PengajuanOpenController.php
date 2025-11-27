@@ -81,7 +81,25 @@ class PengajuanOpenController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
         $createdAtRevisiTerakhir = $revisi ? $revisi->created_at : null;
-        return view('dashboard.open', compact('data',  'files', 'history', 'tglpengembalian', 'revisi', 'createdAtRevisiTerakhir'));
+
+        // Hitung pesan belum dibaca untuk chat
+        $unreadCount = 0;
+        if (in_array(Auth::user()->role, ['ppk', 'verifikator', 'pokjapemilihan'])) {
+            $chatType = 'verifikator';
+            if (Auth::user()->role === 'pokjapemilihan') {
+                $chatType = 'pokja';
+            } elseif (Auth::user()->role === 'ppk') {
+                $chatType = $data->status < 20 ? 'verifikator' : 'pokja';
+            }
+
+            $unreadCount = \App\Models\ChatMessage::where('pengajuan_id', $data->id)
+                ->where('chat_type', $chatType)
+                ->where('user_id', '!=', Auth::user()->id)
+                ->whereNull('read_at')
+                ->count();
+        }
+
+        return view('dashboard.open', compact('data',  'files', 'history', 'tglpengembalian', 'revisi', 'createdAtRevisiTerakhir', 'unreadCount'));
     }
     public function getFiles($id, Request $request)
     {

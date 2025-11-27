@@ -13,6 +13,7 @@ class ChatMessage extends Model
         'message',
         'file_path',
         'chat_type',
+        'read_at',
     ];
 
     protected $casts = [
