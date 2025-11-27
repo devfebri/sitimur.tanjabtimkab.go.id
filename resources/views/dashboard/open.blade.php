@@ -107,6 +107,84 @@
         }
     }
 
+    /* Enhanced Chat Button Design */
+    .btn-chat-modern {
+        position: relative;
+        overflow: hidden;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        border: none;
+    }
+
+    .btn-chat-verifikator {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+    }
+
+    .btn-chat-verifikator:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-chat-pokja {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: #fff;
+    }
+
+    .btn-chat-pokja:hover {
+        background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+    }
+
+    .btn-chat-modern i {
+        font-size: 1.1em;
+        margin-right: 6px;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-chat-modern:hover i {
+        transform: scale(1.2) rotate(10deg);
+    }
+
+    .btn-chat-modern::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-chat-modern:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .btn-chat-modern span {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Action buttons enhancement */
+    .btn-action-group .btn {
+        transition: all 0.3s ease;
+    }
+
+    .btn-action-group .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
 </style>
 @endsection
 
@@ -389,15 +467,18 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div class="btn-group w-100" role="group">
+                                            <div class="btn-group w-100 btn-action-group" role="group">
 
                                                 {{-- Chat Buttons untuk PPK --}}
                                                 @if(auth()->user()->role == 'ppk')
                                                     {{-- Button Chat Verifikator (Status < 20) --}}
                                                     @if($data->status < 20)
                                                         <a href="{{ route('ppk_pengajuan.chat', [$data->id]) }}"
-                                                           class="btn btn-info btn-sm me-1 position-relative" title="Chat dengan Verifikator">
-                                                            <i class="mdi mdi-chat-processing me-1"></i>Chat
+                                                           class="btn btn-sm me-1 position-relative btn-chat-modern btn-chat-verifikator"
+                                                           title="Chat dengan Verifikator">
+                                                            <span>
+                                                                <i class="mdi mdi-chat-processing"></i>Chat Verifikator
+                                                            </span>
                                                             @if($unreadCount > 0)
                                                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                                                     {{ $unreadCount > 99 ? '99+' : $unreadCount }}
@@ -410,8 +491,11 @@
                                                     {{-- Button Chat Pokja (Status >= 20) --}}
                                                     @if($data->status >= 20)
                                                         <a href="{{ route('ppk_pengajuan.chat', [$data->id]) }}"
-                                                           class="btn btn-success btn-sm me-1 position-relative" title="Chat dengan Pokja Pemilihan">
-                                                            <i class="mdi mdi-chat-multiple me-1"></i>Chat
+                                                           class="btn btn-sm me-1 position-relative btn-chat-modern btn-chat-pokja"
+                                                           title="Chat dengan Pokja Pemilihan">
+                                                            <span>
+                                                                <i class="mdi mdi-forum"></i>Chat Pokja
+                                                            </span>
                                                             @if($unreadCount > 0)
                                                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                                                     {{ $unreadCount > 99 ? '99+' : $unreadCount }}
@@ -424,8 +508,11 @@
                                                 {{-- Chat Button untuk Verifikator --}}
                                                 @elseif(auth()->user()->role == 'verifikator')
                                                     <a href="{{ route('verifikator_pengajuan.chat', [$data->id]) }}"
-                                                       class="btn btn-info btn-sm me-1 position-relative" title="Chat dengan PPK">
-                                                        <i class="mdi mdi-chat me-1"></i>Chat
+                                                       class="btn btn-sm me-1 position-relative btn-chat-modern btn-chat-verifikator"
+                                                       title="Chat dengan PPK">
+                                                        <span>
+                                                            <i class="mdi mdi-message-text"></i>Chat PPK
+                                                        </span>
                                                         @if($unreadCount > 0)
                                                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                                                 {{ $unreadCount > 99 ? '99+' : $unreadCount }}
@@ -437,8 +524,11 @@
                                                 {{-- Chat Button untuk Pokja Pemilihan --}}
                                                 @elseif(auth()->user()->role == 'pokjapemilihan')
                                                     <a href="{{ route('pokjapemilihan_pengajuan.chat', [$data->id]) }}"
-                                                       class="btn btn-success btn-sm me-1 position-relative" title="Chat dengan PPK">
-                                                        <i class="mdi mdi-chat-multiple me-1"></i>Chat
+                                                       class="btn btn-sm me-1 position-relative btn-chat-modern btn-chat-pokja"
+                                                       title="Chat dengan PPK">
+                                                        <span>
+                                                            <i class="mdi mdi-message-reply-text"></i>Chat PPK
+                                                        </span>
                                                         @if($unreadCount > 0)
                                                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                                                 {{ $unreadCount > 99 ? '99+' : $unreadCount }}
@@ -447,10 +537,17 @@
                                                         @endif
                                                     </a>
                                                 @endif
-                                                <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}" class="btn btn-info btn-sm"> PDF</a>
-                                                {{-- <a href="#" class="btn btn-warning btn-sm"> PDF</a> --}}
+                                                <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadpdf',[$data->id]) }}"
+                                                   class="btn btn-info btn-sm"
+                                                   title="Download PDF">
+                                                    <i class="mdi mdi-file-pdf"></i> PDF
+                                                </a>
 
-                                                <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadexcel',[$data->id]) }}" class="btn btn-info btn-sm"> Excel</a>
+                                                <a href="{{ route(auth()->user()->role.'_pengajuan_open_downloadexcel',[$data->id]) }}"
+                                                   class="btn btn-success btn-sm"
+                                                   title="Download Excel">
+                                                    <i class="mdi mdi-file-excel"></i> Excel
+                                                </a>
 
 
 
